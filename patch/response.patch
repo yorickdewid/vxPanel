@@ -1,0 +1,12 @@
+--- http_response.cpp	2014-10-28 22:25:54.000000000 +0100
++++ myver.cpp	2015-11-11 22:48:03.241230637 +0100
+@@ -115,9 +115,6 @@
+ 	finalized_(0)
+ {
+ 	set_content_header("text/html");
+-	if(context_.service().cached_settings().service.disable_xpowered_by==false) {
+-		set_header("X-Powered-By", CPPCMS_PACKAGE_NAME "/" CPPCMS_PACKAGE_VERSION);
+-	}
+ }
+ 
+ response::~response()

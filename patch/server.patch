@@ -1,0 +1,11 @@
+--- http_api.cpp	2014-10-28 22:25:54.000000000 +0100
++++ http_api2.cpp	2015-11-11 22:42:49.617235819 +0100
+@@ -500,7 +500,7 @@
+ 		size_t write_response(io_handler const &h,size_t s)
+ 		{
+ 			char const *addon = 
+-				"Server: CppCMS-Embedded/" CPPCMS_PACKAGE_VERSION "\r\n"
++				"Server: vxDaemon/0.1\r\n"
+ 				"Connection: close\r\n";
+ 
+ 			response_line_.append(addon);
