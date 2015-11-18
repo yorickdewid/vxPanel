@@ -1,4 +1,8 @@
 {
+       	"db" : {
+                //"connection_string" : "sqlite3:db=mb.db;@pool_size=10"
+                "connection_string" : "mysql:database=vxpanel;user=root;password=q;@pool_size=10"
+        },
 	"service" : {
 		"api" : "http",
 		"port" : 8080
@@ -6,7 +10,7 @@
 	"http" : {
 		"script" : "/rpc"
 	},
-	"file_server" : { 
+	"file_server" : {
 		"enable" : true
 	}
 }
