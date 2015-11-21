@@ -72,7 +72,7 @@ std::string master::format_uptime(std::string sec){
 	seconds = seconds % 60;
 	unsigned int secs = seconds;
 
-	os << days " days " << ", " << hours << ":" << mins << ":" << secs << std::endl;
+	os << days << " days " << ", " << hours << ":" << mins << ":" << secs << std::endl;
 	std::string s = os.str();
 	return s;
 }
