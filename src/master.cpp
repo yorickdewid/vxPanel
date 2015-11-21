@@ -4,15 +4,18 @@
 #include <iostream>
 #include <fstream>
 
-#include "master.h"
 #include "config.h"
+#include "exceptions.h"
+#include "backend.h"
+#include "master.h"
 
 /*
  * Bind JSON RPC calls to class methods
  */
 master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 {
-	conn_str_ = settings().get<std::string>("db.connection_string");
+	std::string conn = settings().get<std::string>("db.connection_string");
+	backend c(conn);
 
 	bind("sum", cppcms::rpc::json_method(&master::sum, this), method_role);
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
@@ -20,16 +23,6 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
-}
-
-void master::init()
-{
-	sql.open(conn_str_);
-}
-
-void master::clear()
-{
-	sql.close();
 }
 
 void master::sum(int x, int y)
@@ -104,6 +97,7 @@ void master::system_uptime()
 void master::version()
 {
 	std::ostringstream os;
+
 	os << "VxPanel version " << VERSION;
 	return_result(os.str());
 }
