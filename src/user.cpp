@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "exceptions.h"
+#include "sha1.h"
 #include "backend.h"
 #include "model.h"
 #include "user.h"
@@ -13,7 +14,13 @@ void user::email(std::string email)
 
 void user::password(std::string password)
 {
-	this->_password = password;
+	unsigned char hash[20];
+	char hexstring[41];
+
+	sha1::calc(password.c_str(), password.size(), hash);
+	sha1::toHexString(hash, hexstring);
+
+	this->_password = std::string(hexstring);
 }
 
 void user::save()
@@ -27,6 +34,4 @@ void user::save()
 	stat.exec();
 	uid = stat.last_insert_id();
 	stat.reset();
-
-	std::cout << "Saved" << std::endl;
 }
