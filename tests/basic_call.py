@@ -13,7 +13,7 @@ class bcolors:
 	ENDC = '\033[0m'
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
-
+# TODO CLEAN UP DB after test?
 # Default settings
 url = 'http://localhost:8080/rpc'
 headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
@@ -27,6 +27,7 @@ def result_test(result, expected):
 	if not result:
 		return
 	rs = json.loads(result)
+	print rs
 	if rs['error']:
 		print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 		return
@@ -69,14 +70,13 @@ def test_rpc_new_domain():
 def test_rpc_get_domain():
 	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
 	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
-	result_test(rpc_call(data), '{"domain":{"domainname":"trol.com","registrar":"transip","status":"inactive"}}')
-
+	result_test(rpc_call(data),); #TODO json object comparison
 
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
-test_rpc_new_user() # report nothing when user is present in DB
+test_rpc_new_user()
 test_rpc_new_domain()
 test_rpc_get_domain()

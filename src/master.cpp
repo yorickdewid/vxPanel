@@ -134,6 +134,7 @@ void master::new_user(std::string name)
 	user.email("info@kaas.nl");
 
 	user.save();
+	return_result("OK");
 }
 
 void master::get_user(std::string username)
@@ -159,6 +160,7 @@ void master::new_domain(std::string domain_name)
 	domain.user_id(1);
 
 	domain.save();
+	return_result("OK");
 }
 
 void master::get_domain(std::string domain_name)
