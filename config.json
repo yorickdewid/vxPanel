@@ -1,10 +1,11 @@
 {
-       	"db" : {
-                //"connection_string" : "sqlite3:db=mb.db;@pool_size=10"
-                "connection_string" : "mysql:database=vxpanel;user=root;password=q;@pool_size=10"
-        },
+	"db" : {
+			//"connection_string" : "sqlite3:db=mb.db;@pool_size=10"
+			"connection_string" : "mysql:database=vxpanel;user=root;password=q;@pool_size=5"
+	},
 	"service" : {
 		"api" : "http",
+		"ip"  : "0.0.0.0",
 		"port" : 8080
 	},
 	"http" : {
