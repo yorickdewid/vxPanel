@@ -7,6 +7,8 @@
 #include "config.h"
 #include "exceptions.h"
 #include "backend.h"
+#include "model.h"
+#include "user.h"
 #include "master.h"
 
 /*
@@ -24,6 +26,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
+	bind("new_user", cppcms::rpc::json_method(&master::new_user, this), method_role);
 }
 
 master::~master()
@@ -117,4 +120,14 @@ void master::version()
 void master::db_version()
 {
 	return_result(db->version().c_str());
+}
+
+void master::new_user(std::string name)
+{
+	user user(database(), name);
+
+	user.password("kaas");
+	user.email("info@kaas.nl");
+
+	user.save();
 }

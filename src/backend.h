@@ -4,14 +4,18 @@
 #include <cppdb/frontend.h>
 
 class backend {
-public:
 
+public:
 	backend(std::string &conn);
 	virtual ~backend();
 	virtual bool is_active();
 	virtual void init();
 	virtual void kill();
 	std::string version();
+	cppdb::session session()
+	{
+		return sql;
+	}
 
 protected:
 	cppdb::session sql;

@@ -49,7 +49,7 @@ std::string backend::version()
 	try {
 		cppdb::result res = sql << "SELECT VERSION()";
 		if (!res.next()) {
-			//err
+			//TODO err
 		}
 		res >> version;
 	}

@@ -7,8 +7,8 @@
 #include "backend.h"
 
 class master: public cppcms::rpc::json_rpc_server {
-public:
 
+public:
 	master(cppcms::service &srv);
 	~master();
 	backend& database();
@@ -19,6 +19,7 @@ public:
 	void system_uptime();
 	void version();
 	void db_version();
+	void new_user(std::string name);
 
 protected:
 	std::string format_uptime(std::string sec);

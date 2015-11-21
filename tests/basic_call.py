@@ -24,6 +24,8 @@ def rpc_call(data):
 	return response.read()
 
 def result_test(result, expected):
+	if not result:
+		return
 	rs = json.loads(result)
 	if rs['error']:
 		print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
@@ -54,8 +56,14 @@ def test_rpc_db_version():
 	data = '{"id":0,"method":"db_version","params":[]}'
 	result_test(rpc_call(data), None)
 
+def test_rpc_new_user():
+	print bcolors.OKBLUE + "Testcase: Create new user" + bcolors.ENDC
+	data = '{"id":0,"method":"new_user","params":["kaasie"]}'
+	result_test(rpc_call(data), None)
+
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
+test_rpc_new_user()
