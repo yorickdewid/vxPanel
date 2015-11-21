@@ -16,6 +16,11 @@ void domain::registrar(std::string registrar)
 	this->_registrar = registrar;
 }
 
+void domain::user_id(int uid)
+{
+	this->_uid = uid;
+}
+
 std::string domain::get_status()
 {
 	return this->_status;
@@ -33,35 +38,47 @@ std::string domain::get_domain_name()
 
 void domain::save()
 {
-	cppdb::statement stat;
+	try{
+		cppdb::statement stat;
 
-	stat = db.session() << 
-			"INSERT INTO domain (name, status, registrar) "
-			"VALUES (?, ?, ?)" << name << _status << _registrar;
+		stat = db.session() << 
+			"INSERT INTO domain (name, status, registrar, uid) "
+			"VALUES (?, ?, ?, ?)" << name << _status << _registrar << _uid;
 
-	stat.exec();
-	stat.reset();
+		stat.exec();
+		stat.reset();
 
-	std::cout << "Saved" << std::endl;
+		std::cout << "Saved" << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "exception occured " << e.what();
+	}
 }
 
 void domain::load()
 {
-	cppdb::statement stat;
+	try{
+		cppdb::statement stat;
 
-	stat = db.session() << 
-			"SELECT * FROM domain WHERE name = ?" << name;
-	cppdb::result r = stat.query();
+		stat = db.session() << 
+				"SELECT * FROM domain WHERE name = ?" << name;
+		cppdb::result r = stat.query();
 
-	while(r.next()) {
-  		r.fetch(0,this->name);
-  		r.fetch(1,this->_status);
-  		r.fetch(2,this->_registrar);
-  		r.fetch(3,this->_created);
-    }
+		while(r.next()) {
+	  		r.fetch(0,this->name);
+	  		r.fetch(1,this->_status);
+	  		r.fetch(2,this->_registrar);
+	  		r.fetch(3,this->_created);
+	    }
 
-    stat.reset();
+	    stat.reset();
 
-	std::cout << "Entity loaded " << std::endl;
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "exception occured " << e.what();
+	}
 }
 

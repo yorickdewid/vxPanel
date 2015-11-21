@@ -23,35 +23,59 @@ void user::password(std::string password)
 	this->_password = std::string(hexstring);
 }
 
+std::string user::get_username()
+{
+	return this->name;
+}
+
+std::string user::get_email()
+{
+	return this->_email;
+}
+
 void user::save()
 {
-	cppdb::statement stat;
+	try{
 
-	stat = db.session() << 
-			"INSERT INTO user (username, password, email) "
-			"VALUES (?, ?, ?)" << name << _password << _email;
+		cppdb::statement stat;
 
-	stat.exec();
-	uid = stat.last_insert_id();
-	stat.reset();
+		stat = db.session() << 
+				"INSERT INTO user (username, password, email) "
+				"VALUES (?, ?, ?)" << name << _password << _email;
+
+		stat.exec();
+		uid = stat.last_insert_id();
+		stat.reset();
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "exception occured " << e.what();
+	}
 }
 
 void user::load()
 {
-	cppdb::statement stat;
+	try{
 
-	stat = db.session() << 
+		cppdb::statement stat;
+
+		stat = db.session() << 
 			"SELECT uid,password,email FROM user WHERE username = ?" << name;
-	cppdb::result r = stat.query();
+		cppdb::result r = stat.query();
 
-	while(r.next()) {
-  		r.fetch(0,this->uid);
-  		r.fetch(1,this->_password);
-  		r.fetch(2,this->_email);
-    }
+		while(r.next()) {
+  			r.fetch(0,this->uid);
+  			r.fetch(1,this->_password);
+  			r.fetch(2,this->_email);
+    	}
     
-    stat.reset();
+    	stat.reset();
 
-	std::cout << "Entity loaded " << std::endl;
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "exception occured " << e.what();
+	}
 }
 

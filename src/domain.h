@@ -7,6 +7,7 @@ public:
 	domain(backend& db, std::string domain_name) : model(db), name(domain_name) {};
 	void status(std::string status);
 	void registrar(std::string registrar);
+	void user_id(int uid);
 	void save();
 	void load();
 	std::string get_registrar();
@@ -18,6 +19,7 @@ private:
 	std::string _status;
 	std::string _registrar;
 	std::string _created;
+	int _uid;
 
 };
 

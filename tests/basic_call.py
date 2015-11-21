@@ -61,14 +61,22 @@ def test_rpc_new_user():
 	data = '{"id":0,"method":"new_user","params":["kaasie"]}'
 	result_test(rpc_call(data), None)
 
-def test_rpc_new_user():
+def test_rpc_new_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
 	data = '{"id":0,"method":"new_domain","params":["trol.com"]}'
 	result_test(rpc_call(data), None)
+
+def test_rpc_get_domain():
+	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
+	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
+	result_test(rpc_call(data), '{"domain":{"domainname":"trol.com","registrar":"transip","status":"inactive"}}')
+
 
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
-test_rpc_new_user()
+test_rpc_new_user() # report nothing when user is present in DB
+test_rpc_new_domain()
+test_rpc_get_domain()

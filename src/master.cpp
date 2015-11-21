@@ -28,6 +28,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
 	bind("new_user", cppcms::rpc::json_method(&master::new_user, this), method_role);
+	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
 	bind("new_domain", cppcms::rpc::json_method(&master::new_domain, this), method_role);
 	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
 }
@@ -135,12 +136,27 @@ void master::new_user(std::string name)
 	user.save();
 }
 
+void master::get_user(std::string username)
+{
+	cppcms::json::value json;
+
+	user user(database(), username);
+
+	user.load();
+
+	json["user"]["username"] = user.get_username();
+	json["user"]["email"] =  user.get_email();
+
+	return_result(json);
+}
+
 void master::new_domain(std::string domain_name)
 {
 	domain domain(database(), domain_name);
 
 	domain.status("inactive");
 	domain.registrar("transip");
+	domain.user_id(1);
 
 	domain.save();
 }
@@ -155,7 +171,7 @@ void master::get_domain(std::string domain_name)
 
 	json["domain"]["domainname"] = domain.get_domain_name();
 	json["domain"]["status"] = domain.get_status();
-	json["domain"]["registrar"]=  domain.get_registrar();
+	json["domain"]["registrar"] =  domain.get_registrar();
 
 	return_result(json);
 }

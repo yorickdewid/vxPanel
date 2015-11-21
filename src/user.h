@@ -9,6 +9,8 @@ public:
 	void password(std::string password);
 	void save();
 	void load();
+	std::string get_username();
+	std::string get_email();
 
 private:
 	int uid;
