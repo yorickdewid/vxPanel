@@ -7,6 +7,7 @@ vxpanel:
 	$(CXX) $(CXXFLAGS) -O0 -Wall -g $(SRCDIR)/backend.cpp \
 									$(SRCDIR)/sha1.cpp \
 									$(SRCDIR)/user.cpp \
+									$(SRCDIR)/domain.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 

@@ -8,6 +8,7 @@ public:
 	void email(std::string email);
 	void password(std::string password);
 	void save();
+	void load();
 
 private:
 	int uid;

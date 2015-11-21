@@ -35,3 +35,23 @@ void user::save()
 	uid = stat.last_insert_id();
 	stat.reset();
 }
+
+void user::load()
+{
+	cppdb::statement stat;
+
+	stat = db.session() << 
+			"SELECT uid,password,email FROM user WHERE username = ?" << name;
+	cppdb::result r = stat.query();
+
+	while(r.next()) {
+  		r.fetch(0,this->uid);
+  		r.fetch(1,this->_password);
+  		r.fetch(2,this->_email);
+    }
+    
+    stat.reset();
+
+	std::cout << "Entity loaded " << std::endl;
+}
+

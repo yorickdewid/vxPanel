@@ -20,6 +20,8 @@ public:
 	void version();
 	void db_version();
 	void new_user(std::string name);
+	void new_domain(std::string domain_name);
+	void get_domain(std::string domain_name);
 
 protected:
 	std::string format_uptime(std::string sec);

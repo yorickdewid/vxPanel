@@ -61,6 +61,11 @@ def test_rpc_new_user():
 	data = '{"id":0,"method":"new_user","params":["kaasie"]}'
 	result_test(rpc_call(data), None)
 
+def test_rpc_new_user():
+	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
+	data = '{"id":0,"method":"new_domain","params":["trol.com"]}'
+	result_test(rpc_call(data), None)
+
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()

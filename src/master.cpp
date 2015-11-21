@@ -9,6 +9,7 @@
 #include "backend.h"
 #include "model.h"
 #include "user.h"
+#include "domain.h"
 #include "master.h"
 
 /*
@@ -27,6 +28,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
 	bind("new_user", cppcms::rpc::json_method(&master::new_user, this), method_role);
+	bind("new_domain", cppcms::rpc::json_method(&master::new_domain, this), method_role);
+	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
 }
 
 master::~master()
@@ -131,3 +134,29 @@ void master::new_user(std::string name)
 
 	user.save();
 }
+
+void master::new_domain(std::string domain_name)
+{
+	domain domain(database(), domain_name);
+
+	domain.status("inactive");
+	domain.registrar("transip");
+
+	domain.save();
+}
+
+void master::get_domain(std::string domain_name)
+{
+	cppcms::json::value json;
+
+	domain domain(database(), domain_name);
+
+	domain.load();
+
+	json["domain"]["domainname"] = domain.get_domain_name();
+	json["domain"]["status"] = domain.get_status();
+	json["domain"]["registrar"]=  domain.get_registrar();
+
+	return_result(json);
+}
+
