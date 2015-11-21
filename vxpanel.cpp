@@ -3,6 +3,7 @@
 #include <cppcms/applications_pool.h>
 #include <string>
 
+#include "config.h"
 #include "master.h"
 
 /*
@@ -11,7 +12,7 @@
 int main(int argc, char *argv[])
 {
     try {
-        std::cout << "Starting vxPanel" << std::endl;
+        std::cout << "Starting vxPanel " << VERSION << std::endl;
     	cppcms::service srv(argc,argv);
     	srv.applications_pool().mount(cppcms::applications_factory<master>());
     	srv.run();

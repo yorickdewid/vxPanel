@@ -1,5 +1,5 @@
-#ifndef APPS_MASTER_H
-#define APPS_MASTER_H
+#ifndef MASTER_H
+#define MASTER_H
 
 #include <cppcms/application.h>
 #include <cppcms/rpc_json.h>
@@ -25,5 +25,5 @@ private:
 	std::string conn_str_;
 };
 
-#endif
+#endif /* MASTER_H */
 
