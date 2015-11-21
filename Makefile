@@ -1,9 +1,10 @@
 LIBS=-lcppcms -lcppdb
+SRCDIR=src
 
 all: vxpanel
 
-vxpanel: vxpanel.cpp
-	$(CXX) $(CXXFLAGS) -O0 -Wall -g master.cpp vxpanel.cpp -o vxd ${LIBS}
+vxpanel:
+	$(CXX) $(CXXFLAGS) -O0 -Wall -g $(SRCDIR)/master.cpp $(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 
 test: all
 	./vxd -c config.json &
@@ -11,4 +12,4 @@ test: all
 	killall vxd
 
 clean:
-	rm -fr vxd
+	rm -rf vxd
