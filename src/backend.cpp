@@ -6,16 +6,16 @@
 
 backend::backend(std::string &conn) : conn_str_(conn)
 {
-	backend::init();
+	init();
 
-	if (!backend::is_active()) {
+	if (!is_active()) {
 		throw backend_ex();
 	}
 }
 
 backend::~backend()
 {
-	backend::kill();
+	kill();
 }
 
 void backend::init()
@@ -41,4 +41,20 @@ bool backend::is_active()
 		return false;
 	}
 	return true;
+}
+
+std::string backend::version()
+{
+	std::string version;
+	try {
+		cppdb::result res = sql << "SELECT VERSION()";
+		if (!res.next()) {
+			//err
+		}
+		res >> version;
+	}
+	catch(std::exception const &e) {
+		std::cerr << "ERROR: " << e.what() << std::endl;
+	}
+	return version;
 }

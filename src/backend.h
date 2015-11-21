@@ -7,10 +7,11 @@ class backend {
 public:
 
 	backend(std::string &conn);
-	~backend();
-	bool is_active();
+	virtual ~backend();
+	virtual bool is_active();
 	virtual void init();
 	virtual void kill();
+	std::string version();
 
 protected:
 	cppdb::session sql;

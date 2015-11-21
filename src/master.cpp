@@ -15,7 +15,7 @@
 master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 {
 	std::string conn = settings().get<std::string>("db.connection_string");
-	backend c(conn);
+	db = new backend(conn);
 
 	bind("sum", cppcms::rpc::json_method(&master::sum, this), method_role);
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
@@ -23,6 +23,18 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
+	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
+}
+
+master::~master()
+{
+	if (db)
+		delete db;
+}
+
+backend& master::database()
+{
+	return *db;
 }
 
 void master::sum(int x, int y)
@@ -86,7 +98,7 @@ void master::system_uptime()
 		{
 			std::size_t pos = line.find(" ");
 			std::string s = line.substr(0, pos);
-			result = master::format_uptime(s);
+			result = format_uptime(s);
 		}
 	}
 
@@ -102,3 +114,7 @@ void master::version()
 	return_result(os.str());
 }
 
+void master::db_version()
+{
+	return_result(db->version().c_str());
+}

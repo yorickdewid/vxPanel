@@ -45,11 +45,17 @@ def test_rpc_uptime():
 	result_test(rpc_call(data), None)
 
 def test_rpc_version():
-	print bcolors.OKBLUE + "Testcase: Retrieve system uptime" + bcolors.ENDC
+	print bcolors.OKBLUE + "Testcase: Daemon version" + bcolors.ENDC
 	data = '{"id":0,"method":"version","params":[]}'
 	result_test(rpc_call(data), "VxPanel version 0.1")
+
+def test_rpc_db_version():
+	print bcolors.OKBLUE + "Testcase: Database version" + bcolors.ENDC
+	data = '{"id":0,"method":"db_version","params":[]}'
+	result_test(rpc_call(data), None)
 
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
+test_rpc_db_version()
