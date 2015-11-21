@@ -17,7 +17,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
-	bind("system_uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
+	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 }
 
 void master::init()
@@ -72,7 +72,7 @@ std::string master::format_uptime(std::string sec){
 	seconds = seconds % 60;
 	unsigned int secs = seconds;
 
-	os << "Days " << days << "," << hours << ":" << mins << ":" << secs;
+	os << days " days " << ", " << hours << ":" << mins << ":" << secs << std::endl;
 	std::string s = os.str();
 	return s;
 }
@@ -98,3 +98,4 @@ void master::system_uptime()
 	uptime.close();
 	return_result(result);
 }
+
