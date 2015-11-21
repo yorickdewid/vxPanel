@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include "master.h"
+#include "config.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -18,6 +19,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
+	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 }
 
 void master::init()
@@ -97,5 +99,12 @@ void master::system_uptime()
 
 	uptime.close();
 	return_result(result);
+}
+
+void master::version()
+{
+	std::ostringstream os;
+	os << "VxPanel version " << VERSION;
+	return_result(os.str());
 }
 

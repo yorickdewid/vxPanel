@@ -14,6 +14,7 @@ public:
 	void notify(std::string msg);
 	void both(std::string msg);
 	void system_uptime();
+	void version();
 	virtual void init();
 	virtual void clear();
 

@@ -41,9 +41,15 @@ def test_rpc_sum():
 
 def test_rpc_uptime():
 	print bcolors.OKBLUE + "Testcase: Retrieve system uptime" + bcolors.ENDC
-	data = '{"id":0,"method":"system_uptime","params":[]}'
+	data = '{"id":0,"method":"uptime","params":[]}'
 	result_test(rpc_call(data), None)
+
+def test_rpc_version():
+	print bcolors.OKBLUE + "Testcase: Retrieve system uptime" + bcolors.ENDC
+	data = '{"id":0,"method":"version","params":[]}'
+	result_test(rpc_call(data), "VxPanel version 0.1")
 
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
+test_rpc_version()
