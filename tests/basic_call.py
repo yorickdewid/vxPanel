@@ -71,7 +71,7 @@ def test_rpc_new_domain():
 def test_rpc_get_domain():
 	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
 	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
-	result_test(rpc_call(data),None); #TODO json object comparison
+	result_test(rpc_call(data), None); #TODO json object comparison
 
 # Call the testcases
 test_rpc_sum()
