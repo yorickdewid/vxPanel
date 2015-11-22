@@ -13,9 +13,16 @@ void user::save()
 
 		cppdb::statement stat;
 
-		stat = db.session() << 
-				"INSERT INTO user (username, password, email) "
-				"VALUES (?, ?, ?)" << username << _password << _email;
+		if ( _note.empty() ) {
+			stat = db.session() << 
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
+		}
+		else{
+			stat = db.session() << 
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, note, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _note << _active << _lastlogin;
+		}
 
 		stat.exec();
 		uid = stat.last_insert_id();
@@ -32,17 +39,32 @@ void user::save()
 void user::load()
 {
 	try{
-
+		int tmp_active;
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"SELECT uid,password,email FROM user WHERE username = ?" << username;
+			"SELECT * FROM user WHERE username = ?" << username;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
   			r.fetch(0,this->uid);
   			r.fetch(1,this->_password);
   			r.fetch(2,this->_email);
+  			r.fetch(3,this->_firstname);
+  			r.fetch(4,this->_lastname);
+  			r.fetch(5,this->_country);
+  			r.fetch(6,this->_city);
+  			r.fetch(7,this->_address);
+  			r.fetch(8,this->_postal);
+  			r.fetch(9,this->_note);
+  			r.fetch(10,tmp_active);
+  			if ( tmp_active == 0 ){
+  				this->_active = false;
+  			}
+  			else if ( tmp_active == 1 ){
+  				this->_active = true;
+  			}
+  			r.fetch(11,this->_lastlogin);
     	}
     
     	stat.reset();

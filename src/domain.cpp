@@ -11,8 +11,7 @@ void domain::save()
 	try{
 		cppdb::statement stat;
 
-		if ( this->_vhost_id != -1 )
-		{
+		if ( this->_vhost_id != -1 ) {
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid) "
 				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << _uid << _vhost_id;
