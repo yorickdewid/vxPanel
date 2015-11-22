@@ -6,11 +6,11 @@
 class backend {
 
 public:
-	backend(std::string &conn);
+	backend(std::string& user, std::string& password, std::string& database);
 	virtual ~backend();
 	virtual bool is_active();
-	virtual void init();
-	virtual void kill();
+	void drop();
+	void create();
 	std::string version();
 	cppdb::session session()
 	{
@@ -22,6 +22,9 @@ protected:
 
 private:
 	std::string conn_str_;
+	std::string user;
+	std::string password;
+	std::string database;
 
 };
 

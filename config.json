@@ -1,7 +1,8 @@
 {
 	"db" : {
-			//"connection_string" : "sqlite3:db=mb.db;@pool_size=10"
-			"connection_string" : "mysql:database=vxpanel;user=root;password=q;@pool_size=5"
+		"user" : "root",
+		"password" : "q",
+		"database" : "vxpanel",
 	},
 	"service" : {
 		"api" : "http",

@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `address` varchar(100) NULL DEFAULT NULL,
   `address_number` smallint(6) NULL DEFAULT NULL,
   `postal` varchar(15) NULL DEFAULT NULL,
-  `note` varchar(250) text NULL,
+  `note` text NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `lastlogin` timestamp NULL NULL DEFAULT NULL,

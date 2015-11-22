@@ -17,8 +17,7 @@
  */
 master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 {
-	std::string conn = settings().get<std::string>("db.connection_string");
-	db = new backend(conn);
+	init_backend();
 
 	bind("sum", cppcms::rpc::json_method(&master::sum, this), method_role);
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
@@ -37,6 +36,14 @@ master::~master()
 {
 	if (db)
 		delete db;
+}
+
+void master::init_backend()
+{
+	std::string user = settings().get<std::string>("db.user");
+	std::string password = settings().get<std::string>("db.password");
+	std::string database = settings().get<std::string>("db.database");
+	db = new backend(user, password, database);
 }
 
 backend& master::database()

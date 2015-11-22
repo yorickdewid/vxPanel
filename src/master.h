@@ -29,6 +29,7 @@ protected:
 
 private:
 	backend *db = NULL;
+	void init_backend();
 
 };
 

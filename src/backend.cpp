@@ -1,12 +1,22 @@
 #include <iostream>
+#include <sstream>
+#include <fstream>
 
 #include "config.h"
 #include "exceptions.h"
 #include "backend.h"
 
-backend::backend(std::string &conn) : conn_str_(conn)
+backend::backend(std::string& user, std::string& password, std::string& database) : 
+	user(user),
+	password(password),
+	database(database)
 {
-	init();
+	std::ostringstream poolsize;
+	poolsize << DB_POOLSZ;
+
+	this->conn_str_ = DB_DRIVER ":database=" + database + ";user=" + user + ";password=" + password + ";@pool_size=" + poolsize.str() + "\n"	;
+
+	sql.open(conn_str_);
 
 	if (!is_active()) {
 		throw backend_ex();
@@ -15,17 +25,35 @@ backend::backend(std::string &conn) : conn_str_(conn)
 
 backend::~backend()
 {
-	kill();
-}
-
-void backend::init()
-{
-	sql.open(conn_str_);
-}
-
-void backend::kill()
-{
 	sql.close();
+}
+
+void backend::drop()
+{
+#if 0
+	sql << "DROP DATABASE IF EXISTS " + database << cppdb::exec;
+#endif
+}
+
+void backend::create()
+{
+#if 0
+	std::string transaction;
+	std::ifstream scheme("scheme/create.sql");
+	std::string line;
+
+	if (scheme.is_open()) {
+		while ( getline(scheme, line) )
+		{
+			transaction.append(line);
+			transaction.append("\n");
+		}
+		std::cout << transaction;
+
+		sql << transaction << cppdb::exec;
+		scheme.close();
+	}
+#endif
 }
 
 bool backend::is_active()
