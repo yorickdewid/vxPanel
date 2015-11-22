@@ -4,7 +4,11 @@
 class domain: public model {
 
 public:
-	domain(backend& db, std::string domain_name) : model(db), name(domain_name) {};
+	domain(backend& db, std::string domain_name) :
+		model(db),
+		name(domain_name),
+		_vhost_id(-1)
+	{};
 	
 	void save();
 	void load();
@@ -28,7 +32,7 @@ private:
 	std::string _registrar;
 	std::string _created;
 	int _uid;
-	int _vhost_id = -1;
+	int _vhost_id;
 
 };
 
