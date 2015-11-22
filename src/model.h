@@ -10,6 +10,7 @@ public:
 
 protected:
 	backend& db;
+	bool saved = false;
 
 };
 
