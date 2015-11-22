@@ -40,7 +40,7 @@ public:
 
 	friend std::ostream &operator<<(std::ostream &output, const user &u)
 	{ 
-		output << u.name;
+		output << u.username;
 		return output;
 	}
 
