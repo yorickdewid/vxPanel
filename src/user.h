@@ -1,6 +1,8 @@
 #ifndef USER_H
 #define USER_H
 
+#include <iostream>
+
 class user: public model {
 
 public:
@@ -11,6 +13,11 @@ public:
 	void load();
 	std::string get_username();
 	std::string get_email();
+	friend std::ostream &operator<<(std::ostream &output, const user &u)
+	{ 
+		output << u.name;
+		return output;
+	}
 
 private:
 	int uid;
