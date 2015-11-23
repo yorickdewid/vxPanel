@@ -12,6 +12,7 @@ vxpanel:
 									$(SRCDIR)/ftp_account.cpp \
 									$(SRCDIR)/vhost.cpp \
 									$(SRCDIR)/mailbox.cpp \
+									$(SRCDIR)/subdomain.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 
