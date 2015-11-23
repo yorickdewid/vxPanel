@@ -6,7 +6,7 @@
 class user: public model {
 
 public:
-	user(backend& db, std::string username) : model(db), username(username) {};
+	user(backend& db, std::string username) : model(db), username(username) { this->load(); };
 	user(backend& db, int uid) : model(db), uid(uid) {};
 	
 	void save();

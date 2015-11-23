@@ -168,8 +168,6 @@ void master::new_domain(std::string domain_name,std::string username)
 	domain.registrar("transip");
 
 	domain.set_user(std::shared_ptr<user>(new user(database(),username)));
-	domain.get_user().load(); /* this needs an elegant fix */
-	std::cout << "We got " << domain.get_user().get_uid() << std::endl;
 
 	domain.save();
 	return_result("OK");

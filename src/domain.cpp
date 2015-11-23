@@ -20,7 +20,6 @@ void domain::save()
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid) "
 				"VALUES (?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid();
-			std::cout << "Uid : " << get_user().get_uid() << "Username : " << get_user().get_username() << std::endl;
 		}
 
 		stat.exec();

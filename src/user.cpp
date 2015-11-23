@@ -10,7 +10,6 @@
 void user::save()
 {
 	try{
-
 		cppdb::statement stat;
 
 		if ( _note.empty() ) {
