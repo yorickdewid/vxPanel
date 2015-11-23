@@ -21,7 +21,7 @@ public:
 	void db_version();
 	void new_user(std::string name);
 	void get_user(std::string name);
-	void new_domain(std::string domain_name);
+	void new_domain(std::string domain_name,std::string username);
 	void get_domain(std::string domain_name);
 	void create_dns(std::string address, std::string domain_name);
 

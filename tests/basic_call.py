@@ -66,7 +66,7 @@ def test_rpc_new_user():
 
 def test_rpc_new_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
-	data = '{"id":0,"method":"new_domain","params":["trol.com"]}'
+	data = '{"id":0,"method":"new_domain","params":["trol.com","kaasie"]}'
 	result_test(rpc_call(data), None)
 
 def test_rpc_get_domain():

@@ -146,6 +146,11 @@ void user::lastlogin(std::string lastlogin)
 	this->_lastlogin = lastlogin;
 }
 
+int user::get_uid()
+{
+	return uid;
+}
+
 std::string user::get_username()
 {
 	return this->username;

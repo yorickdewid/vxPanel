@@ -160,13 +160,16 @@ void master::get_user(std::string username)
 	return_result(json);
 }
 
-void master::new_domain(std::string domain_name)
+void master::new_domain(std::string domain_name,std::string username)
 {
 	domain domain(database(), domain_name);
 
 	domain.status("inactive");
 	domain.registrar("transip");
-	domain.user_id(1);
+
+	domain.set_user(std::shared_ptr<user>(new user(database(),username)));
+	domain.get_user().load(); /* this needs an elegant fix */
+	std::cout << "We got " << domain.get_user().get_uid() << std::endl;
 
 	domain.save();
 	return_result("OK");
@@ -189,13 +192,13 @@ void master::get_domain(std::string domain_name)
 
 void master::create_dns(std::string address, std::string domain_name)
 {
-	/*std::unique_ptr<domain> domain_obj(new domain(database(),domain_name));
+	/*std::shared_ptr<domain> domain_obj(new domain(database(),domain_name));
 	will not work because pointer is destroyed when passsed to set_domain
 	*/
 	dns dns(database(),0);
 
 	dns.set_address(address);
-	dns.set_domain(std::unique_ptr<domain>(new domain(database(),domain_name)));
+	dns.set_domain(std::shared_ptr<domain>(new domain(database(),domain_name)));
 
 	dns.save();
 

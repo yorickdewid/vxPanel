@@ -1,5 +1,6 @@
 #ifndef DOMAIN_H
 #define DOMAIN_H
+#include "user.h"
 
 class domain: public model {
 
@@ -16,14 +17,14 @@ public:
 	/* Setters */
 	void status(std::string status);
 	void registrar(std::string registrar);
-	void user_id(int uid);
+	void set_user(std::shared_ptr<user> user);
 	void vhost_id(int vhost_id);
 
 	std::string get_domain_name();
 	std::string get_status();
 	std::string get_registrar();
 	std::string get_created();
-	int get_user_id();
+	user get_user();
 	int get_vhost_id();
 
 private:
@@ -31,8 +32,8 @@ private:
 	std::string _status;
 	std::string _registrar;
 	std::string _created;
-	int _uid;
-	int _vhost_id;
+	std::shared_ptr<user> _user;
+	int _vhost_id; /* todo vhost object */
 
 };
 

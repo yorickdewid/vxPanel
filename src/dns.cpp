@@ -45,7 +45,7 @@ void dns::load()
 	  		r.fetch(2,this->_created);
 	  		r.fetch(3,domain_name);
 	  		if ( !domain_name.empty() ) {
-	  			set_domain(std::unique_ptr<domain>(new domain(db,domain_name)));
+	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
 	    }
 
@@ -66,7 +66,7 @@ void dns::set_address(std::string address)
 	this->_address = address;
 }
 
-void dns::set_domain(std::unique_ptr<domain> domain)
+void dns::set_domain(std::shared_ptr<domain> domain)
 {
 	this->_domain.swap(domain);
 }

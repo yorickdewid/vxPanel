@@ -5,6 +5,7 @@
 #include "backend.h"
 #include "model.h"
 #include "domain.h"
+#include "user.h"
 
 void domain::save()
 {
@@ -14,11 +15,12 @@ void domain::save()
 		if ( this->_vhost_id != -1 ) {
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid) "
-				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << _uid << _vhost_id;
+				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost_id;
 		}else	{
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid) "
-				"VALUES (?, ?, ?, ?)" << name << _status << _registrar << _uid;
+				"VALUES (?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid();
+			std::cout << "Uid : " << get_user().get_uid() << "Username : " << get_user().get_username() << std::endl;
 		}
 
 		stat.exec();
@@ -38,6 +40,7 @@ void domain::load()
 {
 	try{
 		cppdb::statement stat;
+		int uid;
 
 		stat = db.session() << 
 				"SELECT * FROM domain WHERE name = ?" << name;
@@ -48,7 +51,8 @@ void domain::load()
 	  		r.fetch(1,this->_status);
 	  		r.fetch(2,this->_registrar);
 	  		r.fetch(3,this->_created);
-	  		r.fetch(4,this->_uid);
+	  		r.fetch(4,uid);
+	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
 	  		if(r.fetch(5,this->_vhost_id) == false){
 	  			this->_vhost_id = -1;
 	  		}
@@ -76,9 +80,9 @@ void domain::registrar(std::string registrar)
 	this->_registrar = registrar;
 }
 
-void domain::user_id(int uid)
+void domain::set_user(std::shared_ptr<user> user)
 {
-	this->_uid = uid;
+	this->_user.swap(user);
 }
 
 void domain::vhost_id(int vhost_id)
@@ -106,9 +110,9 @@ std::string domain::get_created()
 	return this->_registrar;
 }
 
-int domain::get_user_id()
+user domain::get_user()
 {
-	return this->_uid;
+	return *this->_user;
 }
 
 int domain::get_vhost_id()

@@ -7,6 +7,7 @@ class user: public model {
 
 public:
 	user(backend& db, std::string username) : model(db), username(username) {};
+	user(backend& db, int uid) : model(db), uid(uid) {};
 	
 	void save();
 	void load();
@@ -25,6 +26,7 @@ public:
 	void active(bool active);
 	void lastlogin(std::string lastlogin);
 
+	int get_uid();
 	std::string get_username();
 	std::string get_password();
 	std::string get_email();

@@ -46,7 +46,7 @@ void ftp_account::load()
 	  		r.fetch(3,this->_created);
 	  		r.fetch(4,domain_name);
 	  		if ( !domain_name.empty() ) {
-	  			set_domain(std::unique_ptr<domain>(new domain(db,domain_name)));
+	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
 	    }
 
@@ -72,7 +72,7 @@ void ftp_account::set_permissions(std::string permissions)
 	this->_permissions = permissions;
 }
 
-void ftp_account::set_domain(std::unique_ptr<domain> domain)
+void ftp_account::set_domain(std::shared_ptr<domain> domain)
 {
 	this->_domain.swap(domain);
 }

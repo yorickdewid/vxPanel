@@ -15,7 +15,7 @@ public:
 
 	void set_password(std::string address);
 	void set_permissions(std::string _permissions);
-	void set_domain(std::unique_ptr<domain> domain);
+	void set_domain(std::shared_ptr<domain> domain);
 
 	std::string get_username();
 	std::string get_password();
@@ -28,7 +28,7 @@ private:
 	std::string _password;
 	std::string _permissions; /* e.g WO, RO */
 	std::string _created;
-	std::unique_ptr<domain> _domain; /* auto_ptr deprecated */
+	std::shared_ptr<domain> _domain; /* auto_ptr deprecated */
 
 };
 
