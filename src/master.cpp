@@ -27,9 +27,9 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
-	bind("new_user", cppcms::rpc::json_method(&master::new_user, this), method_role);
+	bind("new_user", cppcms::rpc::json_method(&master::create_user, this), method_role);
 	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
-	bind("new_domain", cppcms::rpc::json_method(&master::new_domain, this), method_role);
+	bind("new_domain", cppcms::rpc::json_method(&master::create_domain, this), method_role);
 	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
 	bind("create_dns", cppcms::rpc::json_method(&master::create_dns, this), method_role);
 }
@@ -135,39 +135,41 @@ void master::db_version()
 	return_result(db->version().c_str());
 }
 
-void master::new_user(std::string name)
+void master::create_user(std::string username)
 {
-	user user(database(), name);
+	user user(database());
 
-	user.password("kaas");
-	user.email("info@kaas.nl");
+	user.set_username(username);
+	user.set_password("kaas");
+	user.set_email("info@kaas.nl");
 
 	user.save();
 	return_result("OK");
 }
 
-void master::get_user(std::string username)
+void master::get_user(int uid)
 {
 	cppcms::json::value json;
 
-	user user(database(), username);
+	user user(database(), uid);
 
 	user.load();
 
 	json["user"]["username"] = user.get_username();
+	json["user"]["password"] = user.get_password();
 	json["user"]["email"] =  user.get_email();
 
 	return_result(json);
 }
 
-void master::new_domain(std::string domain_name,std::string username)
+void master::create_domain(std::string domain_name,int uid)
 {
 	domain domain(database(), domain_name);
 
 	domain.status("inactive");
 	domain.registrar("transip");
 
-	domain.set_user(std::shared_ptr<user>(new user(database(),username)));
+	domain.set_user(std::shared_ptr<user>(new user(database(),uid)));
 
 	domain.save();
 	return_result("OK");
@@ -190,9 +192,6 @@ void master::get_domain(std::string domain_name)
 
 void master::create_dns(std::string address, std::string domain_name)
 {
-	/*std::shared_ptr<domain> domain_obj(new domain(database(),domain_name));
-	will not work because pointer is destroyed when passsed to set_domain
-	*/
 	dns dns(database(),0);
 
 	dns.set_address(address);

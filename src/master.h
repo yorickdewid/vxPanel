@@ -19,9 +19,9 @@ public:
 	void system_uptime();
 	void version();
 	void db_version();
-	void new_user(std::string name);
-	void get_user(std::string name);
-	void new_domain(std::string domain_name,std::string username);
+	void create_user(std::string username);
+	void get_user(int uid);
+	void create_domain(std::string domain_name,int uid);
 	void get_domain(std::string domain_name);
 	void create_dns(std::string address, std::string domain_name);
 

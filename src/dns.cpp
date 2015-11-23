@@ -13,8 +13,8 @@ void dns::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO dns (id, address, domain_name) "
-			"VALUES (?, ?, ?)" << id << _address << _domain->get_domain_name();
+			"INSERT INTO dns (address, domain_name) "
+			"VALUES (?, ?)" << _address << _domain->get_domain_name();
 
 		stat.exec();
 		stat.reset();

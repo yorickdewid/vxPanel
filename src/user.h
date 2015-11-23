@@ -6,25 +6,26 @@
 class user: public model {
 
 public:
-	user(backend& db, std::string username) : model(db), username(username) { this->load(); };
-	user(backend& db, int uid) : model(db), uid(uid) {};
+	user(backend& db, int uid) : model(db), uid(uid) { this->load(); };
+	user(backend& db) : model(db) {};
 	
 	void save();
 	void load();
 
 	/* Setters */
-	void email(std::string email);
-	void password(std::string password);
-	void firstname(std::string firstname);
-	void lastname(std::string lastname);
-	void country(std::string country);
-	void city(std::string city);
-	void address(std::string address);
-	void postal(std::string postal);
-	void note(std::string note);
-	void user_type(std::string user_type);
-	void active(bool active);
-	void lastlogin(std::string lastlogin);
+	void set_username(std::string username);
+	void set_email(std::string email);
+	void set_password(std::string password);
+	void set_firstname(std::string firstname);
+	void set_lastname(std::string lastname);
+	void set_country(std::string country);
+	void set_city(std::string city);
+	void set_address(std::string address);
+	void set_postal(std::string postal);
+	void set_note(std::string note);
+	void set_user_type(std::string user_type);
+	void set_active(bool active);
+	void set_lastlogin(std::string lastlogin);
 
 	int get_uid();
 	std::string get_username();

@@ -42,7 +42,7 @@ void user::load()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"SELECT * FROM user WHERE username = ?" << username;
+			"SELECT * FROM user WHERE uid = ?" << uid;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
@@ -79,12 +79,17 @@ void user::load()
 	}
 }
 
-void user::email(std::string email)
+void user::set_username(std::string username)
+{
+	this->username = username;
+}
+
+void user::set_email(std::string email)
 {
 	this->_email = email;
 }
 
-void user::password(std::string password)
+void user::set_password(std::string password)
 {
 	unsigned char hash[20];
 	char hexstring[41];
@@ -95,52 +100,52 @@ void user::password(std::string password)
 	this->_password = std::string(hexstring);
 }
 
-void user::firstname(std::string firstname)
+void user::set_firstname(std::string firstname)
 {
 	this->_firstname = firstname;
 }
 
-void user::lastname(std::string lastname)
+void user::set_lastname(std::string lastname)
 {
 	this->_lastname = lastname;
 }
 
-void user::country(std::string country)
+void user::set_country(std::string country)
 {
 	this->_country = country;
 }
 
-void user::city(std::string city)
+void user::set_city(std::string city)
 {
 	this->_city = city;
 }
 
-void user::address(std::string address)
+void user::set_address(std::string address)
 {
 	this->_address = address;
 }
 
-void user::postal(std::string postal)
+void user::set_postal(std::string postal)
 {
 	this->_postal = postal;
 }
 
-void user::note(std::string note)
+void user::set_note(std::string note)
 {
 	this->_note = note;
 }
 
-void user::user_type(std::string user_type)
+void user::set_user_type(std::string user_type)
 {
 	this->_user_type = user_type;
 }
 
-void user::active(bool active)
+void user::set_active(bool active)
 {
 	this->_active = active;
 }
 
-void user::lastlogin(std::string lastlogin)
+void user::set_lastlogin(std::string lastlogin)
 {
 	this->_lastlogin = lastlogin;
 }
