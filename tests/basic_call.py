@@ -73,6 +73,11 @@ def test_rpc_get_domain():
 	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_create_dns():
+	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
+	data = '{"id":0,"method":"create_dns","params":["A www trol.com","trol.com"]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
@@ -81,3 +86,4 @@ test_rpc_db_version()
 test_rpc_new_user()
 test_rpc_new_domain()
 test_rpc_get_domain()
+test_rpc_create_dns();

@@ -16,7 +16,7 @@ void user::save()
 		if ( _note.empty() ) {
 			stat = db.session() << 
 				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
 		}
 		else{
 			stat = db.session() << 

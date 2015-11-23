@@ -153,6 +153,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `address_number` smallint(6) NULL DEFAULT NULL,
   `postal` varchar(15) NULL DEFAULT NULL,
   `note` text NULL,
+  `user_type` enum('administrator','reseller','user') NOT NULL DEFAULT 'user',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `lastlogin` timestamp NULL NULL DEFAULT NULL,

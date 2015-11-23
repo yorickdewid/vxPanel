@@ -10,6 +10,7 @@
 #include "model.h"
 #include "user.h"
 #include "domain.h"
+#include "dns.h"
 #include "master.h"
 
 /*
@@ -30,6 +31,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
 	bind("new_domain", cppcms::rpc::json_method(&master::new_domain, this), method_role);
 	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
+	bind("create_dns", cppcms::rpc::json_method(&master::create_dns, this), method_role);
 }
 
 master::~master()
@@ -183,5 +185,20 @@ void master::get_domain(std::string domain_name)
 	json["domain"]["registrar"] =  domain.get_registrar();
 
 	return_result(json);
+}
+
+void master::create_dns(std::string address, std::string domain_name)
+{
+	/*std::unique_ptr<domain> domain_obj(new domain(database(),domain_name));
+	will not work because pointer is destroyed when passsed to set_domain
+	*/
+	dns dns(database(),0);
+
+	dns.set_address(address);
+	dns.set_domain(std::unique_ptr<domain>(new domain(database(),domain_name)));
+
+	dns.save();
+
+	return_result("OK");
 }
 
