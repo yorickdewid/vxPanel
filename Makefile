@@ -15,7 +15,7 @@ vxpanel:
 
 test: all
 	./vxd -c config.json &
-	python tests/pre_run.py
+	python tests/pre_run.py config.json &
 	python tests/basic_call.py
 	killall vxd
 

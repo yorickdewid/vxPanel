@@ -2,13 +2,14 @@
 
 import json
 import MySQLdb as mdb
+import sys
 
-def open_config_file():
-	file = open("config.json","r")
+def open_config_file(configname):
+	file = open(configname,"r")
 	config = json.loads(file.read());
 	return config["db"]
 
-config = open_config_file()
+config = open_config_file(sys.argv[1])
 
 def open_conn():
 	global config
