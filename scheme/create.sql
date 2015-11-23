@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `dbuser_db` (
 
 
 CREATE TABLE IF NOT EXISTS `dns` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `address` varchar(500) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `ftp_account` (
 
 
 CREATE TABLE IF NOT EXISTS `mailbox` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `address` varchar(200) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 
 CREATE TABLE IF NOT EXISTS `shell` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `uid` int(11) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 
 CREATE TABLE IF NOT EXISTS `vhost` (
-  `id` int(11) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `custom_config` text NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
