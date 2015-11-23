@@ -13,6 +13,7 @@ vxpanel:
 									$(SRCDIR)/vhost.cpp \
 									$(SRCDIR)/mailbox.cpp \
 									$(SRCDIR)/subdomain.cpp \
+									$(SRCDIR)/shell.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 
