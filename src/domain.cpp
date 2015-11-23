@@ -30,7 +30,7 @@ void domain::save()
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what();
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -62,7 +62,7 @@ void domain::load()
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what();
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 

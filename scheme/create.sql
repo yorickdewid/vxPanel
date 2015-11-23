@@ -79,12 +79,12 @@ CREATE TABLE IF NOT EXISTS `domain` (
 
 
 CREATE TABLE IF NOT EXISTS `ftp_account` (
-  `name` varchar(50) NOT NULL,
+  `username` varchar(50) NOT NULL,
   `password` varchar(100) NOT NULL,
-  `permissions` int(4) NOT NULL,
+  `permissions` char(2) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`name`),
+  PRIMARY KEY (`username`),
   KEY `FK_ftp_account_domain` (`domain_name`),
   CONSTRAINT `FK_ftp_account_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

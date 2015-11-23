@@ -2,7 +2,7 @@
 	"db" : {
 		"user" : "root",
 		"password" : "q",
-		"database" : "vxpanel",
+		"database" : "vxpanel"
 	},
 	"service" : {
 		"api" : "http",

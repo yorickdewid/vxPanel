@@ -3,6 +3,8 @@
 import urllib
 import urllib2
 import json
+import time
+import MySQLdb as mdb
 
 class bcolors:
 	HEADER = '\033[95m'
@@ -13,10 +15,11 @@ class bcolors:
 	ENDC = '\033[0m'
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
-# TODO CLEAN UP DB after test?
 # Default settings
 url = 'http://localhost:8080/rpc'
 headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
+
+time.sleep(1)
 
 def rpc_call(data):
 	req = urllib2.Request(url, data, headers)
@@ -27,12 +30,10 @@ def result_test(result, expected):
 	if not result:
 		return
 	rs = json.loads(result)
-	print rs
 	if rs['error']:
 		print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 		return
 	if expected:
-		print rs['result']
 		if rs['result'] != expected:
 			print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 			return

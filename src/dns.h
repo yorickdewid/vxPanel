@@ -16,6 +16,11 @@ public:
 	void set_address(std::string address);
 	void set_domain(std::unique_ptr<domain> domain);
 
+	int get_id();
+	std::string get_address();
+	std::string get_created();
+	domain get_domain();
+
 private:
 	int id;
 	std::string _address;
