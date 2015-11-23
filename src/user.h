@@ -21,6 +21,7 @@ public:
 	void address(std::string address);
 	void postal(std::string postal);
 	void note(std::string note);
+	void user_type(std::string user_type);
 	void active(bool active);
 	void lastlogin(std::string lastlogin);
 
@@ -34,6 +35,7 @@ public:
 	std::string get_address();
 	std::string get_postal();
 	std::string get_note();
+	std::string get_user_type();
 	bool get_active();
 	std::string get_created(); /* no altering */
 	std::string get_lastlogin();
@@ -56,6 +58,7 @@ private:
 	std::string _address;
 	std::string _postal;
 	std::string _note;
+	std::string _user_type;
 	bool _active;
 	std::string _created;
 	std::string _lastlogin;

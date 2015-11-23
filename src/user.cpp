@@ -15,13 +15,13 @@ void user::save()
 
 		if ( _note.empty() ) {
 			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, user_type, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
 		}
 		else{
 			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, note, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _note << _active << _lastlogin;
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, note, user_type, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _note  << _user_type << _active << _lastlogin;
 		}
 
 		stat.exec();
@@ -57,14 +57,15 @@ void user::load()
   			r.fetch(7,this->_address);
   			r.fetch(8,this->_postal);
   			r.fetch(9,this->_note);
-  			r.fetch(10,tmp_active);
+  			r.fetch(10,this->_user_type);
+  			r.fetch(11,tmp_active);
   			if ( tmp_active == 0 ){
   				this->_active = false;
   			}
   			else if ( tmp_active == 1 ){
   				this->_active = true;
   			}
-  			r.fetch(11,this->_lastlogin);
+  			r.fetch(12,this->_lastlogin);
     	}
     
     	stat.reset();
@@ -130,6 +131,11 @@ void user::note(std::string note)
 	this->_note = note;
 }
 
+void user::user_type(std::string user_type)
+{
+	this->_user_type = user_type;
+}
+
 void user::active(bool active)
 {
 	this->_active = active;
@@ -188,6 +194,11 @@ std::string user::get_postal()
 std::string user::get_note()
 {
 	return this->_note;
+}
+
+std::string user::get_user_type()
+{
+	return this->_user_type;
 }
 
 bool user::get_active()
