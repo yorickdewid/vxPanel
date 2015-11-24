@@ -36,7 +36,7 @@ void ftp_account::load()
 		std::string domain_name;
 
 		stat = db.session() << 
-				"SELECT * FROM dns WHERE username = ?" << username;
+				"SELECT * FROM ftp_account WHERE username = ?" << username;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
