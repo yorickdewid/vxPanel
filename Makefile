@@ -15,6 +15,7 @@ vxpanel:
 									$(SRCDIR)/subdomain.cpp \
 									$(SRCDIR)/shell.cpp \
 									$(SRCDIR)/settings.cpp \
+									$(SRCDIR)/database_type.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 
