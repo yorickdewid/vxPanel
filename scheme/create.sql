@@ -14,7 +14,6 @@
 CREATE DATABASE IF NOT EXISTS `vxpanel` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `vxpanel`;
 
-
 -- Structuur van  tabel vxpanel.dns wordt geschreven
 CREATE TABLE IF NOT EXISTS `dns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -27,7 +26,6 @@ CREATE TABLE IF NOT EXISTS `dns` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporteren was gedeselecteerd
-
 
 -- Structuur van  tabel vxpanel.domain wordt geschreven
 CREATE TABLE IF NOT EXISTS `domain` (
@@ -46,7 +44,6 @@ CREATE TABLE IF NOT EXISTS `domain` (
 
 -- Data exporteren was gedeselecteerd
 
-
 -- Structuur van  tabel vxpanel.ftp_account wordt geschreven
 CREATE TABLE IF NOT EXISTS `ftp_account` (
   `username` varchar(50) NOT NULL,
@@ -64,7 +61,6 @@ CREATE TABLE IF NOT EXISTS `ftp_account` (
 
 -- Data exporteren was gedeselecteerd
 
-
 -- Structuur van  tabel vxpanel.mailbox wordt geschreven
 CREATE TABLE IF NOT EXISTS `mailbox` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -77,7 +73,6 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporteren was gedeselecteerd
-
 
 -- Structuur van  tabel vxpanel.settings wordt geschreven
 CREATE TABLE IF NOT EXISTS `settings` (
@@ -92,7 +87,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- Data exporteren was gedeselecteerd
 
-
 -- Structuur van  tabel vxpanel.shell wordt geschreven
 CREATE TABLE IF NOT EXISTS `shell` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -104,7 +98,6 @@ CREATE TABLE IF NOT EXISTS `shell` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporteren was gedeselecteerd
-
 
 -- Structuur van  tabel vxpanel.subdomain wordt geschreven
 CREATE TABLE IF NOT EXISTS `subdomain` (
@@ -120,7 +113,6 @@ CREATE TABLE IF NOT EXISTS `subdomain` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporteren was gedeselecteerd
-
 
 -- Structuur van  tabel vxpanel.user wordt geschreven
 CREATE TABLE IF NOT EXISTS `user` (
@@ -145,7 +137,6 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 -- Data exporteren was gedeselecteerd
 
-
 -- Structuur van  tabel vxpanel.user_db wordt geschreven
 CREATE TABLE IF NOT EXISTS `user_db` (
   `name` varchar(100) NOT NULL,
@@ -161,29 +152,6 @@ CREATE TABLE IF NOT EXISTS `user_db` (
 
 -- Data exporteren was gedeselecteerd
 
-
--- Structuur van  tabel vxpanel.user_dbuser_db wordt geschreven
-CREATE TABLE IF NOT EXISTS `user_dbuser_db` (
-  `dbuser_name` varchar(50) NOT NULL,
-  `db_name` varchar(100) NOT NULL,
-  PRIMARY KEY (`dbuser_name`,`db_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- Data exporteren was gedeselecteerd
-
-
--- Structuur van  tabel vxpanel.user_db_type wordt geschreven
-CREATE TABLE IF NOT EXISTS `user_db_type` (
-  `name` varchar(50) NOT NULL,
-  PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-/*!40000 ALTER TABLE `user_db_type` DISABLE KEYS */;
-INSERT INTO `user_db_type` (`name`) VALUES
-  ('mysql'),
-  ('postgresql');
-/*!40000 ALTER TABLE `user_db_type` ENABLE KEYS */;
-
 -- Structuur van  tabel vxpanel.user_db_user wordt geschreven
 CREATE TABLE IF NOT EXISTS `user_db_user` (
   `name` varchar(50) NOT NULL,
@@ -198,6 +166,30 @@ CREATE TABLE IF NOT EXISTS `user_db_user` (
 
 -- Data exporteren was gedeselecteerd
 
+-- Structuur van  tabel vxpanel.user_dbuser_db wordt geschreven
+CREATE TABLE IF NOT EXISTS `user_dbuser_db` (
+  `db_username` varchar(50) NOT NULL,
+  `db_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`db_username`,`db_name`),
+  KEY `FK_db_username` (`db_username`),
+  KEY `FK_db_name` (`db_name`),
+  CONSTRAINT `FK_db_username` FOREIGN KEY (`db_username`) REFERENCES `user_db_user` (`name`) ON UPDATE CASCADE,
+  CONSTRAINT `FK_db_name` FOREIGN KEY (`db_name`) REFERENCES `user_db` (`name`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporteren was gedeselecteerd
+
+-- Structuur van  tabel vxpanel.user_db_type wordt geschreven
+CREATE TABLE IF NOT EXISTS `user_db_type` (
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*!40000 ALTER TABLE `user_db_type` DISABLE KEYS */;
+INSERT INTO `user_db_type` (`name`) VALUES
+  ('mysql'),
+  ('postgresql');
+/*!40000 ALTER TABLE `user_db_type` ENABLE KEYS */;
 
 -- Structuur van  tabel vxpanel.vhost wordt geschreven
 CREATE TABLE IF NOT EXISTS `vhost` (

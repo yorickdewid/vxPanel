@@ -22,6 +22,7 @@
 #include "database.h"
 #include "database_user.h"
 #include "database_type.h"
+#include "user_dbuser_db.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -209,7 +210,9 @@ void master::create_ftp_account(std::string ftp_username, std::string password, 
 
 	ftp_account.set_password(password);
 	ftp_account.set_permissions(permissions);
-	ftp_account.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+	std::shared_ptr<user> point(new user(get_database(),uid));
+	ftp_account.set_user(point);
 
 	ftp_account.save();
 
@@ -290,7 +293,7 @@ void master::create_database_user(std::string name, std::string password, std::s
 	return_result("OK");
 }
 
-void master::create_database(std::string db_name, std::string db_type, int uid)
+void master::create_database(std::string db_name, std::string db_type, std::string db_username, int uid)
 {
 	try{
 		database database(get_database(),db_name);
@@ -300,7 +303,13 @@ void master::create_database(std::string db_name, std::string db_type, int uid)
 
 		database.save();
 
-		return_result("OK");
+		/* now connect the db_username and db_name */
+		user_dbuser_db connect(get_database(),db_username,db_name);
+		connect.save();
+
+		if ( connect.get_saved() ) {
+			return_result("OK");
+		}
 	}
 	catch(std::exception &e)
 	{

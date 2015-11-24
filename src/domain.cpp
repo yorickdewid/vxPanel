@@ -52,7 +52,7 @@ void domain::load()
 	  		r.fetch(3,this->_created);
 	  		r.fetch(4,uid);
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
-	  		if(r.fetch(5,this->_vhost_id) == false){
+	  		if(r.fetch(5,this->_vhost_id) == false){ /* TODO replace with vhost object) */
 	  			this->_vhost_id = -1;
 	  		}
 	    }

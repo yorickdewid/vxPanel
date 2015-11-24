@@ -15,7 +15,6 @@ void mailbox::save()
 		stat = db.session() << 
 			"INSERT INTO mailbox (address, domain_name) "
 			"VALUES (?, ?)" << _address << _domain->get_domain_name();
-
 		stat.exec();
 		stat.reset();
 

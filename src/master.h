@@ -30,7 +30,7 @@ public:
 	void create_subdomain(std::string subdomain_name, std::string domain_name, int uid);
 	void create_setting(std::string key, std::string value, bool default_, std::string description);
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
-	void create_database(std::string db_name, std::string db_type, int uid);
+	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
 
 	void get_user(int uid);
 	void get_domain(std::string domain_name,int uid);

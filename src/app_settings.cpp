@@ -12,9 +12,9 @@ void app_settings::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO app_settings (key,value,default,description) "
-			"VALUES (?, ?, ?)" << key << _value << _default << _description;
-
+			"INSERT INTO settings (`key`,value,`default`,description) "
+			"VALUES (?, ?, ?, ?)" << key << _value << _default << _description;
+			
 		stat.exec();
 		stat.reset();
 
@@ -35,7 +35,7 @@ void app_settings::load()
 		int tmp_default;
 
 		stat = db.session() << 
-				"SELECT * FROM app_settings WHERE key = ?" << key;
+				"SELECT * FROM settings WHERE key = ?" << key;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {

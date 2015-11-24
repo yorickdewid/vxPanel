@@ -6,7 +6,7 @@
 class user: public model {
 
 public:
-	user(backend& db, int uid) : model(db), uid(uid) { this->load(); };
+	user(backend& db, int uid) : model(db), uid(uid) { /*this->load(); */ };
 	user(backend& db) : model(db) {};
 	
 	void save();

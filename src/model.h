@@ -11,6 +11,8 @@ public:
 	virtual void save() = 0;
 	virtual void load() = 0;
 
+	bool get_saved(){ return this->saved; };
+
 protected:
 	backend& db;
 	bool saved;

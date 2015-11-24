@@ -6,15 +6,22 @@
 #include "model.h"
 #include "ftp_account.h"
 #include "domain.h"
+#include "user.h"
 
 void ftp_account::save()
 {
 	try{
 		cppdb::statement stat;
 
-		stat = db.session() << 
+		if ( _domain ) {
+			stat = db.session() << 
 			"INSERT INTO ftp_account (username, password, permissions, domain_name , uid) "
 			"VALUES (?, ?, ?, ?, ?)" << username << _password << _permissions << _domain->get_domain_name() << _user->get_uid();
+		}else{
+			stat = db.session() << 
+			"INSERT INTO ftp_account (username, password, permissions, uid) "
+			"VALUES (?, ?, ?, ?)" << username << _password << _permissions << _user->get_uid();
+		}
 
 		stat.exec();
 		stat.reset();

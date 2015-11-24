@@ -18,6 +18,7 @@ vxpanel:
 									$(SRCDIR)/database_type.cpp \
 									$(SRCDIR)/database_user.cpp \
 									$(SRCDIR)/database.cpp \
+									$(SRCDIR)/user_dbuser_db.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 
