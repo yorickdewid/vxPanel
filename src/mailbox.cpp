@@ -7,8 +7,6 @@
 #include "mailbox.h"
 #include "domain.h"
 
-using namespace std;
-
 void mailbox::save()
 {
 	try{
@@ -23,11 +21,11 @@ void mailbox::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -35,7 +33,7 @@ void mailbox::load()
 {
 	try{
 		cppdb::statement stat;
-		string domain_name;
+		std::string domain_name;
 
 		stat = db.session() << 
 				"SELECT * FROM mailbox WHERE id = ?" << id;
@@ -56,20 +54,20 @@ void mailbox::load()
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
-void mailbox::set_name(string name)
+void mailbox::set_name(std::string name)
 {
 	this->_name = name;
 }
 
-void mailbox::set_address(string address)
+void mailbox::set_address(std::string address)
 {
 	this->_address = address;
 }
@@ -84,12 +82,12 @@ int mailbox::get_id()
 	return this->id;
 }
 
-string mailbox::get_address()
+std::string mailbox::get_address()
 {
 	return this->_address;
 }
 
-string mailbox::get_created()
+std::string mailbox::get_created()
 {
 	return this->_created;
 }

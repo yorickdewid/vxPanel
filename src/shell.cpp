@@ -7,8 +7,6 @@
 #include "shell.h"
 #include "user.h"
 
-using namespace std;
-
 void shell::save()
 {
 	try{
@@ -23,11 +21,11 @@ void shell::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -52,11 +50,11 @@ void shell::load()
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -70,7 +68,7 @@ int shell::get_id()
 	return this->id;
 }
 
-string shell::get_created()
+std::string shell::get_created()
 {
 	return this->_created;
 }

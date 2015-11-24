@@ -7,8 +7,6 @@
 #include "subdomain.h"
 #include "domain.h"
 
-using namespace std;
-
 void subdomain::save()
 {
 	try{
@@ -23,11 +21,11 @@ void subdomain::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -35,7 +33,7 @@ void subdomain::load()
 {
 	try{
 		cppdb::statement stat;
-		string domain_name;
+		std::string domain_name;
 
 		stat = db.session() << 
 				"SELECT * FROM subdomain WHERE id = ?" << id;
@@ -55,15 +53,15 @@ void subdomain::load()
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
-void subdomain::set_name(string name)
+void subdomain::set_name(std::string name)
 {
 	this->_name = name;
 }
@@ -78,12 +76,12 @@ int subdomain::get_id()
 	return this->id;
 }
 
-string subdomain::get_name()
+std::string subdomain::get_name()
 {
 	return this->_name;
 }
 
-string subdomain::get_created()
+std::string subdomain::get_created()
 {
 	return this->_created;
 }

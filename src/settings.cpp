@@ -6,8 +6,6 @@
 #include "model.h"
 #include "settings.h"
 
-using namespace std;
-
 void settings::save()
 {
 	try{
@@ -22,11 +20,11 @@ void settings::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -57,20 +55,20 @@ void settings::load()
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
-void settings::set_key(string key)
+void settings::set_key(std::string key)
 {
 	this->key = key;
 }
 
-void settings::set_value(string value)
+void settings::set_value(std::string value)
 {
 	this->_value = value;
 }
@@ -80,12 +78,12 @@ void settings::set_default(bool default_)
 	this->_default = default_;
 }
 
-void settings::set_description(string description)
+void settings::set_description(std::string description)
 {
 	this->_description = description;
 }
 
-string settings::get_key()
+std::string settings::get_key()
 {
 	return this->key;
 }
@@ -110,7 +108,7 @@ std::string settings::get_updated()
 	return this->_updated;
 }
 
-string settings::get_created()
+std::string settings::get_created()
 {
 	return this->_created;
 }

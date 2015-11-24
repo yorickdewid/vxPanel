@@ -6,8 +6,6 @@
 #include "model.h"
 #include "database_type.h"
 
-using namespace std;
-
 void database_type::save()
 {
 	try{
@@ -22,11 +20,11 @@ void database_type::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -47,15 +45,15 @@ void database_type::load()
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
-string database_type::get_name()
+std::string database_type::get_name()
 {
 	return this->name;
 }
