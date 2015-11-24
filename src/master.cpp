@@ -18,7 +18,7 @@
 #include "mailbox.h"
 #include "shell.h"
 #include "subdomain.h"
-#include "settings.h"
+#include "app_settings.h"
 #include "database.h"
 #include "database_user.h"
 #include "database_type.h"
@@ -266,13 +266,13 @@ void master::create_subdomain(std::string subdomain_name, std::string domain_nam
 
 void master::create_setting(std::string key, std::string value, bool default_, std::string description)
 {
-	settings settings(get_database(),key);
+	app_settings app_settings(get_database(),key);
 
-	settings.set_value(value);
-    settings.set_default(default_);
-	settings.set_description(description);
+	app_settings.set_value(value);
+    app_settings.set_default(default_);
+	app_settings.set_description(description);
 
-	settings.save();
+	app_settings.save();
 
 	return_result("OK");
 }

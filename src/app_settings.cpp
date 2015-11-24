@@ -4,15 +4,15 @@
 #include "exceptions.h"
 #include "backend.h"
 #include "model.h"
-#include "settings.h"
+#include "app_settings.h"
 
-void settings::save()
+void app_settings::save()
 {
 	try{
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO settings (key,value,default,description) "
+			"INSERT INTO app_settings (key,value,default,description) "
 			"VALUES (?, ?, ?)" << key << _value << _default << _description;
 
 		stat.exec();
@@ -28,14 +28,14 @@ void settings::save()
 	}
 }
 
-void settings::load()
+void app_settings::load()
 {
 	try{
 		cppdb::statement stat;
 		int tmp_default;
 
 		stat = db.session() << 
-				"SELECT * FROM settings WHERE key = ?" << key;
+				"SELECT * FROM app_settings WHERE key = ?" << key;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
@@ -63,52 +63,52 @@ void settings::load()
 	}
 }
 
-void settings::set_key(std::string key)
+void app_settings::set_key(std::string key)
 {
 	this->key = key;
 }
 
-void settings::set_value(std::string value)
+void app_settings::set_value(std::string value)
 {
 	this->_value = value;
 }
 
-void settings::set_default(bool default_)
+void app_settings::set_default(bool default_)
 {
 	this->_default = default_;
 }
 
-void settings::set_description(std::string description)
+void app_settings::set_description(std::string description)
 {
 	this->_description = description;
 }
 
-std::string settings::get_key()
+std::string app_settings::get_key()
 {
 	return this->key;
 }
 
-std::string settings::get_value()
+std::string app_settings::get_value()
 {
 	return this->_value;
 }
 
-bool settings::get_default()
+bool app_settings::get_default()
 {
 	return this->_default;
 }
 
-std::string settings::get_description()
+std::string app_settings::get_description()
 {
 	return this->_description;
 }
 
-std::string settings::get_updated()
+std::string app_settings::get_updated()
 {
 	return this->_updated;
 }
 
-std::string settings::get_created()
+std::string app_settings::get_created()
 {
 	return this->_created;
 }

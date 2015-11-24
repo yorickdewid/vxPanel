@@ -1,10 +1,10 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef APP_SETTINGS_H
+#define APP_SETTINGS_H
 
-class settings : public model {
+class app_settings : public model {
 
 public:
-	settings(backend& db, std::string key) :
+	app_settings(backend& db, std::string key) :
 		model(db),
 		key(key)
 	{};
@@ -34,5 +34,5 @@ private:
 
 };
 
-#endif /* SETTINGS_H */
+#endif /* APP_SETTINGS_H */
 

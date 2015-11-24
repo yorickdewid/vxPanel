@@ -14,7 +14,7 @@ vxpanel:
 									$(SRCDIR)/mailbox.cpp \
 									$(SRCDIR)/subdomain.cpp \
 									$(SRCDIR)/shell.cpp \
-									$(SRCDIR)/settings.cpp \
+									$(SRCDIR)/app_settings.cpp \
 									$(SRCDIR)/database_type.cpp \
 									$(SRCDIR)/database_user.cpp \
 									$(SRCDIR)/database.cpp \
