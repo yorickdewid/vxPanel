@@ -54,9 +54,12 @@ CREATE TABLE IF NOT EXISTS `ftp_account` (
   `permissions` char(2) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(50) DEFAULT NULL,
+  `uid` int(11) unsigned NOT NULL,
   PRIMARY KEY (`username`),
   KEY `FK_ftp_account_domain` (`domain_name`),
-  CONSTRAINT `FK_ftp_account_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_ftp_account_user` (`uid`),
+  CONSTRAINT `FK_ftp_account_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_ftp_account_user` FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporteren was gedeselecteerd

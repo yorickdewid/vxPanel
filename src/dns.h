@@ -12,6 +12,7 @@ public:
 	
 	void save();
 	void load();
+	void load(std::string domain_name);
 
 	void set_address(std::string address);
 	void set_domain(std::shared_ptr<domain> domain);

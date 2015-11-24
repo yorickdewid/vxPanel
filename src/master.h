@@ -23,7 +23,13 @@ public:
 	void create_user(std::string username);
 	void create_domain(std::string domain_name,int uid);
 	void create_dns(std::string address, std::string domain_name);
-	void create_db_user(std::string name, std::string password, std::string permissions, int uid);
+	void create_ftp_account(std::string ftp_account,std::string password,std::string permissions, int uid);
+	void create_vhost(std::string domain_name, std::string custom_config, int uid);
+	void create_mailbox(std::string name, std::string address, std::string domain_name, int uid);
+	void create_shell(int uid);
+	void create_subdomain(std::string subdomain_name, std::string domain_name, int uid);
+	void create_setting(std::string key, std::string value, bool default_, std::string description);
+	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
 	void create_database(std::string db_name, std::string db_type, int uid);
 
 	void get_user(int uid);

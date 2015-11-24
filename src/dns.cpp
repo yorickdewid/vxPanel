@@ -61,6 +61,37 @@ void dns::load()
 	}
 }
 
+void dns::load(std::string domain_name)
+{
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"SELECT * FROM dns WHERE domain_name = ?" << domain_name;
+		cppdb::result r = stat.query();
+
+		while(r.next()) {
+	  		r.fetch(0,this->id);
+	  		r.fetch(1,this->_address);
+	  		r.fetch(2,this->_created);
+	  		r.fetch(3,domain_name);
+	  		if ( !domain_name.empty() ) {
+	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
+	  		}
+	    }
+
+	    stat.reset();
+
+    	this->saved = true;
+
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+}
+
 void dns::set_address(std::string address)
 {
 	this->_address = address;

@@ -59,20 +59,15 @@ def test_rpc_db_version():
 	data = '{"id":0,"method":"db_version","params":[]}'
 	result_test(rpc_call(data), None)
 
-def test_rpc_new_user():
+def test_rpc_create_user():
 	print bcolors.OKBLUE + "Testcase: Create new user" + bcolors.ENDC
-	data = '{"id":0,"method":"new_user","params":["kaasie"]}'
+	data = '{"id":0,"method":"create_user","params":["kaasie"]}'
 	result_test(rpc_call(data), None)
 
-def test_rpc_new_domain():
+def test_rpc_create_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
-	data = '{"id":0,"method":"new_domain","params":["trol.com",1]}'
+	data = '{"id":0,"method":"create_domain","params":["trol.com",1]}'
 	result_test(rpc_call(data), None)
-
-def test_rpc_get_domain():
-	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
@@ -81,7 +76,7 @@ def test_rpc_create_dns():
 
 def test_rpc_create_db_user():
 	print bcolors.OKBLUE + "Testcase: Create db user" + bcolors.ENDC
-	data = '{"id":0,"method":"create_db_user","params":["arie","ae4834ejs","RO",1]}'
+	data = '{"id":0,"method":"create_database_user","params":["arie","ae4834ejs","RO",1]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_database():
@@ -89,14 +84,28 @@ def test_rpc_create_database():
 	data = '{"id":0,"method":"create_database","params":["kaas","mysql",1]}'
 	result_test(rpc_call(data), None);
 
+def test_rpc_get_user():
+	print bcolors.OKBLUE + "Testcase: Get user" + bcolors.ENDC
+	data = '{"id":0,"method":"get_user","params":[1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_get_domain():
+	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
+	data = '{"id":0,"method":"get_domain","params":["trol.com",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+
+
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
-test_rpc_new_user()
-test_rpc_new_domain()
-test_rpc_get_domain()
+test_rpc_create_user()
+test_rpc_create_domain()
 test_rpc_create_dns();
 test_rpc_create_db_user();
 test_rpc_create_database();
+
+test_rpc_get_user()
+test_rpc_get_domain()

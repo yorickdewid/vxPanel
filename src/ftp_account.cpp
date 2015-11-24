@@ -13,8 +13,8 @@ void ftp_account::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO ftp_account (username, password, permissions, domain_name) "
-			"VALUES (?, ?, ?, ?)" << username << _password << _permissions << _domain->get_domain_name();
+			"INSERT INTO ftp_account (username, password, permissions, domain_name , uid) "
+			"VALUES (?, ?, ?, ?, ?)" << username << _password << _permissions << _domain->get_domain_name() << _user->get_uid();
 
 		stat.exec();
 		stat.reset();
@@ -34,6 +34,7 @@ void ftp_account::load()
 	try{
 		cppdb::statement stat;
 		std::string domain_name;
+		int uid;
 
 		stat = db.session() << 
 				"SELECT * FROM ftp_account WHERE username = ?" << username;
@@ -48,6 +49,8 @@ void ftp_account::load()
 	  		if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
+	  		r.fetch(5,uid);
+	  		set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 
 	    stat.reset();
@@ -77,6 +80,11 @@ void ftp_account::set_domain(std::shared_ptr<domain> domain)
 	this->_domain.swap(domain);
 }
 
+void ftp_account::set_user(std::shared_ptr<user> user)
+{
+	this->_user.swap(user);
+}
+
 std::string ftp_account::get_username()
 {
 	return this->username;
@@ -100,5 +108,10 @@ std::string ftp_account::get_created()
 domain ftp_account::get_domain()
 {
 	return *this->_domain;
+}
+
+user ftp_account::get_user()
+{
+	return *this->_user;
 }
 

@@ -1,6 +1,7 @@
 #ifndef FTP_ACCOUNT_H
 #define FTP_ACCOUNT_H
 #include "domain.h"
+#include "user.h"
 
 class ftp_account : public model {
 
@@ -16,12 +17,14 @@ public:
 	void set_password(std::string address);
 	void set_permissions(std::string _permissions);
 	void set_domain(std::shared_ptr<domain> domain);
+	void set_user(std::shared_ptr<user> user);
 
 	std::string get_username();
 	std::string get_password();
 	std::string get_permissions();
 	std::string get_created();
 	domain get_domain();
+	user get_user();
 
 private:
 	std::string username;
@@ -29,6 +32,7 @@ private:
 	std::string _permissions; /* e.g WO, RO */
 	std::string _created;
 	std::shared_ptr<domain> _domain; /* auto_ptr deprecated */
+	std::shared_ptr<user> _user;
 
 };
 

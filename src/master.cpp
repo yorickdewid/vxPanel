@@ -4,19 +4,24 @@
 #include <iostream>
 #include <fstream>
 
+#include "master.h"
 #include "config.h"
 #include "exceptions.h"
 #include "backend.h"
 #include "model.h"
+
 #include "user.h"
 #include "domain.h"
 #include "dns.h"
-
-
+#include "ftp_account.h"
+#include "vhost.h"
+#include "mailbox.h"
+#include "shell.h"
+#include "subdomain.h"
+#include "settings.h"
 #include "database.h"
 #include "database_user.h"
 #include "database_type.h"
-#include "master.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -36,7 +41,13 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("create_user", cppcms::rpc::json_method(&master::create_user, this), method_role);
 	bind("create_domain", cppcms::rpc::json_method(&master::create_domain, this), method_role);
 	bind("create_dns", cppcms::rpc::json_method(&master::create_dns, this), method_role);
-	bind("create_db_user", cppcms::rpc::json_method(&master::create_db_user, this), method_role);
+	bind("create_ftp_account",cppcms::rpc::json_method(&master::create_ftp_account, this), method_role);
+	bind("create_vhost",cppcms::rpc::json_method(&master::create_vhost, this), method_role);
+	bind("create_mailbox",cppcms::rpc::json_method(&master::create_mailbox, this), method_role);
+	bind("create_shell",cppcms::rpc::json_method(&master::create_shell, this), method_role);
+	bind("create_subdomain",cppcms::rpc::json_method(&master::create_subdomain, this), method_role);
+	bind("create_setting",cppcms::rpc::json_method(&master::create_setting, this), method_role);
+	bind("create_database_user", cppcms::rpc::json_method(&master::create_database_user, this), method_role);
 	bind("create_database", cppcms::rpc::json_method(&master::create_database, this), method_role);
 
 	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
@@ -163,19 +174,20 @@ void master::create_user(std::string username)
 	user.set_email("info@kaas.nl");
 
 	user.save();
+
 	return_result("OK");
 }
 
-void master::create_domain(std::string domain_name,int uid)
+void master::create_domain(std::string domain_name, int uid)
 {
 	domain domain(get_database(), domain_name);
 
 	domain.status("inactive");
 	domain.registrar("transip");
-
 	domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
 
 	domain.save();
+
 	return_result("OK");
 }
 
@@ -191,7 +203,81 @@ void master::create_dns(std::string address, std::string domain_name)
 	return_result("OK");
 }
 
-void master::create_db_user(std::string name, std::string password, std::string permissions, int uid)
+void master::create_ftp_account(std::string ftp_username, std::string password, std::string permissions, int uid)
+{
+	ftp_account ftp_account(get_database(),ftp_username);
+
+	ftp_account.set_password(password);
+	ftp_account.set_permissions(permissions);
+	ftp_account.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+	ftp_account.save();
+
+	return_result("OK");
+}
+
+void master::create_vhost(std::string name, std::string custom_config, int uid)
+{
+	vhost vhost(get_database(),0);
+
+	vhost.set_name(name); /* either domain or subdomain */
+	vhost.set_custom_config(custom_config);
+
+	vhost.save();
+
+	return_result("OK");
+}
+
+void master::create_mailbox(std::string name, std::string address, std::string domain_name, int uid)
+{
+	mailbox mailbox(get_database(),0);
+
+	mailbox.set_name(name);
+	mailbox.set_address(address);
+	mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+
+	mailbox.save();
+
+	return_result("OK");
+}
+
+void master::create_shell(int uid)
+{
+	shell shell(get_database(),0);
+
+	shell.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+	shell.save();
+
+	return_result("OK");
+}
+
+void master::create_subdomain(std::string subdomain_name, std::string domain_name, int uid)
+{
+	subdomain subdomain(get_database(),0);
+
+	subdomain.set_name(subdomain_name);
+	subdomain.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+
+	subdomain.save();
+
+	return_result("OK");
+}
+
+void master::create_setting(std::string key, std::string value, bool default_, std::string description)
+{
+	settings settings(get_database(),key);
+
+	settings.set_value(value);
+    settings.set_default(default_);
+	settings.set_description(description);
+
+	settings.save();
+
+	return_result("OK");
+}
+
+void master::create_database_user(std::string name, std::string password, std::string permissions, int uid)
 {
 	database_user database_user(get_database(),name);
 
@@ -222,6 +308,8 @@ void master::create_database(std::string db_name, std::string db_type, int uid)
 	}
 }
 
+/* get */
+
 void master::get_user(int uid)
 {
 	cppcms::json::value json;
@@ -237,7 +325,7 @@ void master::get_user(int uid)
 	return_result(json);
 }
 
-void master::get_domain(std::string domain_name,int uid)
+void master::get_domain(std::string domain_name, int uid)
 {
 	cppcms::json::value json;
 
@@ -252,11 +340,18 @@ void master::get_domain(std::string domain_name,int uid)
 	return_result(json);
 }
 
-/* get */
-
 void master::get_dns(std::string domain_name, int uid)
 {
+	cppcms::json::value json;
 
+	dns dns(get_database(), 0);
+	dns.load(domain_name);
+
+	json["dns"]["address"] = dns.get_address();
+	json["dns"]["created"] = dns.get_created();
+	json["dns"]["domain_name"] = domain_name;
+
+	return_result(json);
 }
 
 void master::get_ftp_account(std::string ftp_account, int uid)
