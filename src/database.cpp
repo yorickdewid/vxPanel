@@ -6,8 +6,7 @@
 #include "model.h"
 #include "database.h"
 #include "user.h"
-
-using namespace std;
+#include "database_type.h"
 
 void database::save()
 {
@@ -15,7 +14,7 @@ void database::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO database (name, type, uid) "
+			"INSERT INTO user_db (name, db_type, uid) "
 			"VALUES (?, ?, ?)" << name << _database_type->get_name() << _user->get_uid();
 
 		stat.exec();
@@ -23,11 +22,11 @@ void database::save()
 
 		this->saved = true;
 
-		cout << "Saved" << endl;
+		std::cout << "Saved" << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
@@ -35,50 +34,50 @@ void database::load()
 {
 	try{
 		cppdb::statement stat;
-		string type;
+		std::string type;
 		int uid;
 
 		stat = db.session() << 
-				"SELECT * FROM database WHERE name = ?" << name;
+				"SELECT * FROM user_db WHERE name = ?" << name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
 	  		r.fetch(0,this->name);
 	  		r.fetch(1,type);
-	  		set_database_type(shared_ptr<database_type>(new database_type(db,type)));
+	  		set_database_type(std::shared_ptr<database_type>(new database_type(db,type)));
 	  		r.fetch(2,this->_created);
 	  		r.fetch(3,uid);
-	  		set_user(shared_ptr<user>(new user(db,uid)));
+	  		set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 
 	    stat.reset();
 
     	this->saved = true;
 
-		cout << "Entity loaded " << endl;
+		std::cout << "Entity loaded " << std::endl;
 	}
-	catch(exception &e)
+	catch(std::exception &e)
 	{
-		cout << "Exception occured " << e.what() << endl;
+		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 }
 
-void database::set_name(string name)
+void database::set_name(std::string name)
 {
 	this->name = name;
 }
 
-void database::set_database_type(shared_ptr<database_type> database_type)
+void database::set_database_type(std::shared_ptr<database_type> database_type)
 {
 	this->_database_type.swap(database_type);
 }
 
-void database::set_user(shared_ptr<user> user)
+void database::set_user(std::shared_ptr<user> user)
 {
 	this->_user.swap(user);
 }
 
-string database::get_name()
+std::string database::get_name()
 {
 	return this->name;
 }
@@ -88,7 +87,7 @@ database_type database::get_database_type()
 	return *this->_database_type;
 }
 
-string database::get_created()
+std::string database::get_created()
 {
 	return this->_created;
 }

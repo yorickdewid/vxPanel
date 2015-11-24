@@ -7,7 +7,7 @@ public:
 	database_type(backend& db, std::string name) :
 		model(db),
 		name(name)
-	{};
+	{ this->load(); };
 	
 	void save();
 	void load();

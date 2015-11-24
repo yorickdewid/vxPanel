@@ -14,7 +14,7 @@ void database_type::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO database_type (name) "
+			"INSERT INTO user_db_type (name) "
 			"VALUES (?)" << name;
 
 		stat.exec();
@@ -36,7 +36,7 @@ void database_type::load()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"SELECT * FROM database_type WHERE name = ?" << name;
+				"SELECT * FROM user_db_type WHERE name = ?" << name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {

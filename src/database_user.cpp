@@ -15,7 +15,7 @@ void database_user::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO database_user (name, password, permissions, uid) "
+			"INSERT INTO user_db_user (name, password, permissions, uid) "
 			"VALUES (?, ?, ?, ?)" << name << _password << _permissions << _user->get_uid();
 
 		stat.exec();
@@ -38,7 +38,7 @@ void database_user::load()
 		int uid;
 
 		stat = db.session() << 
-				"SELECT * FROM database_user WHERE name = ?" << name;
+				"SELECT * FROM user_db_user WHERE name = ?" << name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {

@@ -11,6 +11,11 @@
 #include "user.h"
 #include "domain.h"
 #include "dns.h"
+
+
+#include "database.h"
+#include "database_user.h"
+#include "database_type.h"
 #include "master.h"
 
 /*
@@ -27,11 +32,25 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
-	bind("new_user", cppcms::rpc::json_method(&master::create_user, this), method_role);
-	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
-	bind("new_domain", cppcms::rpc::json_method(&master::create_domain, this), method_role);
-	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
+
+	bind("create_user", cppcms::rpc::json_method(&master::create_user, this), method_role);
+	bind("create_domain", cppcms::rpc::json_method(&master::create_domain, this), method_role);
 	bind("create_dns", cppcms::rpc::json_method(&master::create_dns, this), method_role);
+	bind("create_db_user", cppcms::rpc::json_method(&master::create_db_user, this), method_role);
+	bind("create_database", cppcms::rpc::json_method(&master::create_database, this), method_role);
+
+	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
+	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
+	bind("get_dns", cppcms::rpc::json_method(&master::get_dns, this), method_role);
+	bind("get_ftp_account", cppcms::rpc::json_method(&master::get_ftp_account, this), method_role);
+	bind("get_vhost", cppcms::rpc::json_method(&master::get_vhost, this), method_role);
+	bind("get_mailbox", cppcms::rpc::json_method(&master::get_mailbox, this), method_role);
+	bind("get_shell", cppcms::rpc::json_method(&master::get_shell, this), method_role);
+	bind("get_subdomain", cppcms::rpc::json_method(&master::get_subdomain, this), method_role);
+	bind("get_settings", cppcms::rpc::json_method(&master::get_settings, this), method_role);
+	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
+	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
+	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
 }
 
 master::~master()
@@ -48,7 +67,7 @@ void master::init_backend()
 	db = new backend(user, password, database);
 }
 
-backend& master::database()
+backend& master::get_database()
 {
 	return *db;
 }
@@ -137,7 +156,7 @@ void master::db_version()
 
 void master::create_user(std::string username)
 {
-	user user(database());
+	user user(get_database());
 
 	user.set_username(username);
 	user.set_password("kaas");
@@ -147,11 +166,67 @@ void master::create_user(std::string username)
 	return_result("OK");
 }
 
+void master::create_domain(std::string domain_name,int uid)
+{
+	domain domain(get_database(), domain_name);
+
+	domain.status("inactive");
+	domain.registrar("transip");
+
+	domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+	domain.save();
+	return_result("OK");
+}
+
+void master::create_dns(std::string address, std::string domain_name)
+{
+	dns dns(get_database(),0);
+
+	dns.set_address(address);
+	dns.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+
+	dns.save();
+
+	return_result("OK");
+}
+
+void master::create_db_user(std::string name, std::string password, std::string permissions, int uid)
+{
+	database_user database_user(get_database(),name);
+
+	database_user.set_password(password);
+	database_user.set_permissions(permissions);
+	database_user.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+	database_user.save();
+
+	return_result("OK");
+}
+
+void master::create_database(std::string db_name, std::string db_type, int uid)
+{
+	try{
+		database database(get_database(),db_name);
+
+		database.set_database_type(std::shared_ptr<database_type>(new database_type(get_database(),db_type)));
+		database.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+		database.save();
+
+		return_result("OK");
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+}
+
 void master::get_user(int uid)
 {
 	cppcms::json::value json;
 
-	user user(database(), uid);
+	user user(get_database(), uid);
 
 	user.load();
 
@@ -162,24 +237,11 @@ void master::get_user(int uid)
 	return_result(json);
 }
 
-void master::create_domain(std::string domain_name,int uid)
-{
-	domain domain(database(), domain_name);
-
-	domain.status("inactive");
-	domain.registrar("transip");
-
-	domain.set_user(std::shared_ptr<user>(new user(database(),uid)));
-
-	domain.save();
-	return_result("OK");
-}
-
-void master::get_domain(std::string domain_name)
+void master::get_domain(std::string domain_name,int uid)
 {
 	cppcms::json::value json;
 
-	domain domain(database(), domain_name);
+	domain domain(get_database(), domain_name);
 
 	domain.load();
 
@@ -190,15 +252,56 @@ void master::get_domain(std::string domain_name)
 	return_result(json);
 }
 
-void master::create_dns(std::string address, std::string domain_name)
+/* get */
+
+void master::get_dns(std::string domain_name, int uid)
 {
-	dns dns(database(),0);
 
-	dns.set_address(address);
-	dns.set_domain(std::shared_ptr<domain>(new domain(database(),domain_name)));
-
-	dns.save();
-
-	return_result("OK");
 }
+
+void master::get_ftp_account(std::string ftp_account, int uid)
+{
+
+}
+
+void master::get_vhost(std::string domain_name, int uid)
+{
+
+}
+
+void master::get_mailbox(std::string domain_name, int uid)
+{
+
+}
+
+void master::get_shell(int uid)
+{
+
+}
+
+void master::get_subdomain(std::string subdomain, int uid)
+{
+
+}
+
+void master::get_settings(std::string key)
+{
+
+}
+
+void master::get_database_types()
+{
+
+}
+
+void master::get_database_user(int uid)
+{
+
+}
+
+void master::get_database(int uid)
+{
+
+}
+
 

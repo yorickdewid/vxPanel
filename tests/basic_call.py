@@ -77,7 +77,17 @@ def test_rpc_get_domain():
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
 	data = '{"id":0,"method":"create_dns","params":["A www trol.com","trol.com"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data), None); 
+
+def test_rpc_create_db_user():
+	print bcolors.OKBLUE + "Testcase: Create db user" + bcolors.ENDC
+	data = '{"id":0,"method":"create_db_user","params":["arie","ae4834ejs","RO",1]}'
+	result_test(rpc_call(data), None); 
+
+def test_rpc_create_database():
+	print bcolors.OKBLUE + "Testcase: Create database" + bcolors.ENDC
+	data = '{"id":0,"method":"create_database","params":["kaas","mysql",1]}'
+	result_test(rpc_call(data), None);
 
 # Call the testcases
 test_rpc_sum()
@@ -88,3 +98,5 @@ test_rpc_new_user()
 test_rpc_new_domain()
 test_rpc_get_domain()
 test_rpc_create_dns();
+test_rpc_create_db_user();
+test_rpc_create_database();
