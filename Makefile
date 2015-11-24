@@ -17,6 +17,7 @@ vxpanel:
 									$(SRCDIR)/settings.cpp \
 									$(SRCDIR)/database_type.cpp \
 									$(SRCDIR)/database_user.cpp \
+									$(SRCDIR)/database.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 

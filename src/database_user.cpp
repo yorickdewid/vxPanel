@@ -7,6 +7,8 @@
 #include "database_user.h"
 #include "user.h"
 
+using namespace std;
+
 void database_user::save()
 {
 	try{
@@ -21,11 +23,11 @@ void database_user::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		cout << "Saved" << endl;
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		cout << "Exception occured " << e.what() << endl;
 	}
 }
 
@@ -45,57 +47,57 @@ void database_user::load()
 	  		r.fetch(2,this->_permissions);
 	  		r.fetch(3,this->_created);
 	  		r.fetch(4,uid);
-	  		set_user(std::shared_ptr<user>(new user(db,uid)));
+	  		set_user(shared_ptr<user>(new user(db,uid)));
 	    }
 
 	    stat.reset();
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		cout << "Entity loaded " << endl;
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		cout << "Exception occured " << e.what() << endl;
 	}
 }
 
-void database_user::set_name(std::string name)
+void database_user::set_name(string name)
 {
 	this->name = name;
 }
 
-void database_user::set_password(std::string password)
+void database_user::set_password(string password)
 {
 	this->_password = password;
 }
 
-void database_user::set_permissions(std::string permissions)
+void database_user::set_permissions(string permissions)
 {
 	this->_permissions = permissions;
 }
 
-void database_user::set_user(std::shared_ptr<user> user)
+void database_user::set_user(shared_ptr<user> user)
 {
 	this->_user.swap(user);
 }
 
-std::string database_user::get_name()
+string database_user::get_name()
 {
 	return this->name;
 }
 
-std::string database_user::get_password()
+string database_user::get_password()
 {
 	return this->_password;
 }
 
-std::string database_user::get_permissions()
+string database_user::get_permissions()
 {
 	return this->_permissions;
 }
 
-std::string database_user::get_created()
+string database_user::get_created()
 {
 	return this->_created;
 }
