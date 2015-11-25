@@ -5,9 +5,10 @@
 class subdomain : public model {
 
 public:
-	subdomain(backend& db, int id) :
+	subdomain(backend& db, std::string name) :
 		model(db),
-		id(id)
+		name(name),
+		_vhost_id(-1)
 	{};
 	
 	void save();
@@ -15,17 +16,19 @@ public:
 
 	void set_name(std::string name);
 	void set_domain(std::shared_ptr<domain> domain);
+	void set_vhost_id(int vhost_id);
 
-	int get_id();
 	std::string get_name();
 	std::string get_created();
 	domain get_domain();
+	std::shared_ptr<domain> get_domain_ptr();
+	int get_vhost_id();
 
 private:
-	int id;
-	std::string _name;
+	std::string name;
 	std::string _created; 
 	std::shared_ptr<domain> _domain; /* auto_ptr deprecated */
+	int _vhost_id; /* todo vhost object */
 
 };
 

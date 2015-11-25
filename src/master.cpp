@@ -256,9 +256,8 @@ void master::create_shell(int uid)
 
 void master::create_subdomain(std::string subdomain_name, std::string domain_name, int uid)
 {
-	subdomain subdomain(get_database(),0);
+	subdomain subdomain(get_database(),subdomain_name);
 
-	subdomain.set_name(subdomain_name);
 	subdomain.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
 
 	subdomain.save();
@@ -440,9 +439,21 @@ void master::get_shell(int id,int uid)
 	}
 }
 
-void master::get_subdomain(std::string subdomain, int uid)
+/* todo check if domain belongs to logged in user */
+void master::get_subdomain(std::string subdomain_name, int uid)
 {
+	cppcms::json::value json;
 
+	subdomain subdomain(get_database(),subdomain_name);
+	subdomain.load();
+
+	json["subdomain"]["name"] = subdomain.get_name();	
+	json["subdomain"]["created"] = subdomain.get_created();
+	if ( subdomain.get_domain_ptr() !=  NULL ) { /* good enough? */
+			json["subdomain"]["domain"] = subdomain.get_domain().get_domain_name();
+	}
+
+	return_result(json);
 }
 
 void master::get_settings(std::string key)

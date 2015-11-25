@@ -154,6 +154,11 @@ def test_rpc_get_shell():
 	data = '{"id":0,"method":"get_shell","params":[1,1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_subdomain():
+	print bcolors.OKBLUE + "Testcase: Get subdomain" + bcolors.ENDC
+	data = '{"id":0,"method":"get_subdomain","params":["kaas.",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 
 # Call the testcases
@@ -181,3 +186,4 @@ test_rpc_get_ftp_account()
 test_rpc_get_vhost()
 test_rpc_get_mailbox()
 test_rpc_get_shell();
+test_rpc_get_subdomain();
