@@ -11,6 +11,7 @@ public:
 	
 	void save();
 	void load();
+	void load(std::string domain_name);
 
 	void set_name(std::string name);
 	void set_custom_config(std::string custom_config);

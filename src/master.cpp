@@ -363,14 +363,48 @@ void master::get_dns(std::string domain_name, int uid)
 	return_result(json);
 }
 
-void master::get_ftp_account(std::string ftp_account, int uid)
+void master::get_ftp_account(std::string ftp_username, int uid)
 {
+	cppcms::json::value json;
 
+	ftp_account ftp_account(get_database(), ftp_username);
+	ftp_account.load();
+
+	if (ftp_account.get_user().get_uid() == uid){
+
+		json["ftp_account"]["username"] = ftp_account.get_username();
+		json["ftp_account"]["password"] = ftp_account.get_password();
+		json["ftp_account"]["permissions"] = ftp_account.get_permissions();
+		json["ftp_account"]["created"] = ftp_account.get_created();
+		if ( ftp_account.get_domain_ptr() !=  NULL ) { /* good enough? */
+			json["ftp_account"]["domain"] = ftp_account.get_domain().get_domain_name();
+		}
+
+		return_result(json);
+	}
+	else{
+		return_error("Unauthorized");
+	}
 }
 
 void master::get_vhost(std::string domain_name, int uid)
 {
+	cppcms::json::value json;
 
+	vhost vhost(get_database(),0);
+	vhost.load(domain_name);
+
+	if ( !domain_name.compare(vhost.get_name())) {
+		json["vhost"]["id"] = vhost.get_id();
+		json["vhost"]["name"] = vhost.get_name();
+		json["vhost"]["custom_config"] = vhost.get_custom_config();
+		json["vhost"]["created"] = vhost.get_created();
+
+		return_result(json);
+	}
+	else{
+		return_error("Unauthorized");
+	}
 }
 
 void master::get_mailbox(std::string domain_name, int uid)

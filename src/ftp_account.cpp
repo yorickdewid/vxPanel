@@ -117,6 +117,11 @@ domain ftp_account::get_domain()
 	return *this->_domain;
 }
 
+std::shared_ptr<domain> ftp_account::get_domain_ptr()
+{
+	return this->_domain;
+}
+
 user ftp_account::get_user()
 {
 	return *this->_user;

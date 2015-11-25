@@ -30,6 +30,7 @@ def result_test(result, expected):
 	if not result:
 		return
 	rs = json.loads(result)
+	print rs
 	if rs['error']:
 		print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 		return
@@ -128,6 +129,21 @@ def test_rpc_get_domain():
 	data = '{"id":0,"method":"get_domain","params":["trol.com",1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_dns():
+	print bcolors.OKBLUE + "Testcase: Get dns" + bcolors.ENDC
+	data = '{"id":0,"method":"get_dns","params":["trol.com",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_get_ftp_account():
+	print bcolors.OKBLUE + "Testcase: Get ftp account" + bcolors.ENDC
+	data = '{"id":0,"method":"get_ftp_account","params":["kaasje",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_get_vhost():
+	print bcolors.OKBLUE + "Testcase: Get vhost" + bcolors.ENDC
+	data = '{"id":0,"method":"get_vhost","params":["trol.com",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 
 # Call the testcases
@@ -150,3 +166,6 @@ test_rpc_create_database();
 
 test_rpc_get_user()
 test_rpc_get_domain()
+test_rpc_get_dns();
+test_rpc_get_ftp_account();
+test_rpc_get_vhost();

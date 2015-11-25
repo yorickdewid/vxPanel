@@ -56,6 +56,34 @@ void vhost::load()
 	}
 }
 
+void vhost::load(std::string domain_name)
+{
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"SELECT * FROM vhost WHERE name = ?" << domain_name;
+		cppdb::result r = stat.query();
+
+		while(r.next()) {
+	  		r.fetch(0,this->id);
+	  		r.fetch(1,this->_name);
+	  		r.fetch(2,this->_custom_config);
+	  		r.fetch(3,this->_created);
+	    }
+
+	    stat.reset();
+
+    	this->saved = true;
+
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+}
+
 void vhost::set_name(std::string name)
 {
 	this->_name = name;

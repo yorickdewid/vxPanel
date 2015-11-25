@@ -8,7 +8,8 @@ class ftp_account : public model {
 public:
 	ftp_account(backend& db, std::string username) :
 		model(db),
-		username(username)
+		username(username),
+		_user(NULL)
 	{};
 	
 	void save();
@@ -24,6 +25,7 @@ public:
 	std::string get_permissions();
 	std::string get_created();
 	domain get_domain();
+	std::shared_ptr<domain> get_domain_ptr();
 	user get_user();
 
 private:
