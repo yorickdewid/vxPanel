@@ -12,6 +12,8 @@ public:
 	
 	void save();
 	void load();
+	bool update(std::string field);
+	bool m_delete();
 
 	void set_name(std::string name);
 	void set_password(std::string address);

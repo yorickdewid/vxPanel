@@ -54,6 +54,17 @@ void database_type::load()
 	}
 }
 
+bool database_type::update(std::string field)
+{
+
+}
+
+bool database_type::m_delete()
+{
+	
+}
+
+
 std::vector<database_type> database_type::load_all()
 {
 	try{

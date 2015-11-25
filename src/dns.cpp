@@ -92,6 +92,16 @@ void dns::load(std::string domain_name)
 	}
 }
 
+bool dns::update(std::string field)
+{
+
+}
+
+bool dns::m_delete()
+{
+	
+}
+
 void dns::set_address(std::string address)
 {
 	this->_address = address;

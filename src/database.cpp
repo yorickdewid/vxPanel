@@ -59,6 +59,17 @@ void database::load()
 	}
 }
 
+bool database::update(std::string field)
+{
+
+}
+
+bool database::m_delete()
+{
+	
+}
+
+
 void database::set_name(std::string name)
 {
 	this->name = name;

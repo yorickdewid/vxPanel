@@ -10,6 +10,8 @@ public:
 	{};
 	virtual void save() = 0;
 	virtual void load() = 0;
+	virtual bool update(std::string field) = 0;
+	virtual bool m_delete() = 0;
 
 	bool get_saved(){ return this->saved; };
 

@@ -60,6 +60,17 @@ void database_user::load()
 	}
 }
 
+bool database_user::update(std::string field)
+{
+
+}
+
+bool database_user::m_delete()
+{
+	
+}
+
+
 void database_user::set_name(std::string name)
 {
 	this->name = name;

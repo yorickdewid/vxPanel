@@ -73,6 +73,16 @@ void subdomain::load()
 	}
 }
 
+bool subdomain::update(std::string field)
+{
+
+}
+
+bool subdomain::m_delete()
+{
+	
+}
+
 void subdomain::set_name(std::string name)
 {
 	this->name = name;

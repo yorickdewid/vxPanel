@@ -91,6 +91,17 @@ void mailbox::load(std::string domain_name)
 	}
 }
 
+bool mailbox::update(std::string field)
+{
+
+}
+
+bool mailbox::m_delete()
+{
+	
+}
+
+
 void mailbox::set_address(std::string address)
 {
 	this->_address = address;

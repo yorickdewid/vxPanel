@@ -13,6 +13,8 @@ public:
 	void save();
 	void load();
 	void load(std::string db_username,std::string db_name);
+	bool update(std::string field);
+	bool m_delete();
 
 	void set_db_username(std::string db_username);
 	void set_db_name(std::string db_name);

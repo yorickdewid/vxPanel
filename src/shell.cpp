@@ -58,6 +58,16 @@ void shell::load()
 	}
 }
 
+bool shell::update(std::string field)
+{
+
+}
+
+bool shell::m_delete()
+{
+	
+}
+
 void shell::set_user(std::shared_ptr<user> user)
 {
 	this->_user.swap(user);

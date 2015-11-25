@@ -11,6 +11,8 @@ public:
 	
 	void save();
 	void load();
+	bool update(std::string field);
+	bool m_delete();
 
 	/* Setters */
 	void set_username(std::string username);

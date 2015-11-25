@@ -11,6 +11,8 @@ public:
 	
 	void save();
 	void load();
+	bool update(std::string field);
+	bool m_delete();
 
 	void set_key(std::string key);
 	void set_value(std::string value);

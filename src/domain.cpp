@@ -69,6 +69,16 @@ void domain::load()
 	}
 }
 
+bool domain::update(std::string field)
+{
+
+}
+
+bool domain::m_delete()
+{
+	
+}
+
 void domain::status(std::string status)
 {
 	this->_status = status;

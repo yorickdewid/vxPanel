@@ -12,7 +12,9 @@ public:
 	
 	void save();
 	void load();
-
+	bool update(std::string field);
+	bool m_delete();
+	
 	void set_user(std::shared_ptr<user> user);
 
 	int get_id();

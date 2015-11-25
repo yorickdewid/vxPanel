@@ -64,6 +64,16 @@ void user_dbuser_db::load(std::string db_username, std::string db_name = "false"
 	}
 }
 
+bool user_dbuser_db::update(std::string field)
+{
+
+}
+
+bool user_dbuser_db::m_delete()
+{
+	
+}
+
 void user_dbuser_db::set_db_username(std::string db_username)
 {
 	this->db_username = db_username;

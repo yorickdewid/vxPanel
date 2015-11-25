@@ -60,6 +60,16 @@ void app_settings::load()
 	}
 }
 
+bool app_settings::update(std::string field)
+{
+
+}
+
+bool app_settings::m_delete()
+{
+	
+}
+
 void app_settings::set_key(std::string key)
 {
 	this->key = key;

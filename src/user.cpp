@@ -79,6 +79,16 @@ void user::load()
 	}
 }
 
+bool user::update(std::string field)
+{
+
+}
+
+bool user::m_delete()
+{
+	
+}
+
 void user::set_username(std::string username)
 {
 	this->username = username;

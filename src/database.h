@@ -13,7 +13,9 @@ public:
 	
 	void save();
 	void load();
-
+	bool update(std::string field);
+	bool m_delete();
+	
 	void set_name(std::string name);
 	void set_database_type(std::shared_ptr<database_type> database_type);
 	void set_user(std::shared_ptr<user> user);

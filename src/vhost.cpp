@@ -84,6 +84,16 @@ void vhost::load(std::string domain_name)
 	}
 }
 
+bool vhost::update(std::string field)
+{
+
+}
+
+bool vhost::m_delete()
+{
+	
+}
+
 void vhost::set_name(std::string name)
 {
 	this->_name = name;

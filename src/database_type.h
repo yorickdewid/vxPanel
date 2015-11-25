@@ -12,6 +12,9 @@ public:
 	
 	void save();
 	void load();
+	bool update(std::string field);
+	bool m_delete();
+	
 	std::vector<database_type> load_all();
 
 	void set_name(std::string name);

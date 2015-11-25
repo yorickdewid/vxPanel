@@ -72,6 +72,16 @@ void ftp_account::load()
 	}
 }
 
+bool ftp_account::update(std::string field)
+{
+
+}
+
+bool ftp_account::m_delete()
+{
+	
+}
+
 void ftp_account::set_password(std::string password)
 {
 	this->_password = password;

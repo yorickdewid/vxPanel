@@ -14,7 +14,9 @@ public:
 	
 	void save();
 	void load();
-
+	bool update(std::string field);
+	bool m_delete();
+	
 	void set_password(std::string address);
 	void set_permissions(std::string _permissions);
 	void set_domain(std::shared_ptr<domain> domain);

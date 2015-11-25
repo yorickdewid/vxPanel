@@ -13,6 +13,8 @@ public:
 	
 	void save();
 	void load();
+	bool update(std::string field);
+	bool m_delete();
 
 	/* Setters */
 	void status(std::string status);

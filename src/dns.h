@@ -13,7 +13,9 @@ public:
 	void save();
 	void load();
 	void load(std::string domain_name);
-
+	bool update(std::string field);
+	bool m_delete();
+	
 	void set_address(std::string address);
 	void set_domain(std::shared_ptr<domain> domain);
 
