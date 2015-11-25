@@ -36,7 +36,7 @@ void shell::load()
 		int uid;
 
 		stat = db.session() << 
-				"SELECT * FROM shell WHERE id = ?" << id;
+				"SELECT * FROM shell WHERE id = ? " << id;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {

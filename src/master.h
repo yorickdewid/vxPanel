@@ -38,7 +38,7 @@ public:
 	void get_ftp_account(std::string ftp_account, int uid);
 	void get_vhost(std::string domain_name, int uid);
 	void get_mailbox(std::string domain_name, int uid);
-	void get_shell(int uid);
+	void get_shell(int id,int uid);
 	void get_subdomain(std::string subdomain, int uid);
 	void get_settings(std::string key);
 	void get_database_types();

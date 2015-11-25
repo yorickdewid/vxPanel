@@ -423,9 +423,21 @@ void master::get_mailbox(std::string domain_name, int uid)
 	}
 }
 
-void master::get_shell(int uid)
+void master::get_shell(int id,int uid)
 {
+	cppcms::json::value json;
 
+	shell shell(get_database(),uid);
+	shell.load();
+
+	if ( shell.get_user().get_uid() == uid) {
+		json["shell"]["created"] = shell.get_created();
+
+		return_result(json);
+	}
+	else{
+		return_error("Unauthorized");
+	}
 }
 
 void master::get_subdomain(std::string subdomain, int uid)
