@@ -531,4 +531,127 @@ void master::get_database(std::string db_name, int uid)
 	}
 }
 
+/* Update */
+
+/* password,email,fname,lname,country,city,address,postal,note,user_type,active */
+void master::update_user(int uid, std::vector<std::string> update_list)
+{
+
+}
+
+/* status, registrar, vhost_id */
+void master::update_domain(int uid, std::string domain_name, std::vector<std::string> update_list)
+{
+
+}
+
+/* address */
+void master::update_dns(int uid, int dns_id, std::vector<std::string> update_list)
+{
+
+}
+
+/* password, permissions */
+void master::update_ftp_account(int uid, std::string ftp_account, std::vector<std::string> update_list)
+{
+
+}
+
+/* name ?, custom_config */ 
+void master::update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list)
+{
+
+}
+
+/* address */
+void master::update_mailbox(int uid, std::string domain_name, std::vector<std::string> update_list)
+{
+
+}
+
+/* subdomain name , vhost_id */
+void master::update_subdomain(int uid, std::string subdomain_name, std::vector<std::string> update_list)
+{
+
+}
+
+/* value, default, description */
+void master::update_setting(std::string key)
+{
+
+}
+
+/* password, permissions */
+void master::update_database_user(int uid, std::string username)
+{
+
+}
+
+/* database_type */
+void master::update_database(int uid, std::string db_name, std::vector<std::string> update_list)
+{
+
+}
+
+/* delete */
+
+void master::delete_user(std::string username, int uid)
+{
+
+}
+
+void master::delete_domain(std::string domain_name, int uid)
+{
+
+}
+
+void master::delete_dns(int dns_id, int uid)
+{
+
+}
+
+void master::delete_ftp_account(std::string ftp_account, int uid)
+{
+
+}
+
+void master::delete_vhost(int vhost_id, int uid)
+{
+
+}
+
+void master::delete_mailbox(std::string name, std::string domain_name, int uid)
+{
+
+}
+
+void master::delete_shell(int id, int uid)
+{
+
+}
+
+void master::delete_subdomain(std::string subdomain_name, std::string domain_name, int uid)
+{
+
+}
+
+void master::delete_setting(std::string key)
+{
+
+}
+
+void master::delete_database_type(std::string name)
+{
+
+}
+
+void master::delete_database_user(std::string username, int uid)
+{
+
+}
+
+void master::delete_database(std::string db_name, std::string username, int uid)
+{
+
+}
 
