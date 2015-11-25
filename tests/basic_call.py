@@ -89,7 +89,7 @@ def test_rpc_create_vhost():
 
 def test_rpc_create_mailbox():
 	print bcolors.OKBLUE + "Testcase: Create mailbox" + bcolors.ENDC
-	data = '{"id":0,"method":"create_mailbox","params":["arie","127.0.0.1","trol.com",1]}'
+	data = '{"id":0,"method":"create_mailbox","params":["127.0.0.1","trol.com",1]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_shell():
@@ -144,6 +144,11 @@ def test_rpc_get_vhost():
 	data = '{"id":0,"method":"get_vhost","params":["trol.com",1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_mailbox():
+	print bcolors.OKBLUE + "Testcase: Get mailbox" + bcolors.ENDC
+	data = '{"id":0,"method":"get_mailbox","params":["trol.com",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 
 # Call the testcases
@@ -154,18 +159,19 @@ test_rpc_db_version()
 
 test_rpc_create_user()
 test_rpc_create_domain()
-test_rpc_create_dns();
-test_rpc_create_ftp_account();
-test_rpc_create_vhost();
-test_rpc_create_mailbox();
-test_rpc_create_shell();
-test_rpc_create_subdomain();
-test_rpc_create_setting();
-test_rpc_create_db_user();
-test_rpc_create_database();
+test_rpc_create_dns()
+test_rpc_create_ftp_account()
+test_rpc_create_vhost()
+test_rpc_create_mailbox()
+test_rpc_create_shell()
+test_rpc_create_subdomain()
+test_rpc_create_setting()
+test_rpc_create_db_user()
+test_rpc_create_database()
 
 test_rpc_get_user()
 test_rpc_get_domain()
-test_rpc_get_dns();
-test_rpc_get_ftp_account();
-test_rpc_get_vhost();
+test_rpc_get_dns()
+test_rpc_get_ftp_account()
+test_rpc_get_vhost()
+test_rpc_get_mailbox()

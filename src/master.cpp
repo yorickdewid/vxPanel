@@ -231,11 +231,10 @@ void master::create_vhost(std::string name, std::string custom_config, int uid)
 	return_result("OK");
 }
 
-void master::create_mailbox(std::string name, std::string address, std::string domain_name, int uid)
+void master::create_mailbox(std::string address, std::string domain_name, int uid)
 {
 	mailbox mailbox(get_database(),0);
 
-	mailbox.set_name(name);
 	mailbox.set_address(address);
 	mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
 
@@ -394,22 +393,34 @@ void master::get_vhost(std::string domain_name, int uid)
 	vhost vhost(get_database(),0);
 	vhost.load(domain_name);
 
-	if ( !domain_name.compare(vhost.get_name())) {
-		json["vhost"]["id"] = vhost.get_id();
-		json["vhost"]["name"] = vhost.get_name();
-		json["vhost"]["custom_config"] = vhost.get_custom_config();
-		json["vhost"]["created"] = vhost.get_created();
+	json["vhost"]["id"] = vhost.get_id();
+	json["vhost"]["name"] = vhost.get_name();
+	json["vhost"]["custom_config"] = vhost.get_custom_config();
+	json["vhost"]["created"] = vhost.get_created();
+
+	return_result(json);
+}
+
+void master::get_mailbox(std::string domain_name, int uid)
+{
+	cppcms::json::value json;
+
+	mailbox mailbox(get_database(),0);
+	mailbox.load(domain_name);
+
+	if ( mailbox.get_domain().get_domain_name().compare(domain_name) == 0) {
+		json["mailbox"]["id"] = mailbox.get_id();
+		json["mailbox"]["address"] = mailbox.get_address();
+		json["mailbox"]["created"] = mailbox.get_created();
+		if ( !mailbox.get_domain().get_domain_name().compare("") ) { /* good enough? */
+			json["mailbox"]["domain"] = mailbox.get_domain().get_domain_name();
+		}
 
 		return_result(json);
 	}
 	else{
 		return_error("Unauthorized");
 	}
-}
-
-void master::get_mailbox(std::string domain_name, int uid)
-{
-
 }
 
 void master::get_shell(int uid)

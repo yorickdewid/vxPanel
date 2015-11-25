@@ -37,7 +37,7 @@ void user_dbuser_db::load(std::string db_username, std::string db_name = "false"
 {
 	try{
 		cppdb::statement stat;
-		if (db_name.compare("false") ) {
+		if (db_name.compare("false") == 0) {
 			stat = db.session() << 
 			"SELECT * FROM user_dbuser_db WHERE db_username = ?" << db_username;
 		} else {

@@ -40,10 +40,9 @@ void mailbox::load()
 
 		while(r.next()) {
 	  		r.fetch(0,this->id);
-	  		r.fetch(1,this->_name);
-	  		r.fetch(2,this->_address);
-	  		r.fetch(3,this->_created);
-	  		r.fetch(4,domain_name);
+	  		r.fetch(1,this->_address);
+	  		r.fetch(2,this->_created);
+	  		r.fetch(3,domain_name);
 			if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
@@ -61,9 +60,35 @@ void mailbox::load()
 	}
 }
 
-void mailbox::set_name(std::string name)
+void mailbox::load(std::string domain_name)
 {
-	this->_name = name;
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"SELECT * FROM mailbox WHERE domain_name = ?" << domain_name;
+		cppdb::result r = stat.query();
+
+		while(r.next()) {
+	  		r.fetch(0,this->id);
+	  		r.fetch(1,this->_address);
+	  		r.fetch(2,this->_created);
+	  		r.fetch(3,domain_name);
+			if ( !domain_name.empty() ) {
+	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
+	  		}
+	    }
+
+	    stat.reset();
+
+    	this->saved = true;
+
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
 }
 
 void mailbox::set_address(std::string address)
