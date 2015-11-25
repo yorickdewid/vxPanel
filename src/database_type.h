@@ -1,5 +1,6 @@
 #ifndef DATABASE_TYPE_H
 #define DATABASE_TYPE_H
+#include <vector>
 
 class database_type : public model {
 
@@ -11,6 +12,7 @@ public:
 	
 	void save();
 	void load();
+	std::vector<database_type> load_all();
 
 	void set_name(std::string name);
 

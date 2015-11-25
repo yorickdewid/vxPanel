@@ -35,20 +35,17 @@ void app_settings::load()
 		int tmp_default;
 
 		stat = db.session() << 
-				"SELECT * FROM settings WHERE key = ?" << key;
+				"SELECT * FROM settings WHERE `key` = ?" << key;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->key);
-	  		r.fetch(1,this->_value);
-	  		r.fetch(2,tmp_default);
+	  		r >> this->key >> this->_value >> tmp_default >> this->_description >> this->_updated >> this->_created;
 	  		if ( tmp_default == 0 ){
   				this->_default = false;
   			}
   			else if ( tmp_default == 1 ){
   				this->_default = true;
   			}
-	  		r.fetch(3,this->_description);
 	    }
 
 	    stat.reset();

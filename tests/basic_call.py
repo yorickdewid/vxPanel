@@ -159,6 +159,16 @@ def test_rpc_get_subdomain():
 	data = '{"id":0,"method":"get_subdomain","params":["kaas.",1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_setting():
+	print bcolors.OKBLUE + "Testcase: Get setting" + bcolors.ENDC
+	data = '{"id":0,"method":"get_setting","params":["reboot"]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_get_database_types():
+	print bcolors.OKBLUE + "Testcase: Get database options" + bcolors.ENDC
+	data = '{"id":0,"method":"get_database_types","params":[]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 
 # Call the testcases
@@ -185,5 +195,7 @@ test_rpc_get_dns()
 test_rpc_get_ftp_account()
 test_rpc_get_vhost()
 test_rpc_get_mailbox()
-test_rpc_get_shell();
-test_rpc_get_subdomain();
+test_rpc_get_shell()
+test_rpc_get_subdomain()
+test_rpc_get_setting()
+test_rpc_get_database_types()

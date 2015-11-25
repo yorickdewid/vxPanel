@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "config.h"
 #include "exceptions.h"
@@ -38,7 +39,7 @@ void database_type::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->name);
+	  		r >> this->name;
 	    }
 
 	    stat.reset();
@@ -50,6 +51,37 @@ void database_type::load()
 	catch(std::exception &e)
 	{
 		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+}
+
+std::vector<database_type> database_type::load_all()
+{
+	try{
+		cppdb::statement stat;
+		std::vector<database_type> database_types; 
+
+		stat = db.session() << 
+				"SELECT * FROM user_db_type";
+		cppdb::result r = stat.query();
+
+		while(r.next()) {
+			std::string tmp_name;
+	  		r >> tmp_name;
+	  		database_type obj = database_type(db,tmp_name);
+	  		database_types.push_back(obj);
+	    }
+
+	    stat.reset();
+
+
+		std::cout << "All data loaded" << std::endl;
+		return database_types;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+		std::vector<database_type> k;
+		return k;
 	}
 }
 

@@ -59,7 +59,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_mailbox", cppcms::rpc::json_method(&master::get_mailbox, this), method_role);
 	bind("get_shell", cppcms::rpc::json_method(&master::get_shell, this), method_role);
 	bind("get_subdomain", cppcms::rpc::json_method(&master::get_subdomain, this), method_role);
-	bind("get_settings", cppcms::rpc::json_method(&master::get_settings, this), method_role);
+	bind("get_setting", cppcms::rpc::json_method(&master::get_setting, this), method_role);
 	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
@@ -456,14 +456,37 @@ void master::get_subdomain(std::string subdomain_name, int uid)
 	return_result(json);
 }
 
-void master::get_settings(std::string key)
+void master::get_setting(std::string key)
 {
+	cppcms::json::value json;
 
+	app_settings app_settings(get_database(),key);
+	app_settings.load();
+
+	json["app_settings"]["key"] = app_settings.get_key();
+	json["app_settings"]["value"] = app_settings.get_value();
+	json["app_settings"]["default"] = app_settings.get_default();
+	json["app_settings"]["description"] = app_settings.get_description();
+	json["app_settings"]["updated"] = app_settings.get_updated();	
+	json["app_settings"]["created"] = app_settings.get_created();
+
+	return_result(json);
 }
 
 void master::get_database_types()
 {
+	cppcms::json::value json;
 
+	database_type tmp_object(get_database(),"");
+
+	std::vector<database_type> v = tmp_object.load_all();
+
+	int count = 0;
+	for(std::vector<database_type>::iterator it = v.begin(); it != v.end(); ++it) {
+    	json["database_types"][count] = it->get_name();
+    	count++;
+	}
+	return_result(json);
 }
 
 void master::get_database_user(int uid)
