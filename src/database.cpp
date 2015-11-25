@@ -42,11 +42,8 @@ void database::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->name);
-	  		r.fetch(1,type);
+	  		r >> this->name	>> this->_created >> uid >> type;
 	  		set_database_type(std::shared_ptr<database_type>(new database_type(db,type)));
-	  		r.fetch(2,this->_created);
-	  		r.fetch(3,uid);
 	  		set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 

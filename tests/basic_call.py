@@ -169,13 +169,23 @@ def test_rpc_get_database_types():
 	data = '{"id":0,"method":"get_database_types","params":[]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_database_user():
+	print bcolors.OKBLUE + "Testcase: Get database user" + bcolors.ENDC
+	data = '{"id":0,"method":"get_database_user","params":["arie",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_database():
+	print bcolors.OKBLUE + "Testcase: Get database" + bcolors.ENDC
+	data = '{"id":0,"method":"get_database","params":["kaas",1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
 
 # Call the testcases
 test_rpc_sum()
 test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
+
+## all 'perfect' scenarios ##
 
 test_rpc_create_user()
 test_rpc_create_domain()
@@ -199,3 +209,7 @@ test_rpc_get_shell()
 test_rpc_get_subdomain()
 test_rpc_get_setting()
 test_rpc_get_database_types()
+test_rpc_get_database_user()
+test_rpc_get_database()
+
+## all 'perfect' scenarios ##

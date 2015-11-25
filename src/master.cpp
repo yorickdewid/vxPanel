@@ -473,6 +473,7 @@ void master::get_setting(std::string key)
 	return_result(json);
 }
 
+/* TODO Inspect for memory leakage */
 void master::get_database_types()
 {
 	cppcms::json::value json;
@@ -486,17 +487,48 @@ void master::get_database_types()
     	json["database_types"][count] = it->get_name();
     	count++;
 	}
+	v.clear();
 	return_result(json);
 }
 
-void master::get_database_user(int uid)
+void master::get_database_user(std::string username, int uid)
 {
 
+	cppcms::json::value json;
+
+	database_user database_user(get_database(),username);
+	database_user.load();
+
+	if ( database_user.get_user().get_uid() == uid ) {
+		json["db_user"]["username"] = database_user.get_name();
+		json["db_user"]["password"] = database_user.get_password();
+		json["db_user"]["permissions"] = database_user.get_permissions();
+		json["db_user"]["created"] = database_user.get_created();
+
+		return_result(json);
+	}
+	else {
+		return_error("Unauthorized");
+	}
 }
 
-void master::get_database(int uid)
+void master::get_database(std::string db_name, int uid)
 {
+	cppcms::json::value json;
 
+	database database(get_database(),db_name);
+	database.load();
+
+	if ( database.get_user().get_uid() == uid ) {
+		json["db"]["name"] = database.get_name();
+		json["db"]["created"] = database.get_created();
+		json["db"]["db_type"] = database.get_database_type().get_name();
+
+		return_result(json);
+	}
+	else {
+		return_error("Unauthorized");
+	}
 }
 
 

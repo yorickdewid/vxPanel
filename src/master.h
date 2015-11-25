@@ -42,8 +42,8 @@ public:
 	void get_subdomain(std::string subdomain_name, int uid);
 	void get_setting(std::string key);
 	void get_database_types();
-	void get_database_user(int uid);
-	void get_database(int uid);
+	void get_database_user(std::string username,int uid);
+	void get_database(std::string db_name, int uid);
 
 protected:
 	std::string format_uptime(std::string sec);
