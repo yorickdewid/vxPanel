@@ -37,11 +37,7 @@ void database_user::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->name);
-	  		r.fetch(1,this->_password);
-	  		r.fetch(2,this->_permissions);
-	  		r.fetch(3,this->_created);
-	  		r.fetch(4,uid);
+			r >> this->name >> this->_password >> this->_permissions >> this->_created >> uid;
 	  		set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 

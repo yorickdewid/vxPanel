@@ -43,11 +43,7 @@ void domain::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->name);
-	  		r.fetch(1,this->_status);
-	  		r.fetch(2,this->_registrar);
-	  		r.fetch(3,this->_created);
-	  		r.fetch(4,uid);
+			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
 	  		if(r.fetch(5,this->_vhost_id) == false){ /* TODO replace with vhost object) */
 	  			this->_vhost_id = -1;

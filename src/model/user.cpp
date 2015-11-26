@@ -44,25 +44,13 @@ void user::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-  			r.fetch(0,this->uid);
-  			r.fetch(1,this->_password);
-  			r.fetch(2,this->_email);
-  			r.fetch(3,this->_firstname);
-  			r.fetch(4,this->_lastname);
-  			r.fetch(5,this->_country);
-  			r.fetch(6,this->_city);
-  			r.fetch(7,this->_address);
-  			r.fetch(8,this->_postal);
-  			r.fetch(9,this->_note);
-  			r.fetch(10,this->_user_type);
-  			r.fetch(11,tmp_active);
+  			r >> this->uid >> this->_password >> this->_email >> this->_firstname >> this->_lastname >> this->_country >> this->_city >> this->_address >> this->_postal >> this->_note >> this->_user_type >> tmp_active >> this->_lastlogin;
   			if ( tmp_active == 0 ){
   				this->_active = false;
   			}
   			else if ( tmp_active == 1 ){
   				this->_active = true;
   			}
-  			r.fetch(12,this->_lastlogin);
     	}
     
     	stat.reset();

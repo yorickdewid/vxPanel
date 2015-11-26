@@ -36,10 +36,7 @@ void mailbox::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->id);
-	  		r.fetch(1,this->_address);
-	  		r.fetch(2,this->_created);
-	  		r.fetch(3,domain_name);
+			r >> this->id >> this->_address >> this->_created >> domain_name;
 			if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}

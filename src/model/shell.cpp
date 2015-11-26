@@ -37,9 +37,7 @@ void shell::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->id);
-	  		r.fetch(1,this->_created);
-	  		r.fetch(2,uid);
+			r >> this->id >> this->_created >> uid;
 	  		set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 

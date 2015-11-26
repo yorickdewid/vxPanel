@@ -45,8 +45,7 @@ void user_dbuser_db::load(std::string db_username, std::string db_name = "false"
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->db_username);
-	  		r.fetch(1,this->db_name);
+			r >> this->db_username >> this->db_name;
 	    }
 
 	    stat.reset();

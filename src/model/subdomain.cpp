@@ -43,8 +43,7 @@ void subdomain::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->name);
-	  		r.fetch(1,this->_created);
+			r >> this->name >> this->_created;
 	  		if( r.fetch(2,domain_name) != false){
 				if ( !domain_name.empty() ) {
 	  				set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));

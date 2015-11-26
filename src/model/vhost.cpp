@@ -35,10 +35,7 @@ void vhost::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->id);
-	  		r.fetch(1,this->_name);
-	  		r.fetch(2,this->_custom_config);
-	  		r.fetch(3,this->_created);
+			r >> this->id >> this->_name >> this->_custom_config >> this->_created;
 	    }
 
 	    stat.reset();

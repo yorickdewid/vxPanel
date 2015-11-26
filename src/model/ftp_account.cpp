@@ -45,11 +45,7 @@ void ftp_account::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->username);
-	  		r.fetch(1,this->_password);
-	  		r.fetch(2,this->_permissions);
-	  		r.fetch(3,this->_created);
-	  		r.fetch(4,domain_name);
+			r >> this->username >> this->_password >> this->_permissions >> this->_created >> domain_name;
 	  		if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
