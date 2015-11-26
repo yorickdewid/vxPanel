@@ -1,6 +1,9 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "exceptions.h"
+#include "backend.h"
+
 class model {
 
 public:

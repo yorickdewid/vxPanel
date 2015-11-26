@@ -1,9 +1,6 @@
 #include <iostream>
 
-#include "config.h"
-#include "exceptions.h"
-#include "backend.h"
-#include "model.h"
+#include "../model.h"
 #include "user_dbuser_db.h"
 
 void user_dbuser_db::save()

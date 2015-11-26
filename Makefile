@@ -1,24 +1,25 @@
 LIBS=-lcppcms -lcppdb
 SRCDIR=src
+MDIR=model/
 
 all: vxpanel
 
 vxpanel:
 	$(CXX) $(CXXFLAGS) -O0 -Wall -g -std=c++11 -std=gnu++11 $(SRCDIR)/backend.cpp \
 									$(SRCDIR)/sha1.cpp \
-									$(SRCDIR)/user.cpp \
-									$(SRCDIR)/domain.cpp \
-									$(SRCDIR)/dns.cpp \
-									$(SRCDIR)/ftp_account.cpp \
-									$(SRCDIR)/vhost.cpp \
-									$(SRCDIR)/mailbox.cpp \
-									$(SRCDIR)/subdomain.cpp \
-									$(SRCDIR)/shell.cpp \
-									$(SRCDIR)/app_settings.cpp \
-									$(SRCDIR)/database_type.cpp \
-									$(SRCDIR)/database_user.cpp \
-									$(SRCDIR)/database.cpp \
-									$(SRCDIR)/user_dbuser_db.cpp \
+									$(SRCDIR)/$(MDIR)user.cpp \
+									$(SRCDIR)/$(MDIR)domain.cpp \
+									$(SRCDIR)/$(MDIR)dns.cpp \
+									$(SRCDIR)/$(MDIR)ftp_account.cpp \
+									$(SRCDIR)/$(MDIR)vhost.cpp \
+									$(SRCDIR)/$(MDIR)mailbox.cpp \
+									$(SRCDIR)/$(MDIR)subdomain.cpp \
+									$(SRCDIR)/$(MDIR)shell.cpp \
+									$(SRCDIR)/$(MDIR)app_settings.cpp \
+									$(SRCDIR)/$(MDIR)database_type.cpp \
+									$(SRCDIR)/$(MDIR)database_user.cpp \
+									$(SRCDIR)/$(MDIR)database.cpp \
+									$(SRCDIR)/$(MDIR)user_dbuser_db.cpp \
 									$(SRCDIR)/master.cpp \
 									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
 

@@ -1,9 +1,6 @@
 #include <iostream>
 
-#include "config.h"
-#include "exceptions.h"
-#include "backend.h"
-#include "model.h"
+#include "../model.h"
 #include "database.h"
 #include "user.h"
 #include "database_type.h"

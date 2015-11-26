@@ -1,10 +1,8 @@
 #include <iostream>
 
-#include "config.h"
-#include "exceptions.h"
-#include "sha1.h"
-#include "backend.h"
-#include "model.h"
+#include "../config.h"
+#include "../sha1.h"
+#include "../model.h"
 #include "user.h"
 
 void user::save()

@@ -1,9 +1,6 @@
 #include <iostream>
 
-#include "config.h"
-#include "exceptions.h"
-#include "backend.h"
-#include "model.h"
+#include "../model.h"
 #include "app_settings.h"
 
 void app_settings::save()
