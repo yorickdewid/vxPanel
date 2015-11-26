@@ -56,6 +56,7 @@ bool database_type::update(std::string field)
 
 }
 
+/* TODO Handle foreign key block correctly */
 bool database_type::m_delete()
 {
 	try{

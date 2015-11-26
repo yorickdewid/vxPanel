@@ -71,6 +71,7 @@ bool domain::update(std::string field)
 
 }
 
+/* TODO Handle foreign key block correctly */
 bool domain::m_delete()
 {
 	try{

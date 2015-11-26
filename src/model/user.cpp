@@ -82,6 +82,7 @@ bool user::update(std::string field)
 
 }
 
+/* TODO Handle foreign key block correctly */
 bool user::m_delete()
 {
 	try{

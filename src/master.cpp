@@ -74,6 +74,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("delete_shell", cppcms::rpc::json_method(&master::delete_shell, this), method_role);
 	bind("delete_subdomain", cppcms::rpc::json_method(&master::delete_subdomain, this), method_role);
 	bind("delete_setting", cppcms::rpc::json_method(&master::delete_setting, this), method_role);
+	bind("delete_database_type", cppcms::rpc::json_method(&master::delete_database_type, this), method_role);
 	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
 	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
 }
@@ -752,9 +753,9 @@ void master::delete_database(std::string db_name, std::string db_username, int u
 	database database(get_database(),db_name);
 
 	database.load();
-	if ( database.m_delete() ) {
-		user_dbuser_db connect(get_database(),db_username,db_name);
-		if ( connect.m_delete() ) {
+	user_dbuser_db connect(get_database(),db_username,db_name);
+	if ( connect.m_delete() ) {
+		if ( database.m_delete() ) {
 			return_result("OK");
 		}
 		else {
