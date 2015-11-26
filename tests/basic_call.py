@@ -156,7 +156,7 @@ def test_rpc_get_shell():
 
 def test_rpc_get_subdomain():
 	print bcolors.OKBLUE + "Testcase: Get subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_subdomain","params":["kaas.",1]}'
+	data = '{"id":0,"method":"get_subdomain","params":["kaas.","trol.com",1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_setting():
@@ -178,6 +178,18 @@ def test_rpc_get_database():
 	print bcolors.OKBLUE + "Testcase: Get database" + bcolors.ENDC
 	data = '{"id":0,"method":"get_database","params":["kaas",1]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
+
+
+### update ###
+
+### delete ###
+
+def test_rpc_delete_setting():
+	print bcolors.OKBLUE + "Testcase: Delete setting" + bcolors.ENDC
+	data = '{"id":0,"method":"delete_setting","params":["reboot"]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+
 
 # Call the testcases
 test_rpc_sum()
@@ -212,4 +224,7 @@ test_rpc_get_database_types()
 test_rpc_get_database_user()
 test_rpc_get_database()
 
+
+
+test_rpc_delete_setting()
 ## all 'perfect' scenarios ##

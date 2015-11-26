@@ -77,7 +77,26 @@ bool subdomain::update(std::string field)
 
 bool subdomain::m_delete()
 {
-	
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"DELETE FROM subdomain WHERE name = ? and domain_name = ?" << name << _domain->get_domain_name();
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+	return false;
 }
 
 void subdomain::set_name(std::string name)

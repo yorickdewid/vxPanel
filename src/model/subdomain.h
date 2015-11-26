@@ -5,9 +5,10 @@
 class subdomain : public model {
 
 public:
-	subdomain(backend& db, std::string name) :
+	subdomain(backend& db, std::string name, std::string domain_name) :
 		model(db),
 		name(name),
+		_domain(new domain(db,domain_name)),
 		_vhost_id(-1)
 	{};
 	

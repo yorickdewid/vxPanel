@@ -76,7 +76,26 @@ bool ftp_account::update(std::string field)
 
 bool ftp_account::m_delete()
 {
-	
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"DELETE FROM ftp_account WHERE username = ?" << username;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+	return false;
 }
 
 void ftp_account::set_password(std::string password)

@@ -62,6 +62,20 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
+
+	/* TODO update */
+
+	bind("delete_user", cppcms::rpc::json_method(&master::delete_user, this), method_role);
+	bind("delete_domain", cppcms::rpc::json_method(&master::delete_domain, this), method_role);
+	bind("delete_dns", cppcms::rpc::json_method(&master::delete_dns, this), method_role);
+	bind("delete_ftp_account", cppcms::rpc::json_method(&master::delete_ftp_account, this), method_role);
+	bind("delete_vhost", cppcms::rpc::json_method(&master::delete_vhost, this), method_role);
+	bind("delete_mailbox", cppcms::rpc::json_method(&master::delete_mailbox, this), method_role);
+	bind("delete_shell", cppcms::rpc::json_method(&master::delete_shell, this), method_role);
+	bind("delete_subdomain", cppcms::rpc::json_method(&master::delete_subdomain, this), method_role);
+	bind("delete_setting", cppcms::rpc::json_method(&master::delete_setting, this), method_role);
+	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
+	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
 }
 
 master::~master()
@@ -255,9 +269,7 @@ void master::create_shell(int uid)
 
 void master::create_subdomain(std::string subdomain_name, std::string domain_name, int uid)
 {
-	subdomain subdomain(get_database(),subdomain_name);
-
-	subdomain.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+	subdomain subdomain(get_database(),subdomain_name, domain_name);
 
 	subdomain.save();
 
@@ -439,11 +451,11 @@ void master::get_shell(int id,int uid)
 }
 
 /* todo check if domain belongs to logged in user */
-void master::get_subdomain(std::string subdomain_name, int uid)
+void master::get_subdomain(std::string subdomain_name, std::string domain_name, int uid)
 {
 	cppcms::json::value json;
 
-	subdomain subdomain(get_database(),subdomain_name);
+	subdomain subdomain(get_database(),subdomain_name, domain_name);
 	subdomain.load();
 
 	json["subdomain"]["name"] = subdomain.get_name();	
@@ -596,61 +608,160 @@ void master::update_database(int uid, std::string db_name, std::vector<std::stri
 
 void master::delete_user(std::string username, int uid)
 {
+	user user(get_database(),uid);
 
+	user.load();
+
+	if ( user.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_domain(std::string domain_name, int uid)
 {
+	domain domain(get_database(),domain_name);
 
+	domain.load();
+
+	if ( domain.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_dns(int dns_id, int uid)
 {
+	dns dns(get_database(),dns_id);
 
+	dns.load();
+
+	if ( dns.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
-void master::delete_ftp_account(std::string ftp_account, int uid)
+void master::delete_ftp_account(std::string ftp_username, int uid)
 {
+	ftp_account ftp_account(get_database(),ftp_username);
 
+	ftp_account.load();
+
+	if ( ftp_account.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_vhost(int vhost_id, int uid)
 {
+	vhost vhost(get_database(),vhost_id);
 
+	vhost.load();
+
+	if ( vhost.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
-void master::delete_mailbox(std::string name, std::string domain_name, int uid)
+void master::delete_mailbox(int mailbox_id, int uid)
 {
+	mailbox mailbox(get_database(),mailbox_id);
 
+	mailbox.load();
+
+	if ( mailbox.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_shell(int id, int uid)
 {
+	shell shell(get_database(),id);
 
+	shell.load();
+
+	if ( shell.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_subdomain(std::string subdomain_name, std::string domain_name, int uid)
 {
+	subdomain subdomain(get_database(),subdomain_name,domain_name);
 
+	subdomain.load();
+
+	if ( subdomain.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_setting(std::string key)
 {
+	app_settings app_settings(get_database(),key);
 
+	app_settings.load();
+	if ( app_settings.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_database_type(std::string name)
 {
+	database_type database_type(get_database(),name);
 
+	database_type.load();
+
+	if ( database_type.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
 void master::delete_database_user(std::string username, int uid)
 {
+	database_user database_user(get_database(),username);
 
+	database_user.load();
+	if ( database_user.m_delete() ) {
+		return_result("OK");
+	} else {
+		return_error("Delete failed");
+	}
 }
 
-void master::delete_database(std::string db_name, std::string username, int uid)
+void master::delete_database(std::string db_name, std::string db_username, int uid)
 {
+	database database(get_database(),db_name);
 
+	database.load();
+	if ( database.m_delete() ) {
+		user_dbuser_db connect(get_database(),db_username,db_name);
+		if ( connect.m_delete() ) {
+			return_result("OK");
+		}
+		else {
+			return_error("Failed to delete database, and remove connection with username");
+		}
+	} else {
+		return_error("Delete failed");
+	}
 }
 

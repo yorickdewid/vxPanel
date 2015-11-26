@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS `subdomain` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
   `vhost_id` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`name`),
+  PRIMARY KEY (`name`,`domain_name`),
   KEY `FK_subdomain_domain` (`domain_name`),
   KEY `FK_subdomain_vhost` (`vhost_id`),
   CONSTRAINT `FK_subdomain_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,

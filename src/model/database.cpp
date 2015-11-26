@@ -63,7 +63,26 @@ bool database::update(std::string field)
 
 bool database::m_delete()
 {
-	
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"DELETE FROM user_db WHERE name = ?" << name;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+	return false;
 }
 
 

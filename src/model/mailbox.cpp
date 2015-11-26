@@ -95,7 +95,26 @@ bool mailbox::update(std::string field)
 
 bool mailbox::m_delete()
 {
-	
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"DELETE FROM mailbox WHERE id = ?" << id;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+	return false;
 }
 
 

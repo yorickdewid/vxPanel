@@ -68,7 +68,26 @@ bool user_dbuser_db::update(std::string field)
 
 bool user_dbuser_db::m_delete()
 {
-	
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"DELETE FROM user_dbuser_db WHERE db_username = ? and db_name = ?" << db_username << db_name;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+	return false;
 }
 
 void user_dbuser_db::set_db_username(std::string db_username)

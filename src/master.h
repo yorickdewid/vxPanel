@@ -39,7 +39,7 @@ public:
 	void get_vhost(std::string domain_name, int uid);
 	void get_mailbox(std::string domain_name, int uid);
 	void get_shell(int id, int uid);
-	void get_subdomain(std::string subdomain_name, int uid);
+	void get_subdomain(std::string subdomain_name, std::string domain_name, int uid);
 	void get_setting(std::string key);
 	void get_database_types();
 	void get_database_user(std::string username, int uid);
@@ -59,9 +59,9 @@ public:
 	void delete_user(std::string username, int uid);
 	void delete_domain(std::string domain_name, int uid);
 	void delete_dns(int dns_id, int uid);
-	void delete_ftp_account(std::string ftp_account, int uid);
+	void delete_ftp_account(std::string ftp_username, int uid);
 	void delete_vhost(int vhost_id, int uid);
-	void delete_mailbox(std::string name, std::string domain_name, int uid);
+	void delete_mailbox(int mailbox_id, int uid);
 	void delete_shell(int id, int uid);
 	void delete_subdomain(std::string subdomain_name, std::string domain_name, int uid);
 	void delete_setting(std::string key);
