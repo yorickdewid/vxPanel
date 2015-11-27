@@ -120,7 +120,7 @@ echo -e ""
 echo -e "# Generating installation log and debug info..."
 uname -a
 echo -e ""
-exit
+
 mkdir -p /usr/local/vxpanel
 cp -R . /usr/local/vxpanel
 cd /usr/local/vxpanel
@@ -147,43 +147,22 @@ db_passwd=`passwordgen`;
 mail_passwd=`passwordgen`;
 admin_passwd=`passwordgen`;
 
-# Set-up VXpanel directories and configure directory permissions as required.
-mkdir /etc/zpanel
-mkdir /etc/zpanel/configs
-mkdir /etc/zpanel/panel
-mkdir /var/zpanel
-mkdir /var/zpanel/hostdata
-mkdir /var/zpanel/hostdata/zadmin
-mkdir /var/zpanel/hostdata/zadmin/public_html
-mkdir /var/zpanel/logs
-mkdir /var/zpanel/logs/proftpd
-mkdir /var/zpanel/logs/apache
-mkdir /var/zpanel/backups
-mkdir /var/zpanel/temp
-cp -R . /etc/zpanel/panel/
-rm -rf /etc/zpanel/panel/*.sh
-rm -rf /etc/zpanel/panel/*.log
-rm -rf /etc/zpanel/panel/README.md
-rm -rf /etc/zpanel/panel/LICENSE
-rm -rf /etc/zpanel/panel/Vagrantfile
-chmod -R 777 /etc/zpanel/
-chmod -R 777 /var/zpanel/
-chmod -R 770 /var/zpanel/hostdata/
-chown -R apache:apache /var/zpanel/hostdata/
-chmod ugo+rx -R /var/zpanel/hostdata/
-ln -s /etc/zpanel/panel/bin/zppy /usr/bin/zppy
-ln -s /etc/zpanel/panel/bin/setso /usr/bin/setso
-ln -s /etc/zpanel/panel/bin/setzadmin /usr/bin/setzadmin
-chmod +x /etc/zpanel/panel/bin/zppy
-chmod +x /etc/zpanel/panel/bin/setso
-cp -R /etc/zpanel/panel/etc/build/config_packs/fedora_22/* /etc/zpanel/configs/
-cp -R /etc/zpanel/panel/etc/build/config_packs/sql/ /etc/zpanel/configs/sql/
-cc -O3 -o /etc/zpanel/panel/bin/zsudo /etc/zpanel/configs/bin/zsudo.c
-sudo chown root /etc/zpanel/panel/bin/zsudo
-chmod +s /etc/zpanel/panel/bin/zsudo
+# Set-up vxPanel directories and configure directory permissions as required
+mkdir /var/vxpanel
+mkdir /var/vxpanel/logs
+mkdir /var/vxpanel/logs/proftpd
+mkdir /var/vxpanel/logs/apache
+mkdir /var/vxpanel/backups
+mkdir /var/vxpanel/tmp
+
+chmod -R 777 /var/vxpanel/
+chmod +x /usr/local/vxpanel/bin/vxd
+
+ln -s /usr/local/vxpanel/bin/vxd /usr/bin/vxd
+ln -s /usr/local/vxpanel/etc/config.json /etc/vxpanel.conf
 
 # MariaDB specific installation tasks...
-MYSQL_ROOT_PASSWORD=$password
+MYSQL_ROOT_PASSWORD=$db_passwd
 SECURE_MYSQL=$(expect -c "
 set timeout 10
 spawn mysql_secure_installation
@@ -192,9 +171,9 @@ send \"\r\"
 expect \"Change the root password?\"
 send \"y\r\"
 expect \"New password:\"
-send \"$password\r\"
+send \"$db_passwd\r\"
 expect \"Re-enter new password:\"
-send \"$password\r\"
+send \"$db_passwd\r\"
 expect \"Remove anonymous users?\"
 send \"y\r\"
 expect \"Disallow root login remotely?\"
@@ -206,34 +185,35 @@ send \"y\r\"
 expect eof
 ")
 echo "$SECURE_MYSQL"
-sed -i "s|YOUR_ROOT_MYSQL_PASSWORD|$password|" /etc/zpanel/panel/cnf/db.php
-mysql -u root -p$password -e "DELETE FROM mysql.user WHERE User='root' AND Host != 'localhost'";
-mysql -u root -p$password -e "DELETE FROM mysql.user WHERE User=''";
-mysql -u root -p$password -e "FLUSH PRIVILEGES";
-mysql -u root -p$password -e "CREATE SCHEMA zpanel_roundcube";
-cat /etc/zpanel/configs/sql/*.sql | mysql -u root -p$password
-mysql -u root -p$password -e "UPDATE mysql.user SET Password=PASSWORD('$postfixpassword') WHERE User='postfix' AND Host='localhost';";
-mysql -u root -p$password -e "FLUSH PRIVILEGES";
+mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User = 'root' AND Host != 'localhost'";
+mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User = ''";
+mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User != 'root'";
+mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
+# mysql -u root -p$db_passwd -e "CREATE SCHEMA vxpanel_roundcube";
+cat /usr/local/vxpanel/create.sql | mysql -u root -p$db_passwd
+# mysql -u root -p$db_passwd -e "UPDATE mysql.user SET Password=PASSWORD('$postfixpassword') WHERE User='postfix' AND Host='localhost';";
+# mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
 
-# Set some ZPanel custom configuration settings (using. setso and setzadmin)
-setzadmin --set "$zadminNewPass";
-/etc/zpanel/panel/bin/setso --set zpanel_domain $fqdn
-/etc/zpanel/panel/bin/setso --set server_ip $publicip
-/etc/zpanel/panel/bin/setso --set apache_changed "true"
+# Set some vxPanel custom configuration settings (using. setso and setzadmin)
+# vxadmin --set "$admin_passwd";
+# /etc/vxpanel/panel/bin/setso --set vxpanel_domain $fqdn
+# /etc/vxpanel/panel/bin/setso --set server_ip $publicip
+# /etc/vxpanel/panel/bin/setso --set apache_changed "true"
 
 # We'll store the passwords so that users can review them later if required.
-echo "Store settings in passwords.txt"
-touch /root/passwords.txt;
-echo "zadmin Password: $zadminNewPass" >> /root/passwords.txt;
-echo "MariaDB Root Password: $password" >> /root/passwords.txt
-echo "MariaDB Postfix Password: $postfixpassword" >> /root/passwords.txt
-echo "IP Address: $publicip" >> /root/passwords.txt
-echo "Panel Domain: $fqdn" >> /root/passwords.txt
+echo "Store settings in vxconfig.txt"
+touch /root/vxconfig.txt;
+echo "Admin Password: $admin_passwd" >> /root/vxconfig.txt;
+echo "MariaDB Root Password: $password" >> /root/vxconfig.txt
+echo "MariaDB Postfix Password: $postfixpassword" >> /root/vxconfig.txt
+echo "IP Address: $publicip" >> /root/vxconfig.txt
+echo "Panel Domain: $fqdn" >> /root/vxconfig.txt
+chmod 600 /root/vxconfig.txt
 
 # PHP specific installation tasks...
 echo "Reconfigure PHP settings"
 sed -i "s|;date.timezone =|date.timezone = $tz|" /etc/php.ini
-sed -i "s|;upload_tmp_dir =|upload_tmp_dir = /var/zpanel/temp/|" /etc/php.ini
+sed -i "s|;upload_tmp_dir =|upload_tmp_dir = /var/vxpanel/tmp/|" /etc/php.ini
 sed -i "s|upload_max_filesize = 2M|upload_max_filesize = 500M|" /etc/php.ini
 sed -i "s|post_max_size = 8M|post_max_size = 1G|" /etc/php.ini
 sed -i "s|memory_limit = 128M|memory_limit = 256M|" /etc/php.ini
@@ -241,6 +221,8 @@ sed -i "s|expose_php = On|expose_php = Off|" /etc/php.ini
 sed -i "s|session.gc_maxlifetime = 1440|session.gc_maxlifetime = 7200|" /etc/php.ini
 sed -i "s|session.name = PHPSESSID|session.name = _UMTAUTHS|" /etc/php.ini
 sed -i "s|session.hash_function = 0|session.hash_function = 1|" /etc/php.ini
+
+# TODO and further.....#
 
 # Postfix specific installation tasks...
 echo "Setup SMTP"
@@ -325,8 +307,8 @@ chmod -R 644 /etc/cron.d/
 chown -R apache:apache /var/spool/cron/
 
 # Webalizer specific installation tasks...
-echo "Configure webstatistics"
-rm -rf /etc/webalizer.conf
+# echo "Configure webstatistics"
+# rm -rf /etc/webalizer.conf
 
 # phpMyAdmin config
 salt=`passwordgen`;
@@ -362,29 +344,24 @@ systemctl reload crond
 systemctl restart mariadb
 systemctl start proftpd
 systemctl restart atd
-php /etc/zpanel/panel/bin/daemon.php
-# Try to get tlds
-php /etc/zpanel/panel/bin/TldCron.php
 
 # We'll now remove the temporary install cache.
 echo "Cleanup..."
-cd ../
-rm -rf qp_install_cache/
 dnf -y autoremove
 
 # Advise the user that VXpanel is now installed and accessible.
 echo -e "##############################################################" &>/dev/tty
-echo -e "# Congratulations VXpanel has now been installed on your      #" &>/dev/tty
-echo -e "# server. Please review the log file left in /root/ for      #" &>/dev/tty
-echo -e "# any errors encountered during installation.                #" &>/dev/tty
+echo -e "# Congratulations vxPanel has now been installed on your     #" &>/dev/tty
+echo -e "# server. Please review the log file for any errors          #" &>/dev/tty
+echo -e "# encountered during installation.                           #" &>/dev/tty
 echo -e "#                                                            #" &>/dev/tty
 echo -e "# Save the following information somewhere safe:             #" &>/dev/tty
-echo -e "# MariaDB Root Password    : $password" &>/dev/tty
-echo -e "# MariaDB Postfix Password : $postfixpassword" &>/dev/tty
-echo -e "# VXpanel Username        : zadmin                            #" &>/dev/tty
-echo -e "# VXpanel Password        : $zadminNewPass" &>/dev/tty
+echo -e "# MariaDB Root Password    : $db_passwd" &>/dev/tty
+echo -e "# MariaDB Postfix Password : $mail_passwd" &>/dev/tty
+echo -e "# vxPanel Username        : admin                            #" &>/dev/tty
+echo -e "# vxPanel Password        : $admin_passwd" &>/dev/tty
 echo -e "#                                                            #" &>/dev/tty
-echo -e "# VXpanel Web login can be accessed using your server IP      #" &>/dev/tty
+echo -e "# vxPanel Web login can be accessed using your server IP      #" &>/dev/tty
 echo -e "# inside your web browser.                                   #" &>/dev/tty
 echo -e "#                                                            #" &>/dev/tty
 echo -e "#                !!! A REBOOT IS REQUIRED !!!                #" &>/dev/tty

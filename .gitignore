@@ -1,3 +1,8 @@
-vxd
+# Folders
+bin/
+dist/
+
+# Files
 *.o
 *.sublime-workspace
+dist*.tar.gz
