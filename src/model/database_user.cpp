@@ -55,7 +55,9 @@ void database_user::load()
 
 bool database_user::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 /* TODO Handle foreign key block correctly */

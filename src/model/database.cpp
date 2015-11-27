@@ -58,7 +58,9 @@ void database::load()
 
 bool database::update(std::string field)
 {
-
+	 /* TODO */
+	(std::string)field;
+	return true;
 }
 
 bool database::m_delete()

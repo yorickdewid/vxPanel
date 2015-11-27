@@ -1,5 +1,6 @@
 #ifndef SUBDOMAIN_H
 #define SUBDOMAIN_H
+
 #include "domain.h"
 
 class subdomain : public model {

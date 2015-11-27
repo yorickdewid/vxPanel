@@ -1,33 +1,34 @@
-LIBS=-lcppcms -lcppdb
-SRCDIR=src
-MDIR=model/
+NAME = vxd
+SRCDIR = src
+MODDIR = $(SRCDIR)/model
+CXX_OBJS = $(wildcard src/model/*.o) $(wildcard src/*.o)
+INCLUDE_DIRS = .
+LIBRARY_DIRS = .
+LIBRARIES = cppcms cppdb
+CPPFLAGS += -O0 -Wall -Werror -g -std=c++11
+CPPFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
+LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
+LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 
-all: vxpanel
+.PHONY: all clean distclean
 
-vxpanel:
-	$(CXX) $(CXXFLAGS) -O0 -Wall -g -std=c++11 -std=gnu++11 $(SRCDIR)/backend.cpp \
-									$(SRCDIR)/sha1.cpp \
-									$(SRCDIR)/$(MDIR)user.cpp \
-									$(SRCDIR)/$(MDIR)domain.cpp \
-									$(SRCDIR)/$(MDIR)dns.cpp \
-									$(SRCDIR)/$(MDIR)ftp_account.cpp \
-									$(SRCDIR)/$(MDIR)vhost.cpp \
-									$(SRCDIR)/$(MDIR)mailbox.cpp \
-									$(SRCDIR)/$(MDIR)subdomain.cpp \
-									$(SRCDIR)/$(MDIR)shell.cpp \
-									$(SRCDIR)/$(MDIR)app_settings.cpp \
-									$(SRCDIR)/$(MDIR)database_type.cpp \
-									$(SRCDIR)/$(MDIR)database_user.cpp \
-									$(SRCDIR)/$(MDIR)database.cpp \
-									$(SRCDIR)/$(MDIR)user_dbuser_db.cpp \
-									$(SRCDIR)/master.cpp \
-									$(SRCDIR)/vxpanel.cpp -o vxd ${LIBS}
+all: $(NAME) link
+
+$(NAME):
+	cd $(SRCDIR); $(MAKE) $(MFLAGS)
+
+link:
+	$(LINK.cc) $(CXX_OBJS) -o $(NAME)
 
 test: all
-	./vxd -c config.json &
-	python tests/pre_run.py config.json &
+	$(NAME) -c config.json &
+	python tests/pre_run.py config.json
 	python tests/basic_call.py
-	killall vxd
+	killall $(NAME)
 
 clean:
-	rm -rf vxd
+	@- $(RM) $(NAME)
+	@- $(RM) $(LD_CXX_OBJS)
+	cd $(SRCDIR); $(MAKE) clean
+
+distclean: clean

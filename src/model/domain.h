@@ -1,5 +1,6 @@
 #ifndef DOMAIN_H
 #define DOMAIN_H
+
 #include "user.h"
 
 class domain: public model {
@@ -9,7 +10,9 @@ public:
 		model(db),
 		name(domain_name),
 		_vhost_id(-1)
-	{ this->load(); };
+	{
+		this->load();
+	};
 	
 	void save();
 	void load();

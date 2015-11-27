@@ -67,7 +67,9 @@ void ftp_account::load()
 
 bool ftp_account::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 bool ftp_account::m_delete()

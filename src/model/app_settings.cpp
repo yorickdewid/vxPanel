@@ -59,7 +59,9 @@ void app_settings::load()
 
 bool app_settings::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 bool app_settings::m_delete()

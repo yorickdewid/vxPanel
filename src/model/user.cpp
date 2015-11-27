@@ -67,7 +67,9 @@ void user::load()
 
 bool user::update(std::string field)
 {
-
+	 /* TODO */
+	(std::string)field;
+	return true;
 }
 
 /* TODO Handle foreign key block correctly */

@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "../model.h"
-#include "subdomain.h"
 #include "domain.h"
+#include "subdomain.h"
 
 void subdomain::save()
 {
@@ -71,7 +71,9 @@ void subdomain::load()
 
 bool subdomain::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 bool subdomain::m_delete()

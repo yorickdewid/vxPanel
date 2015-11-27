@@ -87,7 +87,9 @@ void mailbox::load(std::string domain_name)
 
 bool mailbox::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 bool mailbox::m_delete()

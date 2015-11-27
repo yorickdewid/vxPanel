@@ -53,7 +53,9 @@ void database_type::load()
 
 bool database_type::update(std::string field)
 {
-
+	/* TODO */
+	(std::string)field;
+	return true;
 }
 
 /* TODO Handle foreign key block correctly */
