@@ -44,6 +44,7 @@ public:
 	void get_database_types();
 	void get_database_user(std::string username, int uid);
 	void get_database(std::string db_name, int uid);
+	void get_ip();
 
 	void update_user(int uid, std::vector<std::string> update_list); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 	void update_domain(int uid, std::string domain_name, std::vector<std::string> update_list); /* status, registrar, vhost_id */

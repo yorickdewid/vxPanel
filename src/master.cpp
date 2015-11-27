@@ -1,6 +1,7 @@
 #include <cppcms/json.h>
 #include <cppcms/session_interface.h>
 #include <cppcms/url_mapper.h>
+#include <cppcms/http_request.h>
 #include <iostream>
 #include <fstream>
 
@@ -62,6 +63,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
+	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
 	/* TODO update */
 
@@ -541,6 +543,12 @@ void master::get_database(std::string db_name, int uid)
 	else {
 		return_error("Unauthorized");
 	}
+}
+
+void master::get_ip()
+{
+	std::string remote_address = cppcms::application::request().remote_addr();
+	return_result(remote_address);
 }
 
 /* Update */
