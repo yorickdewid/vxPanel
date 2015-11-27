@@ -1,6 +1,7 @@
 NAMECNF = config.json
 NAME = vxd
 SRCDIR = src
+BINDIR = bin
 MODDIR = $(SRCDIR)/model
 CXX_OBJS = $(wildcard $(MODDIR)/*.o) $(wildcard $(SRCDIR)/*.o)
 GRINDFLAGS = --leak-check=full --track-origins=yes
@@ -23,7 +24,7 @@ $(NAME):
 	cd $(SRCDIR); $(MAKE) $(MFLAGS)
 
 link:
-	$(LINK.cc) $(CXX_OBJS) -o $(NAME)
+	$(LINK.cc) $(CXX_OBJS) -o $(BINDIR)/$(NAME)
 
 test: all
 	$(NAME) -c $(NAMECNF) &
@@ -32,12 +33,12 @@ test: all
 	killall $(NAME)
 
 clean:
-	@- $(RM) $(NAME)
+	@- $(RM) $(BINDIR)/$(NAME)
 	@- $(RM) $(LD_CXX_OBJS)
 	cd $(SRCDIR); $(MAKE) clean
 
 memcheck: all
-	$(GRIND) $(GRINDFLAGS) ./$(NAME) -c $(NAMECNF)
+	$(GRIND) $(GRINDFLAGS) $(BINDIR)/$(NAME) -c $(NAMECNF)
 
 cov: all
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(MODDIR) $(SRCDIR)
