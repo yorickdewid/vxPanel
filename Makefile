@@ -27,7 +27,7 @@ link:
 	$(LINK.cc) $(CXX_OBJS) -o $(BINDIR)/$(NAME)
 
 test: all
-	$(NAME) -c $(NAMECNF) &
+	$(BINDIR)/$(NAME) -c $(NAMECNF) &
 	python tests/pre_run.py $(NAMECNF)
 	python tests/basic_call.py
 	killall $(NAME)
@@ -44,3 +44,5 @@ cov: all
 	$(CPPCHECK) $(CPPCHECKFLAGS) $(MODDIR) $(SRCDIR)
 
 distclean: clean
+	@- $(RM) dist*.tar.gz
+	@- $(RM) -rf dist

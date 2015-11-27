@@ -4,6 +4,7 @@
 		"password" : "q",
 		"database" : "vxpanel"
 	},
+	"secret" : "CHANGEME",
 	"service" : {
 		"api" : "http",
 		"ip"  : "0.0.0.0",
