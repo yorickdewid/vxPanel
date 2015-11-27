@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `address_number` smallint(6) DEFAULT NULL,
   `postal` varchar(15) DEFAULT NULL,
   `note` text,
-  `remote` VARBINARY(16) NULL DEFAULT NULL,
+  `remote` VARBINARY(16) DEFAULT NULL,
   `user_type` enum('administrator','reseller','user') NOT NULL DEFAULT 'user',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   PRIMARY KEY (`uid`),
   UNIQUE INDEX `username` (`username`),
   UNIQUE INDEX `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1000;
 
 
 
