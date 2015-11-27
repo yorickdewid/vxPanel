@@ -70,6 +70,8 @@ public:
 	void delete_database_user(std::string username, int uid);
 	void delete_database(std::string db_name, std::string username, int uid);
 
+	void write_ip_to_db(); /* both ivp4 and ipv6 */
+
 protected:
 	std::string format_uptime(std::string sec);
 

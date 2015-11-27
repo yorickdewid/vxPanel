@@ -79,6 +79,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("delete_database_type", cppcms::rpc::json_method(&master::delete_database_type, this), method_role);
 	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
 	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
+
+	bind("write_ip_to_db", cppcms::rpc::json_method(&master::write_ip_to_db, this), method_role);
 }
 
 master::~master()
@@ -772,5 +774,23 @@ void master::delete_database(std::string db_name, std::string db_username, int u
 	} else {
 		return_error("Delete failed");
 	}
+}
+
+void master::write_ip_to_db()
+{
+	std::string remote_address = cppcms::application::request().remote_addr();
+
+	cppdb::statement stat;
+
+	stat = get_database().session() << 
+		"UPDATE user set remote = inet6_aton(?)" << remote_address;
+
+	stat.exec();
+	stat.reset();
+
+	std::ostringstream stream;
+	stream << "Saved ip to db, " << remote_address;
+
+	return_result(stream.str());
 }
 
