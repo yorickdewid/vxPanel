@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `address_number` smallint(6) DEFAULT NULL,
   `postal` varchar(15) DEFAULT NULL,
   `note` text,
+  `remote` VARBINARY(16) NULL DEFAULT NULL,
   `user_type` enum('administrator','reseller','user') NOT NULL DEFAULT 'user',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -196,6 +197,20 @@ CREATE TABLE `queue` (
   PRIMARY KEY (`qid`),
   KEY `FK_queue_user` (`uid`),
   CONSTRAINT `FK_queue_user` FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `auth_token` (
+  `sessionid` CHAR(40) NOT NULL,
+  `remote` VARBINARY(16) NOT NULL,
+  `uid` INT(10) UNSIGNED NOT NULL,
+  `refresh` CHAR(40) NOT NULL,
+  `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `valid` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`sessionid`, `remote`),
+  UNIQUE INDEX `refresh` (`refresh`),
+  INDEX `FK_auth_token_user` (`uid`),
+  CONSTRAINT `FK_auth_token_user` FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
