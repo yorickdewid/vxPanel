@@ -6,6 +6,19 @@
 #include "config.h"
 #include "master.h"
 
+bool check_secret(cppcms::service &srv )
+{
+	std::string secret = srv.settings().get<std::string>("secret");
+	std::cerr << secret << std::endl;
+	if ( secret.length() != 40) {
+		std::cout << "false" << std::endl;
+		return false;
+	} else {
+		std::cout << "true" << std::endl;
+		return true;
+	}
+}
+
 /*
  * Initialize the application pool and pass control to master
  */
@@ -16,6 +29,10 @@ int main(int argc, char *argv[])
 		cppcms::service srv(argc,argv);
 
 		srv.applications_pool().mount(cppcms::applications_factory<master>());
+		if( !check_secret(srv) ) {
+			std::cout << "Secret key badly formed, exiting..." << std::endl;
+			exit (EXIT_FAILURE);
+		}
 		srv.run();
 		std::cout << "Stopping vxPanel " << std::endl;
 	}
@@ -25,3 +42,5 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
+
+
