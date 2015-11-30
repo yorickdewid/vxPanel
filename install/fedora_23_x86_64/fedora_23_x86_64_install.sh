@@ -2,6 +2,7 @@
 
 # OS VERSION: Fedora 23
 # ARCH: x32_64
+# DIST: fedora_23_x86_64
 
 # vxPanel Automated Installation Script
 # =============================================
@@ -16,6 +17,22 @@ if [ $UID -ne 0 ]; then
   echo "You must be root to run the installer"
   exit 1
 fi
+
+# Display the 'welcome' splash/user warning info..
+echo -e ""
+echo -e "##############################################################"
+echo -e "# Welcome to the vxPanel Installer for Fedora x86_64         #"
+echo -e "#                                                            #"
+echo -e "# Please make sure your VPS provider hasn't pre-installed    #"
+echo -e "# any packages required by vxPanel.                          #"
+echo -e "#                                                            #"
+echo -e "# If you selected additional options during the Fedora       #"
+echo -e "# install please consider reinstalling without them.         #"
+echo -e "#                                                            #"
+echo -e "#                                                            #"
+echo -e "# dist: fedora_23_x86_64                                     #"
+echo -e "##############################################################"
+echo -e ""
 
 # ***************************************
 # * LICENSE AGREEMENT                   *
@@ -81,20 +98,6 @@ passwordgen() {
 	tr -dc A-Za-z0-9 < /dev/urandom | head -c ${l} | xargs
 }
 
-# Display the 'welcome' splash/user warning info..
-echo -e ""
-echo -e "##############################################################"
-echo -e "# Welcome to the vxPanel Installer for Fedora x86_64         #"
-echo -e "#                                                            #"
-echo -e "# Please make sure your VPS provider hasn't pre-installed    #"
-echo -e "# any packages required by vxPanel.                          #"
-echo -e "#                                                            #"
-echo -e "# If you selected additional options during the Fedora       #"
-echo -e "# install please consider reinstalling without them.         #"
-echo -e "#                                                            #"
-echo -e "##############################################################"
-echo -e ""
-
 # Set some installation defaults/auto assignments
 fqdn=`/bin/hostname -f`
 publicip=`curl -s http://whatismijnip.nl | cut -d " " -f 5`
@@ -123,10 +126,9 @@ echo -e ""
 
 mkdir -p /usr/local/vxpanel
 cp -R . /usr/local/vxpanel
-cd /usr/local/vxpanel
 
 # Install required software and dependencies required by vxPanel
-dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap libdb-utils dovecot dovecot-pigeonhole dovecot-mysql postfix cyrus-sasl-lib proftpd-mysql phpmyadmin
+dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap libdb-utils dovecot dovecot-pigeonhole dovecot-mysql postfix cyrus-sasl-lib proftpd-mysql phpmyadmin roundcubemail
 
 # At least start the database and firewall
 systemctl start mariadb
@@ -143,6 +145,7 @@ firewall-cmd --permanent --zone=public --add-service=mysql
 firewall-cmd --reload
 
 # Generation of random passwords
+db_salt=`passwordgen`;
 db_passwd=`passwordgen`;
 mail_passwd=`passwordgen`;
 admin_passwd=`passwordgen`;
@@ -154,12 +157,32 @@ mkdir /var/vxpanel/logs/proftpd
 mkdir /var/vxpanel/logs/apache
 mkdir /var/vxpanel/backups
 mkdir /var/vxpanel/tmp
+mkdir /var/vxpanel/vmail
+mkdir /var/vxpanel/sieve
 
 chmod -R 777 /var/vxpanel/
+chmod +x /usr/local/vxpanel/bin/vxadmin
 chmod +x /usr/local/vxpanel/bin/vxd
 
+mv /etc/postfix/main.cf /etc/postfix/main.cf.orig
+mv /etc/postfix/master.cf /etc/postfix/master.cf.orig
+mv /etc/dovecot/dovecot.conf /etc/dovecot/dovecot.conf.orig
+mv /etc/proftpd.conf /etc/proftpd.conf.orig
+mv /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf.orig
+mv /etc/phpMyAdmin/config.inc.php /etc/phpMyAdmin/config.inc.php.orig
+
+ln -s /usr/local/vxpanel/bin/vxadmin /usr/bin/vxadmin
 ln -s /usr/local/vxpanel/bin/vxd /usr/bin/vxd
 ln -s /usr/local/vxpanel/etc/config.json /etc/vxpanel.conf
+
+ln -s /usr/local/vxpanel/srv/postfix/master.cf /etc/postfix/master.cf
+ln -s /usr/local/vxpanel/srv/postfix/main.cf /etc/postfix/main.cf
+ln -s /usr/local/vxpanel/srv/dovecot/globalfilter.sieve /var/vxpanel/sieve/globalfilter.sieve
+ln -s /usr/local/vxpanel/srv/dovecot/dovecot.conf /etc/dovecot/dovecot.conf
+ln -s /usr/local/vxpanel/srv/proftpd/proftpd-mysql.conf /etc/proftpd.conf
+ln -s /usr/local/vxpanel/srv/apache/httpd.conf /etc/httpd/conf/httpd.conf
+ln -s /usr/local/vxpanel/srv/cron/vxdaemon /etc/cron.d/vxdaemon
+ln -s /usr/local/vxpanel/srv/phpmyadmin/config.inc.php /etc/phpMyAdmin/config.inc.php
 
 # MariaDB specific installation tasks...
 MYSQL_ROOT_PASSWORD=$db_passwd
@@ -190,22 +213,20 @@ mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User = ''";
 mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User != 'root'";
 mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
 # mysql -u root -p$db_passwd -e "CREATE SCHEMA vxpanel_roundcube";
-cat /usr/local/vxpanel/create.sql | mysql -u root -p$db_passwd
+cat /usr/local/vxpanel/share/create.sql | mysql -u root -p$db_passwd
 # mysql -u root -p$db_passwd -e "UPDATE mysql.user SET Password=PASSWORD('$postfixpassword') WHERE User='postfix' AND Host='localhost';";
 # mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
 
-# Set some vxPanel custom configuration settings (using. setso and setzadmin)
-# vxadmin --set "$admin_passwd";
-# /etc/vxpanel/panel/bin/setso --set vxpanel_domain $fqdn
-# /etc/vxpanel/panel/bin/setso --set server_ip $publicip
-# /etc/vxpanel/panel/bin/setso --set apache_changed "true"
+# Set config options
+/usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --gen-key
+/usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --verify
 
 # We'll store the passwords so that users can review them later if required.
 echo "Store settings in vxconfig.txt"
 touch /root/vxconfig.txt;
 echo "Admin Password: $admin_passwd" >> /root/vxconfig.txt;
-echo "MariaDB Root Password: $password" >> /root/vxconfig.txt
-echo "MariaDB Postfix Password: $postfixpassword" >> /root/vxconfig.txt
+echo "MariaDB Root Password: $db_passwd" >> /root/vxconfig.txt
+echo "MariaDB Postfix Password: $mail_passwd" >> /root/vxconfig.txt
 echo "IP Address: $publicip" >> /root/vxconfig.txt
 echo "Panel Domain: $fqdn" >> /root/vxconfig.txt
 chmod 600 /root/vxconfig.txt
@@ -222,45 +243,36 @@ sed -i "s|session.gc_maxlifetime = 1440|session.gc_maxlifetime = 7200|" /etc/php
 sed -i "s|session.name = PHPSESSID|session.name = _UMTAUTHS|" /etc/php.ini
 sed -i "s|session.hash_function = 0|session.hash_function = 1|" /etc/php.ini
 
-# TODO and further.....#
-
 # Postfix specific installation tasks...
 echo "Setup SMTP"
-mkdir -p /var/zpanel/vmail
-chmod -R 770 /var/zpanel/vmail
-useradd -r -u 150 -g mail -d /var/zpanel/vmail -s /sbin/nologin -c "Virtual maildir" vmail
-chown -R vmail:mail /var/zpanel/vmail
+chmod -R 770 /var/vxpanel/vmail
+useradd -r -u 150 -g mail -d /var/vxpanel/vmail -s /sbin/nologin -c "Virtual mail storage" vmail
+chown -R vmail:mail /var/vxpanel/vmail
 mkdir -p /var/spool/vacation
-useradd -r -d /var/spool/vacation -s /sbin/nologin -c "Virtual vacation" vacation
+useradd -r -d /var/spool/vacation -s /sbin/nologin -c "Virtual vacation storage" vacation
 chmod -R 770 /var/spool/vacation
-ln -s /etc/zpanel/configs/postfix/vacation.pl /var/spool/vacation/vacation.pl
+ln -s /usr/local/vxpanel/srv/postfix/vacation.pl /var/spool/vacation/vacation.pl
 postmap /etc/postfix/transport
 chown -R vacation:vacation /var/spool/vacation
 if ! grep -q "127.0.0.1 autoreply.$fqdn" /etc/hosts; then echo "127.0.0.1 autoreply.$fqdn" >> /etc/hosts; fi
-sed -i "s|myhostname = control.yourdomain.com|myhostname = $fqdn|" /etc/zpanel/configs/postfix/main.cf
-sed -i "s|mydomain = control.yourdomain.com|mydomain   = $fqdn|" /etc/zpanel/configs/postfix/main.cf
-rm -rf /etc/postfix/main.cf /etc/postfix/master.cf
-ln -s /etc/zpanel/configs/postfix/master.cf /etc/postfix/master.cf
-ln -s /etc/zpanel/configs/postfix/main.cf /etc/postfix/main.cf
-sed -i "s|password \= postfix|password \= $postfixpassword|" /etc/zpanel/configs/postfix/mysql-relay_domains_maps.cf
-sed -i "s|password \= postfix|password \= $postfixpassword|" /etc/zpanel/configs/postfix/mysql-virtual_alias_maps.cf
-sed -i "s|password \= postfix|password \= $postfixpassword|" /etc/zpanel/configs/postfix/mysql-virtual_domains_maps.cf
-sed -i "s|password \= postfix|password \= $postfixpassword|" /etc/zpanel/configs/postfix/mysql-virtual_mailbox_limit_maps.cf
-sed -i "s|password \= postfix|password \= $postfixpassword|" /etc/zpanel/configs/postfix/mysql-virtual_mailbox_maps.cf
-sed -i "s|\$db_password \= 'postfix';|\$db_password \= '$postfixpassword';|" /etc/zpanel/configs/postfix/vacation.conf
+sed -i "s|myhostname = control.yourdomain.com|myhostname = $fqdn|" /usr/local/vxpanel/srv/postfix/main.cf
+sed -i "s|mydomain = control.yourdomain.com|mydomain   = $fqdn|" /usr/local/vxpanel/srv/postfix/main.cf
+sed -i "s|password \= postfix|password \= $db_passwd|" /usr/local/vxpanel/srv/postfix/mysql-relay_domains_maps.cf
+sed -i "s|password \= postfix|password \= $db_passwd|" /usr/local/vxpanel/srv/postfix/mysql-virtual_alias_maps.cf
+sed -i "s|password \= postfix|password \= $db_passwd|" /usr/local/vxpanel/srv/postfix/mysql-virtual_domains_maps.cf
+sed -i "s|password \= postfix|password \= $db_passwd|" /usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_limit_maps.cf
+sed -i "s|password \= postfix|password \= $db_passwd|" /usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_maps.cf
+sed -i "s|\$db_password \= 'postfix';|\$db_password \= '$db_passwd';|" /usr/local/vxpanel/srv/postfix/vacation.conf
+echo "$publicip" >> /usr/local/vxpanel/srv/postfix/mynetworks
 
 # Dovecot specific installation tasks (includes Sieve)
 echo "Setup IMAP/POP"
-mkdir -p /var/zpanel/sieve
-chown -R vmail:mail /var/zpanel/sieve
+chown -R vmail:mail /var/vxpanel/sieve
 mkdir -p /var/lib/dovecot/sieve/
 touch /var/lib/dovecot/sieve/default.sieve
-ln -s /etc/zpanel/configs/dovecot2/globalfilter.sieve /var/zpanel/sieve/globalfilter.sieve
-rm -rf /etc/dovecot/dovecot.conf
-ln -s /etc/zpanel/configs/dovecot2/dovecot.conf /etc/dovecot/dovecot.conf
 sed -i "s|postmaster_address = postmaster@your-domain.tld|postmaster_address = postmaster@$fqdn|" /etc/dovecot/dovecot.conf
-sed -i "s|password=postfix|password=$postfixpassword|" /etc/zpanel/configs/dovecot2/dovecot-dict-quota.conf
-sed -i "s|password=postfix|password=$postfixpassword|" /etc/zpanel/configs/dovecot2/dovecot-mysql.conf
+sed -i "s|password=postfix|password=$mail_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-dict-quota.conf
+sed -i "s|password=postfix|password=$mail_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-mysql.conf
 touch /var/log/dovecot.log
 touch /var/log/dovecot-info.log
 touch /var/log/dovecot-debug.log
@@ -271,21 +283,15 @@ chmod 660 /var/log/dovecot*
 echo "Setup FTP"
 groupadd -g 2001 ftpgroup
 useradd -u 2001 -s /bin/false -d /bin/null -c "proftpd user" -g ftpgroup ftpuser
-sed -i "s|zpanel_proftpd@localhost root z|zpanel_proftpd@localhost root $password|" /etc/zpanel/configs/proftpd/proftpd-mysql.conf
-rm -rf /etc/proftpd.conf
-touch /etc/proftpd.conf
-rm -rf /etc/proftpd.conf
-ln -s /etc/zpanel/configs/proftpd/proftpd-mysql.conf /etc/proftpd.conf
-chmod -R 644 /var/zpanel/logs/proftpd
+sed -i "s|zpanel_proftpd@localhost root z|zpanel_proftpd@localhost root $db_passwd|" /usr/local/vxpanel/srv/proftpd/proftpd-mysql.conf
+chmod -R 644 /var/vxpanel/logs/proftpd
 serverhost=`hostname`
 
 # Apache HTTPD specific installation tasks...
 echo "Reconfigure Apache"
-rm -rf /etc/httpd/conf/httpd.conf
-ln -s /etc/zpanel/configs/apache/httpd.conf /etc/httpd/conf/httpd.conf
 if ! grep -q "127.0.0.1 "$fqdn /etc/hosts; then echo "127.0.0.1 "$fqdn >> /etc/hosts; fi
 if ! grep -q "apache ALL=NOPASSWD: /etc/zpanel/panel/bin/zsudo" /etc/sudoers; then echo "apache ALL=NOPASSWD: /etc/zpanel/panel/bin/zsudo" >> /etc/sudoers; fi
-chown -R apache:apache /var/zpanel/temp/
+chown -R apache:apache /var/vxpanel/tmp/
 
 # Permissions fix for Apache and ProFTPD (to enable them to play nicely together!)
 if ! grep -q "umask 002" /etc/sysconfig/httpd; then echo "umask 002" >> /etc/sysconfig/httpd; fi
@@ -296,35 +302,26 @@ usermod -a -G ftpgroup apache
 # CRON specific installation tasks...
 echo "Setting up cron tasks"
 mkdir -p /var/spool/cron/
-mkdir -p /etc/cron.d/
 touch /var/spool/cron/apache
 touch /etc/cron.d/apache
 crontab -u apache /var/spool/cron/apache
-cp /etc/zpanel/configs/cron/zdaemon /etc/cron.d/zdaemon
 chmod 744 /var/spool/cron
 chmod 644 /var/spool/cron/apache
 chmod -R 644 /etc/cron.d/
 chown -R apache:apache /var/spool/cron/
 
-# Webalizer specific installation tasks...
-# echo "Configure webstatistics"
-# rm -rf /etc/webalizer.conf
-
 # phpMyAdmin config
-salt=`passwordgen`;
 echo "Configure phpMyAdmin"
-rm -rf /etc/phpMyAdmin/config.inc.php
-ln -s /etc/zpanel/configs/phpmyadmin/config.inc.php /etc/phpMyAdmin/config.inc.php
-sed -i "s|CHANGE_ME|$salt|" /etc/phpMyAdmin/config.inc.php
+sed -i "s|CHANGE_ME|$db_salt|" /usr/local/vxpanel/srv/phpmyadmin/config.inc.php
 
 # Roundcube specific installation tasks...
-echo "Configure RoundCube"
-sed -i "s|YOUR_MYSQL_ROOT_PASSWORD|$password|" /etc/zpanel/configs/roundcube/db.inc.php
-sed -i "s|#||" /etc/zpanel/configs/roundcube/db.inc.php
-rm -rf /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
-ln -s /etc/zpanel/configs/roundcube/main.inc.php /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
-ln -s /etc/zpanel/configs/roundcube/config.inc.php /etc/zpanel/panel/etc/apps/webmail/plugins/managesieve/config.inc.php
-ln -s /etc/zpanel/configs/roundcube/db.inc.php /etc/zpanel/panel/etc/apps/webmail/config/db.inc.php
+# echo "Configure RoundCube"
+# sed -i "s|YOUR_MYSQL_ROOT_PASSWORD|$db_passwd|" /etc/zpanel/configs/roundcube/db.inc.php
+# sed -i "s|#||" /etc/zpanel/configs/roundcube/db.inc.php
+# rm -rf /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
+# ln -s /etc/zpanel/configs/roundcube/main.inc.php /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
+# ln -s /etc/zpanel/configs/roundcube/config.inc.php /etc/zpanel/panel/etc/apps/webmail/plugins/managesieve/config.inc.php
+# ln -s /etc/zpanel/configs/roundcube/db.inc.php /etc/zpanel/panel/etc/apps/webmail/config/db.inc.php
 
 # Enable system services and start/restart them as required.
 echo "Enable services"
@@ -334,7 +331,6 @@ systemctl enable postfix
 systemctl enable dovecot
 systemctl enable proftpd
 systemctl enable firewalld
-systemctl enable atd
 
 echo "Starting services"
 systemctl start httpd
@@ -343,10 +339,12 @@ systemctl start dovecot
 systemctl reload crond
 systemctl restart mariadb
 systemctl start proftpd
-systemctl restart atd
 
 # We'll now remove the temporary install cache.
 echo "Cleanup..."
+mv *.log /var/vxpanel/logs
+cd ..
+rm -rf dist
 dnf -y autoremove
 
 # Advise the user that VXpanel is now installed and accessible.
