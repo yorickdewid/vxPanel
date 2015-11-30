@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `dns` (
   `name` VARCHAR(500) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `FK_domain` (`domain_name`),
   CONSTRAINT `FK_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `domain` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `uid` int(11) unsigned NOT NULL,
   `vhost_id` int(11) unsigned DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`name`),
   KEY `FK_domain_user` (`uid`),
   KEY `FK_domain_vhost` (`vhost_id`),
@@ -34,6 +36,16 @@ CREATE TABLE IF NOT EXISTS `domain` (
   CONSTRAINT `FK_domain_vhost` FOREIGN KEY (`vhost_id`) REFERENCES `vhost` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+CREATE TABLE IF NOT EXISTS `domain_alias` (
+  `goto` varchar(100) NOT NULL,
+  `domain_name` varchar(50) DEFAULT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`goto`),
+  KEY `FK_domain_alias_domain` (`domain_name`),
+  CONSTRAINT `FK_domain_alias_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE IF NOT EXISTS `ftp_account` (
@@ -43,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `ftp_account` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(50) DEFAULT NULL,
   `uid` int(11) unsigned NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`username`),
   KEY `FK_ftp_account_domain` (`domain_name`),
   KEY `FK_ftp_account_user` (`uid`),
@@ -56,8 +69,11 @@ CREATE TABLE IF NOT EXISTS `mailbox` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `address` varchar(200) NOT NULL,
   `password` CHAR(40) NOT NULL,
+  `maildir` varchar(255) NOT NULL,
+  `quota` bigint(20) NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `FK_mailbox_domain` (`domain_name`),
   CONSTRAINT `FK_mailbox_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -81,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `shell` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `uid` int(11) unsigned NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `FK_shell_user` (`uid`),
   CONSTRAINT `FK_shell_user` FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -93,6 +110,7 @@ CREATE TABLE IF NOT EXISTS `subdomain` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
   `vhost_id` int(11) unsigned DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`name`,`domain_name`),
   KEY `FK_subdomain_domain` (`domain_name`),
   KEY `FK_subdomain_vhost` (`vhost_id`),
@@ -180,6 +198,7 @@ CREATE TABLE IF NOT EXISTS `vhost` (
   `name` varchar(100) NOT NULL,
   `custom_config` text,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
