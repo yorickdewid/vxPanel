@@ -37,8 +37,14 @@ void shell::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			r >> this->id >> this->_created >> uid;
+			int tmp_active;
+			r >> this->id >> this->_created >> uid >> tmp_active;
 	  		set_user(std::shared_ptr<user>(new user(db,uid)));
+	  		if ( tmp_active == 1 ) {
+	  			this->_active = true;
+	  		} else {
+	  			this->_active = false;
+	  		}
 	    }
 
 	    stat.reset();
@@ -89,6 +95,11 @@ void shell::set_user(std::shared_ptr<user> user)
 	this->_user.swap(user);
 }
 
+void shell::set_active(bool active)
+{
+	this->_active = active;
+}
+
 int shell::get_id()
 {
 	return this->id;
@@ -102,5 +113,10 @@ std::string shell::get_created()
 user shell::get_user()
 {
 	return *this->_user;
+}
+
+bool shell::get_active()
+{
+	return this->_active;
 }
 

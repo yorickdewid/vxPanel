@@ -86,7 +86,6 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 master::~master()
 {
 	if (db)	{
-		std::cout << db << std::endl;
 		delete db;
 	}
 }
@@ -360,12 +359,18 @@ void master::get_domain(std::string domain_name, int uid)
 
 	domain.load();
 
-	json["domain"]["domainname"] = domain.get_domain_name();
-	json["domain"]["status"] = domain.get_status();
-	json["domain"]["registrar"] =  domain.get_registrar();
+	if (domain.get_user().get_uid() == uid ) {
 
-	return_result(json);
+		json["domain"]["domainname"] = domain.get_domain_name();
+		json["domain"]["status"] = domain.get_status();
+		json["domain"]["registrar"] =  domain.get_registrar();
+
+		return_result(json);
+	} else {
+		return_error("Unauthorized");
+	}
 }
+
 
 void master::get_dns(std::string domain_name, int uid)
 {
@@ -374,11 +379,16 @@ void master::get_dns(std::string domain_name, int uid)
 	dns dns(get_database(), 0);
 	dns.load(domain_name);
 
-	json["dns"]["address"] = dns.get_name();
-	json["dns"]["created"] = dns.get_created();
-	json["dns"]["domain_name"] = domain_name;
+	if (dns.get_domain().get_user().get_uid() == uid ) {
 
-	return_result(json);
+		json["dns"]["address"] = dns.get_name();
+		json["dns"]["created"] = dns.get_created();
+		json["dns"]["domain_name"] = domain_name;
+
+		return_result(json);
+	} else {
+		return_error("Unauthorized");
+	}
 }
 
 void master::get_ftp_account(std::string ftp_username, int uid)
@@ -394,6 +404,7 @@ void master::get_ftp_account(std::string ftp_username, int uid)
 		json["ftp_account"]["password"] = ftp_account.get_password();
 		json["ftp_account"]["permissions"] = ftp_account.get_permissions();
 		json["ftp_account"]["created"] = ftp_account.get_created();
+
 		if ( ftp_account.get_domain_ptr() !=  NULL ) { /* good enough? */
 			json["ftp_account"]["domain"] = ftp_account.get_domain().get_domain_name();
 		}
@@ -416,6 +427,7 @@ void master::get_vhost(std::string domain_name, int uid)
 	json["vhost"]["name"] = vhost.get_name();
 	json["vhost"]["custom_config"] = vhost.get_custom_config();
 	json["vhost"]["created"] = vhost.get_created();
+	json["vhost"]["active"] = vhost.get_active();
 
 	return_result(json);
 }
@@ -446,7 +458,7 @@ void master::get_shell(int id,int uid)
 {
 	cppcms::json::value json;
 
-	shell shell(get_database(),uid);
+	shell shell(get_database(),id);
 	shell.load();
 
 	if ( shell.get_user().get_uid() == uid) {

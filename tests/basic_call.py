@@ -121,42 +121,42 @@ def test_rpc_create_database():
 ### get ###
 def test_rpc_get_user():
 	print bcolors.OKBLUE + "Testcase: Get user" + bcolors.ENDC
-	data = '{"id":0,"method":"get_user","params":[1]}'
+	data = '{"id":0,"method":"get_user","params":[1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_domain():
 	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_domain","params":["trol.com",1]}'
+	data = '{"id":0,"method":"get_domain","params":["trol.com",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_dns():
 	print bcolors.OKBLUE + "Testcase: Get dns" + bcolors.ENDC
-	data = '{"id":0,"method":"get_dns","params":["trol.com",1]}'
+	data = '{"id":0,"method":"get_dns","params":["trol.com",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Get ftp account" + bcolors.ENDC
-	data = '{"id":0,"method":"get_ftp_account","params":["kaasje",1]}'
+	data = '{"id":0,"method":"get_ftp_account","params":["kaasje",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_vhost():
 	print bcolors.OKBLUE + "Testcase: Get vhost" + bcolors.ENDC
-	data = '{"id":0,"method":"get_vhost","params":["trol.com",1]}'
+	data = '{"id":0,"method":"get_vhost","params":["trol.com",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_mailbox():
 	print bcolors.OKBLUE + "Testcase: Get mailbox" + bcolors.ENDC
-	data = '{"id":0,"method":"get_mailbox","params":["trol.com",1]}'
+	data = '{"id":0,"method":"get_mailbox","params":["trol.com",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_shell():
 	print bcolors.OKBLUE + "Testcase: Get shell" + bcolors.ENDC
-	data = '{"id":0,"method":"get_shell","params":[1,1]}'
+	data = '{"id":0,"method":"get_shell","params":[1,1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_subdomain():
 	print bcolors.OKBLUE + "Testcase: Get subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_subdomain","params":["kaas.","trol.com",1]}'
+	data = '{"id":0,"method":"get_subdomain","params":["kaas.","trol.com",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_setting():
@@ -171,12 +171,12 @@ def test_rpc_get_database_types():
 
 def test_rpc_get_database_user():
 	print bcolors.OKBLUE + "Testcase: Get database user" + bcolors.ENDC
-	data = '{"id":0,"method":"get_database_user","params":["arie",1]}'
+	data = '{"id":0,"method":"get_database_user","params":["arie",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_get_database():
 	print bcolors.OKBLUE + "Testcase: Get database" + bcolors.ENDC
-	data = '{"id":0,"method":"get_database","params":["kaas",1]}'
+	data = '{"id":0,"method":"get_database","params":["kaas",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 

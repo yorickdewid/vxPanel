@@ -16,15 +16,18 @@ public:
 	bool m_delete();
 	
 	void set_user(std::shared_ptr<user> user);
+	void set_active(bool active);
 
 	int get_id();
 	std::string get_created();
 	user get_user();
+	bool get_active();
 
 private:
 	int id;
 	std::string _created;
 	std::shared_ptr<user> _user;
+	bool _active;
 
 };
 

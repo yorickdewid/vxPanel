@@ -44,13 +44,13 @@ void domain::load()
 
 		while(r.next()) {
 			int tmp_vhost_id;
-			int active;
-			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> active;
+			int tmp_active;
+			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> tmp_active;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
 	  		if ( tmp_vhost_id != false ) { /* TODO replace with vhost object) */
 	  			this->_vhost_id = -1;
 	  		}
-	  		if ( active == 1 ) {
+	  		if ( tmp_active == 1 ) {
 	  			this->_active = true;
 	  		} else {
 	  			this->_active = false;
