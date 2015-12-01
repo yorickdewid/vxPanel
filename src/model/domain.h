@@ -24,6 +24,7 @@ public:
 	void registrar(std::string registrar);
 	void set_user(std::shared_ptr<user> user);
 	void vhost_id(int vhost_id);
+	void set_active(bool active);
 
 	std::string get_domain_name();
 	std::string get_status();
@@ -31,6 +32,7 @@ public:
 	std::string get_created();
 	user get_user();
 	int get_vhost_id();
+	bool get_active();
 
 private:
 	std::string name;
@@ -39,6 +41,7 @@ private:
 	std::string _created;
 	std::shared_ptr<user> _user;
 	int _vhost_id; /* todo vhost object */
+	bool _active;
 
 };
 

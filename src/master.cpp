@@ -207,18 +207,18 @@ void master::create_domain(std::string domain_name, int uid)
 
 	domain.status("inactive");
 	domain.registrar("transip");
-	//domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+	domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
 
 	domain.save();
 
 	return_result("OK");
 }
 
-void master::create_dns(std::string address, std::string domain_name)
+void master::create_dns(std::string name, std::string domain_name)
 {
 	dns dns(get_database(),0);
 
-	dns.set_address(address);
+	dns.set_name(name);
 	dns.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
 
 	dns.save();
@@ -374,7 +374,7 @@ void master::get_dns(std::string domain_name, int uid)
 	dns dns(get_database(), 0);
 	dns.load(domain_name);
 
-	json["dns"]["address"] = dns.get_address();
+	json["dns"]["address"] = dns.get_name();
 	json["dns"]["created"] = dns.get_created();
 	json["dns"]["domain_name"] = domain_name;
 

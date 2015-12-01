@@ -6,8 +6,8 @@
 class user: public model {
 
 public:
-	user(backend& db) : model(db) {std::cout << &db << std::endl;};
-	user(backend& db, int uid) : model(db), uid(uid) { /* this->load(); */ };
+	user(backend& db) : model(db) {};
+	user(backend& db, int uid) : model(db), uid(uid) { this->load(); };
 
 	
 	void save();

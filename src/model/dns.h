@@ -16,19 +16,22 @@ public:
 	bool update(std::string field);
 	bool m_delete();
 	
-	void set_address(std::string address);
+	void set_name(std::string name);
 	void set_domain(std::shared_ptr<domain> domain);
+	void set_active(bool active);
 
 	int get_id();
-	std::string get_address();
+	std::string get_name();
 	std::string get_created();
 	domain get_domain();
+	bool get_active();
 
 private:
 	int id;
-	std::string _address;
+	std::string _name;
 	std::string _created;
 	std::shared_ptr<domain> _domain; /* auto_ptr deprecated */
+	bool _active;
 
 };
 

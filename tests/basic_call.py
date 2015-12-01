@@ -69,7 +69,7 @@ def test_rpc_create_user():
 
 def test_rpc_create_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
-	data = '{"id":0,"method":"create_domain","params":["trol.com",1]}'
+	data = '{"id":0,"method":"create_domain","params":["trol.com",1000]}'
 	result_test(rpc_call(data), None)
 
 def test_rpc_create_dns():
@@ -79,27 +79,27 @@ def test_rpc_create_dns():
 
 def test_rpc_create_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Create ftp account" + bcolors.ENDC
-	data = '{"id":0,"method":"create_ftp_account","params":["kaasje","hehjajejkhe","RO",1]}'
+	data = '{"id":0,"method":"create_ftp_account","params":["kaasje","hehjajejkhe","RO",1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_vhost():
 	print bcolors.OKBLUE + "Testcase: Create vhost" + bcolors.ENDC
-	data = '{"id":0,"method":"create_vhost","params":["trol.com","",1]}'
+	data = '{"id":0,"method":"create_vhost","params":["trol.com","",1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_mailbox():
 	print bcolors.OKBLUE + "Testcase: Create mailbox" + bcolors.ENDC
-	data = '{"id":0,"method":"create_mailbox","params":["127.0.0.1","trol.com",1]}'
+	data = '{"id":0,"method":"create_mailbox","params":["127.0.0.1","trol.com",1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_shell():
 	print bcolors.OKBLUE + "Testcase: Create shell" + bcolors.ENDC
-	data = '{"id":0,"method":"create_shell","params":[1]}'
+	data = '{"id":0,"method":"create_shell","params":[1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_subdomain():
 	print bcolors.OKBLUE + "Testcase: Create subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"create_subdomain","params":["kaas.","trol.com",1]}'
+	data = '{"id":0,"method":"create_subdomain","params":["kaas.","trol.com",1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_setting():
@@ -109,12 +109,12 @@ def test_rpc_create_setting():
 
 def test_rpc_create_db_user():
 	print bcolors.OKBLUE + "Testcase: Create db user" + bcolors.ENDC
-	data = '{"id":0,"method":"create_database_user","params":["arie","ae4834ejs","RO",1]}'
+	data = '{"id":0,"method":"create_database_user","params":["arie","ae4834ejs","RO",1000]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_database():
 	print bcolors.OKBLUE + "Testcase: Create database" + bcolors.ENDC
-	data = '{"id":0,"method":"create_database","params":["kaas","mysql","arie",1]}'
+	data = '{"id":0,"method":"create_database","params":["kaas","mysql","arie",1000]}'
 	result_test(rpc_call(data), None);
 
 

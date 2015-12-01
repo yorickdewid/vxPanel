@@ -10,8 +10,8 @@ void dns::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO dns (address, domain_name) "
-			"VALUES (?, ?)" << _address << _domain->get_domain_name();
+			"INSERT INTO dns (name, domain_name) "
+			"VALUES (?, ?)" << _name << _domain->get_domain_name();
 
 		stat.exec();
 		stat.reset();
@@ -31,16 +31,23 @@ void dns::load()
 	try{
 		cppdb::statement stat;
 		std::string domain_name;
+		int tmp_active;
 
 		stat = db.session() << 
 				"SELECT * FROM dns WHERE id = ?" << id;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			r >> this->id >> this->_address >> this->_created >> domain_name;
+			r >> this->id >> this->_name >> this->_created >> domain_name >> tmp_active;
 	  		if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
+	  		if ( tmp_active == 0 ){
+  				this->_active = false;
+  			}
+  			else if ( tmp_active == 1 ){
+  				this->_active = true;
+  			}
 	    }
 
 	    stat.reset();
@@ -59,19 +66,23 @@ void dns::load(std::string domain_name)
 {
 	try{
 		cppdb::statement stat;
+		int tmp_active;
 
 		stat = db.session() << 
 				"SELECT * FROM dns WHERE domain_name = ?" << domain_name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-	  		r.fetch(0,this->id);
-	  		r.fetch(1,this->_address);
-	  		r.fetch(2,this->_created);
-	  		r.fetch(3,domain_name);
+			r >> this->id >> this->_name >> this->_created >> domain_name >> tmp_active;
 	  		if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
+	  		if ( tmp_active == 0 ){
+  				this->_active = false;
+  			}
+  			else if ( tmp_active == 1 ){
+  				this->_active = true;
+  			}
 	    }
 
 	    stat.reset();
@@ -117,9 +128,9 @@ bool dns::m_delete()
 	return false;
 }
 
-void dns::set_address(std::string address)
+void dns::set_name(std::string name)
 {
-	this->_address = address;
+	this->_name = name;
 }
 
 void dns::set_domain(std::shared_ptr<domain> domain)
@@ -127,14 +138,19 @@ void dns::set_domain(std::shared_ptr<domain> domain)
 	this->_domain.swap(domain);
 }
 
+void dns::set_active(bool active)
+{
+	this->_active = active;
+}
+
 int dns::get_id()
 {
 	return this->id;
 }
 
-std::string dns::get_address()
+std::string dns::get_name()
 {
-	return this->_address;
+	return this->_name;
 }
 
 std::string dns::get_created()
@@ -145,5 +161,10 @@ std::string dns::get_created()
 domain dns::get_domain()
 {
 	return *this->_domain;
+}
+
+bool dns::get_active()
+{
+	return this->_active;
 }
 

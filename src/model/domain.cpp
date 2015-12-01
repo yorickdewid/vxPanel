@@ -11,7 +11,7 @@ void domain::save()
 
 		if ( this->_vhost_id != -1 ) {
 			stat = db.session() << 
-				"INSERT INTO domain (name, status, registrar, uid) "
+				"INSERT INTO domain (name, status, registrar, uid, vhost_id) "
 				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost_id;
 		}else	{
 			stat = db.session() << 
@@ -43,10 +43,17 @@ void domain::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid;
+			int tmp_vhost_id;
+			int active;
+			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> active;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
-	  		if(r.fetch(5,this->_vhost_id) == false){ /* TODO replace with vhost object) */
+	  		if ( tmp_vhost_id != false ) { /* TODO replace with vhost object) */
 	  			this->_vhost_id = -1;
+	  		}
+	  		if ( active == 1 ) {
+	  			this->_active = true;
+	  		} else {
+	  			this->_active = false;
 	  		}
 	    }
 
@@ -114,6 +121,11 @@ void domain::vhost_id(int vhost_id)
 	this->_vhost_id = vhost_id;
 }
 
+void domain::set_active(bool active)
+{
+	this->_active = active;
+}
+
 std::string domain::get_domain_name()
 {
 	return this->name;
@@ -142,5 +154,10 @@ user domain::get_user()
 int domain::get_vhost_id()
 {
 	return this->_vhost_id;
+}
+
+bool domain::get_active()
+{
+	return this->_active;
 }
 
