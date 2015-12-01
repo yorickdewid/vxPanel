@@ -1,0 +1,7 @@
+HOME=/
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+# */5 * * * * root nice -2 /usr/bin/php -q /etc/zpanel/panel/bin/daemon.php >> /dev/null 2>&1
+# */15 * * * * root /usr/bin/systemctl reload httpd
+# 0 23 * * * root /usr/bin/php -q /etc/zpanel/panel/bin/TldCron.php >> /dev/null 2>&1
