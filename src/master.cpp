@@ -192,8 +192,8 @@ void master::create_user(std::string username)
 	user.set_username(username);
 	user.set_password("kaas");
 	user.set_email("info@kaas.nl");
-	std::string remote = cppcms::application::request().remote_addr();
-	user.set_remote(remote);
+	// std::string remote = cppcms::application::request().remote_addr();
+	// user.set_remote(remote);
 
 	user.save();
 
@@ -252,11 +252,18 @@ void master::create_vhost(std::string name, std::string custom_config, int uid)
 	return_result("OK");
 }
 
-void master::create_mailbox(std::string address, std::string domain_name, int uid)
+void master::create_mailbox(std::vector<std::string> required_fields, std::string domain_name, int uid)
 {
 	mailbox mailbox(get_database(),0);
 
-	mailbox.set_address(address);
+	mailbox.set_address(required_fields[0]);
+	mailbox.set_password(required_fields[1]);
+	mailbox.set_maildir(required_fields[2]);
+	std::string tmp = required_fields[3];
+	std::cout << tmp << std::endl;
+	char tmp_char[tmp.length()];
+	tmp.copy(tmp_char,tmp.length(),0);
+	mailbox.set_quota(atoll(tmp_char));
 	mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
 
 	mailbox.save();
@@ -442,6 +449,9 @@ void master::get_mailbox(std::string domain_name, int uid)
 	if ( mailbox.get_domain().get_domain_name().compare(domain_name) == 0) {
 		json["mailbox"]["id"] = mailbox.get_id();
 		json["mailbox"]["address"] = mailbox.get_address();
+		json["mailbox"]["password"] = mailbox.get_password();
+		json["mailbox"]["maildir"] = mailbox.get_maildir();
+		json["mailbox"]["quota"] = mailbox.get_quota();
 		json["mailbox"]["created"] = mailbox.get_created();
 		if ( !mailbox.get_domain().get_domain_name().compare("") ) { /* good enough? */
 			json["mailbox"]["domain"] = mailbox.get_domain().get_domain_name();
