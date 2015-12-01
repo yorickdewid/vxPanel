@@ -2,14 +2,14 @@
 #define DOMAIN_H
 
 #include "user.h"
+#include "vhost.h"
 
 class domain: public model {
 
 public:
 	domain(backend& db, std::string domain_name) :
 		model(db),
-		name(domain_name),
-		_vhost_id(-1)
+		name(domain_name)
 	{
 		this->load();
 	};
@@ -23,7 +23,7 @@ public:
 	void status(std::string status);
 	void registrar(std::string registrar);
 	void set_user(std::shared_ptr<user> user);
-	void vhost_id(int vhost_id);
+	void set_vhost(std::shared_ptr<vhost> vhost);
 	void set_active(bool active);
 
 	std::string get_domain_name();
@@ -31,7 +31,7 @@ public:
 	std::string get_registrar();
 	std::string get_created();
 	user get_user();
-	int get_vhost_id();
+	vhost get_vhost();
 	bool get_active();
 
 private:
@@ -40,7 +40,7 @@ private:
 	std::string _registrar;
 	std::string _created;
 	std::shared_ptr<user> _user;
-	int _vhost_id; /* todo vhost object */
+	std::shared_ptr<vhost> _vhost;
 	bool _active;
 
 };

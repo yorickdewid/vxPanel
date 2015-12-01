@@ -3,16 +3,17 @@
 #include "../model.h"
 #include "domain.h"
 #include "user.h"
+#include "vhost.h"
 
 void domain::save()
 {
 	try{
 		cppdb::statement stat;
 
-		if ( this->_vhost_id != -1 ) {
+		if ( _vhost ) {
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid, vhost_id) "
-				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost_id;
+				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost->get_id();
 		}else	{
 			stat = db.session() << 
 				"INSERT INTO domain (name, status, registrar, uid) "
@@ -48,7 +49,7 @@ void domain::load()
 			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> tmp_active;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
 	  		if ( tmp_vhost_id != false ) { /* TODO replace with vhost object) */
-	  			this->_vhost_id = -1;
+	  			set_vhost(std::shared_ptr<vhost>(new vhost(db,tmp_vhost_id)));
 	  		}
 	  		if ( tmp_active == 1 ) {
 	  			this->_active = true;
@@ -116,9 +117,9 @@ void domain::set_user(std::shared_ptr<user> user)
 	this->_user.swap(user);
 }
 
-void domain::vhost_id(int vhost_id)
+void domain::set_vhost(std::shared_ptr<vhost> vhost)
 {
-	this->_vhost_id = vhost_id;
+	this->_vhost.swap(vhost);
 }
 
 void domain::set_active(bool active)
@@ -151,9 +152,9 @@ user domain::get_user()
 	return *this->_user;
 }
 
-int domain::get_vhost_id()
+vhost domain::get_vhost()
 {
-	return this->_vhost_id;
+	return *this->_vhost;
 }
 
 bool domain::get_active()

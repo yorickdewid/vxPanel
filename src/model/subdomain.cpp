@@ -3,16 +3,17 @@
 #include "../model.h"
 #include "domain.h"
 #include "subdomain.h"
+#include "vhost.h"
 
 void subdomain::save()
 {
 	try{
 		cppdb::statement stat;
 
-		if (_vhost_id != -1 ) {
+		if ( _vhost ) {
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name, vhost_id) "
-				"VALUES (?, ?, ?)" << name << _domain->get_domain_name() << _vhost_id;
+				"VALUES (?, ?, ?)" << name << _domain->get_domain_name() << _vhost->get_id();
 		} else {
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name) "
@@ -37,6 +38,7 @@ void subdomain::load()
 	try{
 		cppdb::statement stat;
 		std::string domain_name;
+		int vhost_id;
 
 		stat = db.session() << 
 				"SELECT * FROM subdomain WHERE name = ?" << name;
@@ -52,8 +54,8 @@ void subdomain::load()
 	  		else{
 	  			std::cout << "Failed to load domain " << std::endl;
 	  		}
-	  		if(r.fetch(3,this->_vhost_id) == false){ /* TODO replace with vhost object) */
-	  			this->_vhost_id = -1;
+	  		if(r.fetch(3,vhost_id) != false){ 
+	  			set_vhost(std::shared_ptr<vhost>(new vhost(db,vhost_id)));
 	  		}
 	    }
 
@@ -110,9 +112,9 @@ void subdomain::set_domain(std::shared_ptr<domain> domain)
 	this->_domain.swap(domain);
 }
 
-void subdomain::set_vhost_id(int vhost_id)
+void subdomain::set_vhost(std::shared_ptr<vhost> vhost)
 {
-	this->_vhost_id = vhost_id;
+	this->_vhost.swap(vhost);
 }
 
 std::string subdomain::get_name()
@@ -135,8 +137,8 @@ std::shared_ptr<domain> subdomain::get_domain_ptr()
 	return this->_domain;
 }
 
-int subdomain::get_vhost_id()
+vhost subdomain::get_vhost()
 {
-	return this->_vhost_id;
+	return *this->_vhost;
 }
 
