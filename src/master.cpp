@@ -85,8 +85,10 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 
 master::~master()
 {
-	if (db)
+	if (db)	{
+		std::cout << db << std::endl;
 		delete db;
+	}
 }
 
 void master::init_backend()
@@ -191,6 +193,8 @@ void master::create_user(std::string username)
 	user.set_username(username);
 	user.set_password("kaas");
 	user.set_email("info@kaas.nl");
+	std::string remote = cppcms::application::request().remote_addr();
+	user.set_remote(remote);
 
 	user.save();
 
@@ -203,7 +207,7 @@ void master::create_domain(std::string domain_name, int uid)
 
 	domain.status("inactive");
 	domain.registrar("transip");
-	domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+	//domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
 
 	domain.save();
 

@@ -9,12 +9,9 @@
 bool check_secret(cppcms::service &srv )
 {
 	std::string secret = srv.settings().get<std::string>("secret");
-	std::cerr << secret << std::endl;
 	if ( secret.length() != 40) {
-		std::cout << "false" << std::endl;
 		return false;
 	} else {
-		std::cout << "true" << std::endl;
 		return true;
 	}
 }

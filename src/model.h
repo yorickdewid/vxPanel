@@ -16,6 +16,14 @@ public:
 	virtual bool update(std::string field) = 0;
 	virtual bool m_delete() = 0;
 
+	bool is_empty(std::string var){
+		if ( !var.empty() ) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	bool get_saved(){ return this->saved; };
 
 protected:

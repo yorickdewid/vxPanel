@@ -12,13 +12,13 @@ void user::save()
 
 		if ( _note.empty() ) {
 			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, user_type, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _active << _lastlogin;
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
 		}
 		else{
 			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, postal, note, user_type, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _postal << _note  << _user_type << _active << _lastlogin;
+				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) "
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
 		}
 
 		stat.exec();
@@ -44,7 +44,8 @@ void user::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-  			r >> this->uid >> this->_password >> this->_email >> this->_firstname >> this->_lastname >> this->_country >> this->_city >> this->_address >> this->_postal >> this->_note >> this->_user_type >> tmp_active >> this->_lastlogin;
+  			r >> this->uid >> this->username >> this->_password >> this->_email >> this->_firstname >> this->_lastname >> this->_country >> this->_city >> this->_address >> this->_address_number >> this->_postal >> this->_note >> this->_remote >> this->_user_type >> tmp_active >> this->_lastlogin;
+
   			if ( tmp_active == 0 ){
   				this->_active = false;
   			}
@@ -143,6 +144,11 @@ void user::set_address(std::string address)
 	this->_address = address;
 }
 
+void user::set_address_number(int address_number)
+{
+	this->_address_number = address_number;
+}
+
 void user::set_postal(std::string postal)
 {
 	this->_postal = postal;
@@ -151,6 +157,11 @@ void user::set_postal(std::string postal)
 void user::set_note(std::string note)
 {
 	this->_note = note;
+}
+
+void user::set_remote(std::string remote)
+{
+	this->_remote = remote;
 }
 
 void user::set_user_type(std::string user_type)
@@ -213,6 +224,11 @@ std::string user::get_address()
 	return this->_address;
 }
 
+int user::get_address_number()
+{
+	return this->_address_number;
+}
+
 std::string user::get_postal()
 {
 	return this->_postal;
@@ -226,6 +242,11 @@ std::string user::get_note()
 std::string user::get_user_type()
 {
 	return this->_user_type;
+}
+
+std::string user::get_remote()
+{
+	return this->_remote;
 }
 
 bool user::get_active()

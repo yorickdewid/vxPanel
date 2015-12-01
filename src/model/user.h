@@ -6,8 +6,9 @@
 class user: public model {
 
 public:
-	user(backend& db, int uid) : model(db), uid(uid) { /*this->load(); */ };
-	user(backend& db) : model(db) {};
+	user(backend& db) : model(db) {std::cout << &db << std::endl;};
+	user(backend& db, int uid) : model(db), uid(uid) { /* this->load(); */ };
+
 	
 	void save();
 	void load();
@@ -23,7 +24,9 @@ public:
 	void set_country(std::string country);
 	void set_city(std::string city);
 	void set_address(std::string address);
+	void set_address_number(int address_number);
 	void set_postal(std::string postal);
+	void set_remote(std::string remote);
 	void set_note(std::string note);
 	void set_user_type(std::string user_type);
 	void set_active(bool active);
@@ -38,8 +41,10 @@ public:
 	std::string get_country();
 	std::string get_city();
 	std::string get_address();
+	int get_address_number();
 	std::string get_postal();
 	std::string get_note();
+	std::string get_remote();
 	std::string get_user_type();
 	bool get_active();
 	std::string get_created(); /* no altering */
@@ -61,8 +66,10 @@ private:
 	std::string _country;
 	std::string _city;
 	std::string _address;
+	int _address_number;
 	std::string _postal;
 	std::string _note;
+	std::string _remote; // ip_address on save
 	std::string _user_type;
 	bool _active;
 	std::string _created;
