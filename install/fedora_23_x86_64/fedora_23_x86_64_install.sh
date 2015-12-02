@@ -128,7 +128,7 @@ mkdir -p /usr/local/vxpanel
 cp -R . /usr/local/vxpanel
 
 # Install required software and dependencies required by vxPanel
-dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap libdb-utils dovecot dovecot-pigeonhole dovecot-mysql postfix cyrus-sasl-lib proftpd-mysql phpmyadmin roundcubemail
+dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap libdb-utils dovecot dovecot-pigeonhole dovecot-mysql postfix postfix-mysql cyrus-sasl-lib proftpd-mysql phpmyadmin roundcubemail
 
 # At least start the database and firewall
 systemctl start mariadb
@@ -226,7 +226,7 @@ echo "Store settings in vxconfig.txt"
 touch /root/vxconfig.txt;
 echo "Admin Password: $admin_passwd" >> /root/vxconfig.txt;
 echo "MariaDB Root Password: $db_passwd" >> /root/vxconfig.txt
-echo "MariaDB Postfix Password: $mail_passwd" >> /root/vxconfig.txt
+# echo "MariaDB Postfix Password: $mail_passwd" >> /root/vxconfig.txt
 echo "IP Address: $publicip" >> /root/vxconfig.txt
 echo "Panel Domain: $fqdn" >> /root/vxconfig.txt
 chmod 600 /root/vxconfig.txt
@@ -271,8 +271,8 @@ chown -R vmail:mail /var/vxpanel/sieve
 mkdir -p /var/lib/dovecot/sieve/
 touch /var/lib/dovecot/sieve/default.sieve
 sed -i "s|postmaster_address = postmaster@your-domain.tld|postmaster_address = postmaster@$fqdn|" /etc/dovecot/dovecot.conf
-sed -i "s|password=postfix|password=$mail_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-dict-quota.conf
-sed -i "s|password=postfix|password=$mail_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-mysql.conf
+sed -i "s|password=postfix|password=$db_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-dict-quota.conf
+sed -i "s|password=postfix|password=$db_passwd|" /usr/local/vxpanel/srv/dovecot/dovecot-mysql.conf
 touch /var/log/dovecot.log
 touch /var/log/dovecot-info.log
 touch /var/log/dovecot-debug.log

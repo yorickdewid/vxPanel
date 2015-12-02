@@ -2,4 +2,4 @@ hosts = localhost
 user = root
 password = postfix
 dbname = vxpanel
-query = SELECT goto FROM domain_alias WHERE address='%s' AND active = '1'
+query = SELECT destination FROM domain_alias WHERE source='%s' AND active = '1'

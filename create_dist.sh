@@ -12,7 +12,6 @@ rm -rf dist
 echo "Distributions:"
 ls -dl install/* | cut -f2 -d '/'
 
-exit
 while true; do
   echo -n "Enter target distribution [ENTER]: "
   read distname

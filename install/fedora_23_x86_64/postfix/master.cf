@@ -11,6 +11,11 @@
 smtp inet n - n - - smtpd
 # -o content_filter=smtp-amavis:127.0.0.1:10024
 # -o receive_override_options=no_address_mappings
+submission inet n - - - - smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
 pickup fifo n - n 60 1 pickup
   -o content_filter=
   -o receive_override_options=no_header_body_checks
@@ -80,5 +85,5 @@ dovecot unix - n n - - pipe
   flags=DRhu user=vmail:mail argv=/usr/libexec/dovecot/deliver -d ${recipient}
 #
 # Vacation mail
-vacation unix - n n - - pipe
-  flags=Rq user=vacation argv=/var/spool/vacation/vacation.pl -f ${sender} -- ${recipient}
+# vacation unix - n n - - pipe
+#  flags=Rq user=vacation argv=/var/spool/vacation/vacation.pl -f ${sender} -- ${recipient}

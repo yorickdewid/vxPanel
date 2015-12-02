@@ -38,11 +38,13 @@ CREATE TABLE IF NOT EXISTS `domain` (
 
 
 CREATE TABLE IF NOT EXISTS `domain_alias` (
-  `goto` varchar(100) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `domain_name` varchar(50) DEFAULT NULL,
+  `source` varchar(100) NOT NULL,
+  `destination` varchar(100) NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `active` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`goto`),
+  PRIMARY KEY (`id`),
   KEY `FK_domain_alias_domain` (`domain_name`),
   CONSTRAINT `FK_domain_alias_domain` FOREIGN KEY (`domain_name`) REFERENCES `domain` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -67,12 +69,14 @@ CREATE TABLE IF NOT EXISTS `ftp_account` (
 
 CREATE TABLE IF NOT EXISTS `mailbox` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `address` varchar(200) NOT NULL,
-  `password` CHAR(40) NOT NULL,
+  `email` varchar(200) NOT NULL,
+  `password` VARCHAR(106) NOT NULL,
   `maildir` varchar(255) NOT NULL,
   `quota` bigint(20) NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `domain_name` varchar(100) NOT NULL,
+  `bytes` bigint(20) NOT NULL DEFAULT '0',
+  `messages` int(11) NOT NULL DEFAULT '0',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `FK_mailbox_domain` (`domain_name`),

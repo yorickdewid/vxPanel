@@ -25,8 +25,8 @@ inet_interfaces = all
 mydomain = control.yourdomain.com
 myhostname = control.yourdomain.com
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
-mydestination = localhost.$mydomain, localhost
-relay_domains = proxy:mysql:/usr/local/vxpanel/srv/postfix/mysql-relay_domains_maps.cf
+mydestination = localhost.$mydomain, $mydomain, localhost
+relay_domains = mysql:/usr/local/vxpanel/srv/postfix/mysql-relay_domains_maps.cf
 
 # mail delivery
 recipient_delimiter = +
@@ -38,12 +38,11 @@ transport_maps = hash:/etc/postfix/transport
 #local_recipient_maps =
 
 # virtual setup
-virtual_alias_maps = proxy:mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_alias_maps.cf,
-                     regexp:/usr/local/vxpanel/srv/postfix/virtual_regexp
+virtual_alias_maps = mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_alias_maps.cf
 virtual_mailbox_base = /var/vxpanel/vmail
-virtual_mailbox_domains = proxy:mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_domains_maps.cf
-virtual_mailbox_maps = proxy:mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_maps.cf
-virtual_mailbox_limit_maps = proxy:mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_limit_maps.cf
+virtual_mailbox_domains = mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_domains_maps.cf
+virtual_mailbox_maps = mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_maps.cf
+virtual_mailbox_limit_maps = mysql:/usr/local/vxpanel/srv/postfix/mysql-virtual_mailbox_limit_maps.cf
 virtual_minimum_uid = 101
 virtual_uid_maps = static:101
 virtual_gid_maps = static:12
@@ -51,10 +50,10 @@ virtual_transport = dovecot
 dovecot_destination_recipient_limit = 1
 
 # debugging
-debug_peer_level = 2
-debugger_command =
-         PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
-         xxgdb $daemon_directory/$process_name $process_id & sleep 5
+# debug_peer_level = 2
+# debugger_command =
+#         PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+#         xxgdb $daemon_directory/$process_name $process_id & sleep 5
 
 # authentication
 smtpd_sasl_auth_enable = yes
