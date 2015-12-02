@@ -4,10 +4,15 @@
 if [ ! -f bin/vxd ] || [ ! -f bin/vxadmin ]; then
     echo "Not all programs found"
     echo "Make sure all the projects are build and executables are moven into bin"
+    exit
 fi
 
 rm -rf dist
 
+echo "Distributions:"
+ls -dl install/* | cut -f2 -d '/'
+
+exit
 while true; do
   echo -n "Enter target distribution [ENTER]: "
   read distname
