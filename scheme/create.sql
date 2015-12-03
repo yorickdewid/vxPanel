@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS `subdomain` (
 CREATE TABLE IF NOT EXISTS `user` (
   `uid` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(30) NOT NULL,
-  `password` char(40) NOT NULL,
+  `password` varchar(106) NOT NULL,
   `email` varchar(100) NOT NULL,
   `firstname` varchar(50) DEFAULT NULL,
   `lastname` varchar(100) DEFAULT NULL,
