@@ -100,6 +100,7 @@ passwordgen() {
 
 # Set some installation defaults/auto assignments
 fqdn=`/bin/hostname -f`
+serverhost=`hostname`
 publicip=`curl -s http://whatismijnip.nl | cut -d " " -f 5`
 
 # We need to disable SElinux
@@ -183,6 +184,7 @@ ln -s /usr/local/vxpanel/srv/proftpd/proftpd-mysql.conf /etc/proftpd.conf
 ln -s /usr/local/vxpanel/srv/apache/httpd.conf /etc/httpd/conf/httpd.conf
 ln -s /usr/local/vxpanel/srv/cron/vxdaemon /etc/cron.d/vxdaemon
 ln -s /usr/local/vxpanel/srv/phpmyadmin/config.inc.php /etc/phpMyAdmin/config.inc.php
+ln -s /usr/local/vxpanel/srv/roundcube/config.inc.php /etc/roundcubemail/config.inc.php
 
 # MariaDB specific installation tasks...
 MYSQL_ROOT_PASSWORD=$db_passwd
@@ -283,9 +285,8 @@ chmod 660 /var/log/dovecot*
 echo "Setup FTP"
 groupadd -g 2001 ftpgroup
 useradd -u 2001 -s /bin/false -d /bin/null -c "proftpd user" -g ftpgroup ftpuser
-sed -i "s|zpanel_proftpd@localhost root z|zpanel_proftpd@localhost root $db_passwd|" /usr/local/vxpanel/srv/proftpd/proftpd-mysql.conf
+sed -i "s|vxpanel@localhost root CHANGEME|vxpanel@localhost root $db_passwd|" /usr/local/vxpanel/srv/proftpd/proftpd-mysql.conf
 chmod -R 644 /var/vxpanel/logs/proftpd
-serverhost=`hostname`
 
 # Apache HTTPD specific installation tasks...
 echo "Reconfigure Apache"
@@ -315,13 +316,9 @@ echo "Configure phpMyAdmin"
 sed -i "s|CHANGE_ME|$db_salt|" /usr/local/vxpanel/srv/phpmyadmin/config.inc.php
 
 # Roundcube specific installation tasks...
-# echo "Configure RoundCube"
-# sed -i "s|YOUR_MYSQL_ROOT_PASSWORD|$db_passwd|" /etc/zpanel/configs/roundcube/db.inc.php
-# sed -i "s|#||" /etc/zpanel/configs/roundcube/db.inc.php
-# rm -rf /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
-# ln -s /etc/zpanel/configs/roundcube/main.inc.php /etc/zpanel/panel/etc/apps/webmail/config/main.inc.php
-# ln -s /etc/zpanel/configs/roundcube/config.inc.php /etc/zpanel/panel/etc/apps/webmail/plugins/managesieve/config.inc.php
-# ln -s /etc/zpanel/configs/roundcube/db.inc.php /etc/zpanel/panel/etc/apps/webmail/config/db.inc.php
+echo "Configure RoundCube"
+sed -i "s|CHANGEME|$db_passwd|" /usr/local/vxpanel/srv/roundcube/config.inc.php
+rm -rf /usr/share/roundcubemail/installer/
 
 # Enable system services and start/restart them as required.
 echo "Enable services"
