@@ -182,6 +182,9 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE INDEX `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1000;
 
+INSERT INTO `user` (`username`, `password`, `email`, `firstname`, `note`, `remote`, `user_type`) VALUES
+('admin', 'CHANGEME', 'info@localhost', 'admin', 'Administrator', INET6_ATON('::1'), 'administrator');
+
 
 CREATE TABLE IF NOT EXISTS `user_db` (
   `name` varchar(100) NOT NULL,
