@@ -56,7 +56,14 @@ if [ -e /usr/local/cpanel ] || [ -e /usr/local/directadmin ] || [ -e /usr/local/
   echo "You appear to have a control panel already installed on your server; This installer"
   echo "is designed to install and configure vxPanel on a clean OS installation only!"
   echo ""
-  echo "Please re-install your OS before attempting to install using this script."
+  echo "Please re-install your OS before attempting to install using this script"
+  exit
+fi
+
+if [ -e /usr/local/vxpanel ] ; then
+  echo "vxPanel is already installed"
+  echo ""
+  echo "Please re-install your OS before attempting to install using this script"
   exit
 fi
 
@@ -149,7 +156,7 @@ firewall-cmd --reload
 db_salt=`passwordgen`;
 db_passwd=`passwordgen`;
 mail_passwd=`passwordgen`;
-admin_passwd=`passwordgen`;
+# admin_passwd=`passwordgen`;
 
 # Set-up vxPanel directories and configure directory permissions as required
 mkdir /var/vxpanel
@@ -214,21 +221,19 @@ mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User = 'root' AND Ho
 mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User = ''";
 mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User != 'root'";
 mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
-# mysql -u root -p$db_passwd -e "CREATE SCHEMA vxpanel_roundcube";
 cat /usr/local/vxpanel/share/create.sql | mysql -u root -p$db_passwd
-# mysql -u root -p$db_passwd -e "UPDATE mysql.user SET Password=PASSWORD('$postfixpassword') WHERE User='postfix' AND Host='localhost';";
-# mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
+sed -i "s|\"password\" : \"CHANGEME\",|\"password\" : \"$db_passwd\",|" /usr/local/vxpanel/etc/config.json
 
 # Set config options
 /usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --gen-key
 /usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --verify
+admin_passwd=`/usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --admin-reset`
 
 # We'll store the passwords so that users can review them later if required.
 echo "Store settings in vxconfig.txt"
 touch /root/vxconfig.txt;
 echo "Admin Password: $admin_passwd" >> /root/vxconfig.txt;
 echo "MariaDB Root Password: $db_passwd" >> /root/vxconfig.txt
-# echo "MariaDB Postfix Password: $mail_passwd" >> /root/vxconfig.txt
 echo "IP Address: $publicip" >> /root/vxconfig.txt
 echo "Panel Domain: $fqdn" >> /root/vxconfig.txt
 chmod 600 /root/vxconfig.txt
