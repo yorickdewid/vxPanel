@@ -67,6 +67,13 @@ bool user_dbuser_db::update(std::string field)
 	return true;
 }
 
+bool user_dbuser_db::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool user_dbuser_db::m_delete()
 {
 	try{

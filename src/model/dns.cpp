@@ -104,6 +104,13 @@ bool dns::update(std::string field)
 	return true;
 }
 
+bool dns::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool dns::m_delete()
 {
 	try{

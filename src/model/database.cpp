@@ -63,6 +63,13 @@ bool database::update(std::string field)
 	return true;
 }
 
+bool database::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool database::m_delete()
 {
 	try{

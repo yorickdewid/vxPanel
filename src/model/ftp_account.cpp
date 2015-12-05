@@ -72,6 +72,13 @@ bool ftp_account::update(std::string field)
 	return true;
 }
 
+bool ftp_account::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool ftp_account::m_delete()
 {
 	try{

@@ -4,11 +4,12 @@
 #include "exceptions.h"
 #include "backend.h"
 #include <vector>
+#include <boost/any.hpp>
 
-template< typename F, typename V >
 struct update_obj{
-    F field;
-    V value;
+public:
+    std::string field;
+    boost::any value;
 };
 
 class model {
@@ -21,7 +22,7 @@ public:
 	virtual void save() = 0;
 	virtual void load() = 0;
 	virtual bool update(std::string field) = 0;
-	//virtual bool update(std::vector<update_obj<F,V>) = 0;
+	virtual bool update(std::vector<update_obj> list) = 0;
 	virtual bool m_delete() = 0;
 
 	bool is_empty(std::string var){

@@ -64,6 +64,13 @@ bool app_settings::update(std::string field)
 	return true;
 }
 
+bool app_settings::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool app_settings::m_delete()
 {
 	try{

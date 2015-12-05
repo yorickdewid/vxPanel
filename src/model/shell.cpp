@@ -66,6 +66,13 @@ bool shell::update(std::string field)
 	return true;
 }
 
+bool shell::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool shell::m_delete()
 {
 	try{

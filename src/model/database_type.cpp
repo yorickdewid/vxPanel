@@ -58,6 +58,13 @@ bool database_type::update(std::string field)
 	return true;
 }
 
+bool database_type::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 /* TODO Handle foreign key block correctly */
 bool database_type::m_delete()
 {

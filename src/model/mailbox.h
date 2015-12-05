@@ -14,6 +14,7 @@ public:
 	void load();
 	void load(std::string domain_name);
 	bool update(std::string field);
+	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	void set_address(std::string address);

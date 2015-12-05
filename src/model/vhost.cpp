@@ -94,6 +94,13 @@ bool vhost::update(std::string field)
 	return true;
 }
 
+bool vhost::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool vhost::m_delete()
 {
 	/* TODO */

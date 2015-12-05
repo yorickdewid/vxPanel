@@ -101,6 +101,13 @@ bool mailbox::update(std::string field)
 	return true;
 }
 
+bool mailbox::update(std::vector<update_obj> list)
+{
+	/* TODO */
+	(std::vector<update_obj>)list;
+	return true;
+}
+
 bool mailbox::m_delete()
 {
 	try{
