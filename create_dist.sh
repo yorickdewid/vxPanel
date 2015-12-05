@@ -1,7 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
+
+LIBDIR="/usr/local/lib"
+CMS="$LIBDIR/libcppcms.so.1.0.5"
+CMSDB="$LIBDIR/libcppdb.so.0.3.1"
+CMSDDM="$LIBDIR/libcppdb_mysql.so.0.3.1"
+BOOSTER="$LIBDIR/libbooster.so.0.0.3"
 
 # Check if we build the project
-if [ ! -f bin/vxd ] || [ ! -f bin/vxadmin ]; then
+if [ ! -f bin/vxd ] || [ ! -f bin/vxque ] || [ ! -f bin/vxadmin ]; then
     echo "Not all programs found"
     echo "Make sure all the projects are build and executables are moven into bin"
     exit
@@ -25,6 +31,7 @@ done
 # Create directory structure
 mkdir -p dist
 mkdir -p dist/bin
+mkdir -p dist/lib
 mkdir -p dist/srv
 mkdir -p dist/share
 mkdir -p dist/www
@@ -33,6 +40,11 @@ mkdir -p dist/etc
 # Copy files
 cp bin/vxd dist/bin
 cp bin/vxadmin dist/bin
+cp bin/vxque dist/bin
+cp $CMS dist/lib
+cp $CMSDB dist/lib
+cp $CMSDDM dist/lib
+cp $BOOSTER dist/lib
 cp config.json dist/etc
 cp LICENSE dist/
 cp -R install/$distname/* dist/srv

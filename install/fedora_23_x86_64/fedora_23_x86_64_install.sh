@@ -23,7 +23,7 @@ echo -e ""
 echo -e "##############################################################"
 echo -e "# Welcome to the vxPanel Installer for Fedora x86_64         #"
 echo -e "#                                                            #"
-echo -e "# Please make sure your VPS provider hasn't pre-installed    #"
+echo -e "# Please make sure your server hasn't pre-installed          #"
 echo -e "# any packages required by vxPanel.                          #"
 echo -e "#                                                            #"
 echo -e "# If you selected additional options during the Fedora       #"
@@ -121,7 +121,7 @@ while true; do
 	echo -e "Enter the FQDN you will use to access vxPanel on your server."
 	echo -e "- It MUST be a sub-domain of you main domain, it MUST NOT be your main domain only. Example: panel.yourdomain.com"
 	echo -e "- Remember that the sub-domain ('panel' in the example) MUST be setup in your DNS nameserver."
-	read -e -p "FQDN for VXpanel: " -i $fqdn fqdn
+	read -e -p "FQDN for vxPanel: " -i $fqdn fqdn
 	read -e -p "Enter the public (external) server IP: " -i $publicip publicip
 	break;
 done
@@ -136,7 +136,7 @@ mkdir -p /usr/local/vxpanel
 cp -R . /usr/local/vxpanel
 
 # Install required software and dependencies required by vxPanel
-dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap libdb-utils dovecot dovecot-pigeonhole dovecot-mysql postfix postfix-mysql cyrus-sasl-lib proftpd-mysql phpmyadmin roundcubemail
+dnf install -y mariadb mariadb-server httpd firewalld php php-common php-cli php-mysql php-gd php-mcrypt php-curl php-pear php-imap php-xmlrpc php-xsl php-soap dovecot dovecot-pigeonhole dovecot-mysql postfix postfix-mysql cyrus-sasl-lib proftpd-mysql phpmyadmin roundcubemail
 
 # At least start the database and firewall
 systemctl start mariadb
@@ -150,13 +150,13 @@ firewall-cmd --permanent --zone=public --add-service=https
 firewall-cmd --permanent --zone=public --add-service=ftp
 firewall-cmd --permanent --zone=public --add-service=smtp
 firewall-cmd --permanent --zone=public --add-service=mysql
+firewall-cmd --permanent --zone=public --add-port=8080/tcp
 firewall-cmd --reload
 
 # Generation of random passwords
 db_salt=`passwordgen`;
 db_passwd=`passwordgen`;
 mail_passwd=`passwordgen`;
-# admin_passwd=`passwordgen`;
 
 # Set-up vxPanel directories and configure directory permissions as required
 mkdir /var/vxpanel
@@ -171,6 +171,7 @@ mkdir /var/vxpanel/sieve
 chmod -R 777 /var/vxpanel/
 chmod +x /usr/local/vxpanel/bin/vxadmin
 chmod +x /usr/local/vxpanel/bin/vxd
+chmod +x /usr/local/vxpanel/bin/vxque
 
 mv /etc/postfix/main.cf /etc/postfix/main.cf.orig
 mv /etc/postfix/master.cf /etc/postfix/master.cf.orig
@@ -192,6 +193,11 @@ ln -s /usr/local/vxpanel/srv/apache/httpd.conf /etc/httpd/conf/httpd.conf
 ln -s /usr/local/vxpanel/srv/cron/vxdaemon /etc/cron.d/vxdaemon
 ln -s /usr/local/vxpanel/srv/phpmyadmin/config.inc.php /etc/phpMyAdmin/config.inc.php
 ln -s /usr/local/vxpanel/srv/roundcube/config.inc.php /etc/roundcubemail/config.inc.php
+
+# Register libs
+echo -e "Register libraries"
+echo "/usr/local/vxpanel/lib" > /etc/ld.so.conf.d/vxpanel.conf
+ldconfig
 
 # MariaDB specific installation tasks...
 MYSQL_ROOT_PASSWORD=$db_passwd
@@ -223,6 +229,8 @@ mysql -u root -p$db_passwd -e "DELETE FROM mysql.user WHERE User != 'root'";
 mysql -u root -p$db_passwd -e "FLUSH PRIVILEGES";
 cat /usr/local/vxpanel/share/create.sql | mysql -u root -p$db_passwd
 sed -i "s|\"password\" : \"CHANGEME\",|\"password\" : \"$db_passwd\",|" /usr/local/vxpanel/etc/config.json
+sed -i "s|\"ip\" : \"CHANGEME\",|\"ip\" : \"$publicip\",|" /usr/local/vxpanel/etc/config.json
+sed -i "s|\"hostname\" : \"CHANGEME\"|\"hostname\" : \"$fqdn\"|" /usr/local/vxpanel/etc/config.json
 
 # Set config options
 /usr/local/vxpanel/bin/vxadmin --config /usr/local/vxpanel/etc/config.json --gen-key
@@ -327,6 +335,7 @@ rm -rf /usr/share/roundcubemail/installer/
 
 # Enable system services and start/restart them as required.
 echo "Enable services"
+/usr/local/vxpanel/bin/vxd -c /usr/local/vxpanel/etc/config.json &
 systemctl enable mariadb
 systemctl enable httpd
 systemctl enable postfix
@@ -361,7 +370,7 @@ echo -e "# MariaDB Postfix Password : $mail_passwd" &>/dev/tty
 echo -e "# vxPanel Username        : admin                            #" &>/dev/tty
 echo -e "# vxPanel Password        : $admin_passwd" &>/dev/tty
 echo -e "#                                                            #" &>/dev/tty
-echo -e "# vxPanel Web login can be accessed using your server IP      #" &>/dev/tty
+echo -e "# vxPanel Web login can be accessed using your server IP     #" &>/dev/tty
 echo -e "# inside your web browser.                                   #" &>/dev/tty
 echo -e "#                                                            #" &>/dev/tty
 echo -e "#                !!! A REBOOT IS REQUIRED !!!                #" &>/dev/tty

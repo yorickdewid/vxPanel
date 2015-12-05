@@ -5,6 +5,10 @@
 		"database" : "vxpanel"
 	},
 	"secret" : "CHANGEME",
+	"host" : {
+		"ip" : "CHANGEME",
+		"hostname" : "CHANGEME"
+	},
 	"service" : {
 		"api" : "http",
 		"ip"  : "0.0.0.0",
