@@ -65,6 +65,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
+	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
+
 	/* TODO update */
 
 	bind("delete_user", cppcms::rpc::json_method(&master::delete_user, this), method_role);
@@ -578,7 +580,14 @@ void master::get_ip()
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(int uid, std::vector<std::string> update_list)
 {
+	user user(get_database(),uid);
 
+	update_obj update;
+	update.field = "address_number";
+	update.value = 100;
+	if(user.update(update)) {
+		return_result("OK");
+	}
 }
 
 /* status, registrar, vhost_id */

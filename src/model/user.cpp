@@ -1,7 +1,9 @@
 #include <iostream>
+#include <sstream>
 
 #include "../config.h"
 #include "../model.h"
+#include <typeinfo>
 #include "user.h"
 
 void user::save()
@@ -67,14 +69,19 @@ void user::load()
 
 bool user::update(update_obj update)
 {
-	std::string field = update.field;
-	return true;
-
 	try{
 		cppdb::statement stat;
 
+		// if(type_id(update.value) == int i)
+		// {
+		// 	std::cout << "le kaas" << std::endl;
+		// }
+
+		std::ostringstream query;
+		query << "UPDATE user set `" << update.field << "` = ? WHERE uid = ?";
+
 		stat = db.session() << 
-				"UPDATE user set `"<< field << "`="<< update.value <<" WHERE uid = ?" << uid ;
+				query.str() << boost::any_cast<int>(update.value) << uid ;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {
