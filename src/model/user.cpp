@@ -69,6 +69,28 @@ bool user::update(update_obj update)
 {
 	std::string field = update.field;
 	return true;
+
+	try{
+		cppdb::statement stat;
+
+		stat = db.session() << 
+				"UPDATE user set `"<< field << "`="<< update.value <<" WHERE uid = ?" << uid ;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+		return false;
+	}
+	return false;
 }
 
 bool user::update(std::vector<update_obj> list)
