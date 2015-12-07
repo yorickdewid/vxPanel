@@ -10,16 +10,9 @@ void ftp_account::save()
 	try{
 		cppdb::statement stat;
 
-		if ( _domain ) {
-			stat = db.session() << 
-			"INSERT INTO ftp_account (username, password, permissions, domain_name , uid) "
-			"VALUES (?, ?, ?, ?, ?)" << username << _password << _permissions << _domain->get_domain_name() << _user->get_uid();
-		}else{
-			stat = db.session() << 
-			"INSERT INTO ftp_account (username, password, permissions, uid) "
-			"VALUES (?, ?, ?, ?)" << username << _password << _permissions << _user->get_uid();
-		}
-
+		stat = db.session() << 
+		"INSERT INTO ftpuser (name, password, homedir, userid) "
+		"VALUES (?, encrypt(?), ?, ?)" << _name << _password << _homedir << _user->get_uid();
 		stat.exec();
 		stat.reset();
 
@@ -37,20 +30,15 @@ void ftp_account::load()
 {
 	try{
 		cppdb::statement stat;
-		std::string domain_name;
-		int uid;
+		int userid;
 
 		stat = db.session() << 
-				"SELECT * FROM ftp_account WHERE username = ?" << username;
+				"SELECT * FROM ftpuser WHERE name = ?" << _name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			r >> this->username >> this->_password >> this->_permissions >> this->_created >> domain_name;
-	  		if ( !domain_name.empty() ) {
-	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
-	  		}
-	  		r.fetch(5,uid);
-	  		set_user(std::shared_ptr<user>(new user(db,uid)));
+			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
+	  		set_user(std::shared_ptr<user>(new user(db,userid)));
 	    }
 
 	    stat.reset();
@@ -85,7 +73,7 @@ bool ftp_account::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM ftp_account WHERE username = ?" << username;
+				"DELETE FROM ftpuser WHERE name = ?" << _name;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {
@@ -103,19 +91,41 @@ bool ftp_account::m_delete()
 	return false;
 }
 
+
+
+void ftp_account::set_username(std::string username)
+{
+	this->_name = username;
+}
+
 void ftp_account::set_password(std::string password)
 {
 	this->_password = password;
 }
 
-void ftp_account::set_permissions(std::string permissions)
+void ftp_account::set_uid(int uid)
 {
-	this->_permissions = permissions;
+	this->_uid = uid;
 }
 
-void ftp_account::set_domain(std::shared_ptr<domain> domain)
+void ftp_account::set_gid(int gid)
 {
-	this->_domain.swap(domain);
+	this->_gid = gid;
+}
+
+void ftp_account::set_homedir(std::string homedir)
+{
+	this->_homedir = homedir;
+}
+
+void ftp_account::set_shell(std::string shell)
+{
+	this->_shell = shell;
+}
+
+void ftp_account::set_count(int count)
+{
+	this->_count = count;
 }
 
 void ftp_account::set_user(std::shared_ptr<user> user)
@@ -123,9 +133,24 @@ void ftp_account::set_user(std::shared_ptr<user> user)
 	this->_user.swap(user);
 }
 
+void ftp_account::set_accessed(std::string accessed)
+{
+	this->_accessed = accessed;
+}
+
+void ftp_account::set_modified(std::string modified)
+{
+	this->_modified = modified;
+}
+
+int ftp_account::get_id()
+{
+	return this->id;
+}
+
 std::string ftp_account::get_username()
 {
-	return this->username;
+	return this->_name;
 }
 
 std::string ftp_account::get_password()
@@ -133,9 +158,34 @@ std::string ftp_account::get_password()
 	return this->_password;
 }
 
-std::string ftp_account::get_permissions()
+int ftp_account::get_uid()
 {
-	return this->_permissions;
+	return this->_uid;
+}
+
+int ftp_account::get_gid()
+{
+	return this->_gid;
+}
+
+std::string ftp_account::get_homedir()
+{
+	return this->_homedir;
+}
+
+std::string ftp_account::get_shell()
+{
+	return this->_shell;
+}
+
+int ftp_account::get_count()
+{
+	return this->_count;
+}
+
+user ftp_account::get_user()
+{
+	return *this->_user;
 }
 
 std::string ftp_account::get_created()
@@ -143,18 +193,13 @@ std::string ftp_account::get_created()
 	return this->_created;
 }
 
-domain ftp_account::get_domain()
+std::string ftp_account::get_accessed()
 {
-	return *this->_domain;
+	return this->_accessed;
 }
 
-std::shared_ptr<domain> ftp_account::get_domain_ptr()
+std::string ftp_account::get_modified()
 {
-	return this->_domain;
-}
-
-user ftp_account::get_user()
-{
-	return *this->_user;
+	return this->_modified;
 }
 

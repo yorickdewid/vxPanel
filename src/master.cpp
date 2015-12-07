@@ -225,12 +225,11 @@ void master::create_dns(std::string name, std::string domain_name)
 	return_result("OK");
 }
 
-void master::create_ftp_account(std::string ftp_username, std::string password, std::string permissions, int uid)
+void master::create_ftp_account(std::string ftp_username, std::string password, int uid)
 {
 	ftp_account ftp_account(get_database(),ftp_username);
 
 	ftp_account.set_password(password);
-	ftp_account.set_permissions(permissions);
 
 	std::shared_ptr<user> point(new user(get_database(),uid));
 	ftp_account.set_user(point);
@@ -398,6 +397,7 @@ void master::get_dns(std::string domain_name, int uid)
 	}
 }
 
+// TODO add missing fields
 void master::get_ftp_account(std::string ftp_username, int uid)
 {
 	cppcms::json::value json;
@@ -409,12 +409,7 @@ void master::get_ftp_account(std::string ftp_username, int uid)
 
 		json["ftp_account"]["username"] = ftp_account.get_username();
 		json["ftp_account"]["password"] = ftp_account.get_password();
-		json["ftp_account"]["permissions"] = ftp_account.get_permissions();
 		json["ftp_account"]["created"] = ftp_account.get_created();
-
-		if ( ftp_account.get_domain_ptr() !=  NULL ) { /* good enough? */
-			json["ftp_account"]["domain"] = ftp_account.get_domain().get_domain_name();
-		}
 
 		return_result(json);
 	}
