@@ -182,6 +182,7 @@ mv /etc/phpMyAdmin/config.inc.php /etc/phpMyAdmin/config.inc.php.orig
 
 ln -s /usr/local/vxpanel/bin/vxadmin /usr/bin/vxadmin
 ln -s /usr/local/vxpanel/bin/vxd /usr/bin/vxd
+ln -s /usr/local/vxpanel/bin/vxque /usr/bin/vxque
 ln -s /usr/local/vxpanel/etc/config.json /etc/vxpanel.conf
 
 ln -s /usr/local/vxpanel/srv/postfix/master.cf /etc/postfix/master.cf
