@@ -17,7 +17,7 @@ public:
 	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
-	void set_address(std::string address);
+	void set_email(std::string email);
 	void set_password(std::string password);
 	void set_maildir(std::string maildir);
 	void set_quota(long long int quota);
@@ -25,7 +25,7 @@ public:
 	void set_active(bool active);
 
 	int get_id();
-	std::string get_address();
+	std::string get_email();
 	std::string get_password();
 	std::string get_created();
 	std::string get_maildir();
@@ -35,7 +35,7 @@ public:
 
 private:
 	int id;
-	std::string _address;
+	std::string _email;
 	std::string _password;
 	std::string _created;
 	std::string _maildir;

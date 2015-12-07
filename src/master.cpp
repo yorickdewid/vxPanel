@@ -255,11 +255,10 @@ void master::create_mailbox(std::vector<std::string> required_fields, std::strin
 {
 	mailbox mailbox(get_database(),0);
 
-	mailbox.set_address(required_fields[0]);
+	mailbox.set_email(required_fields[0]);
 	mailbox.set_password(required_fields[1]);
 	mailbox.set_maildir(required_fields[2]);
 	std::string tmp = required_fields[3];
-	std::cout << tmp << std::endl;
 	char tmp_char[tmp.length()];
 	tmp.copy(tmp_char,tmp.length(),0);
 	mailbox.set_quota(atoll(tmp_char));
@@ -443,7 +442,7 @@ void master::get_mailbox(std::string domain_name, int uid)
 
 	if ( mailbox.get_domain().get_domain_name().compare(domain_name) == 0) {
 		json["mailbox"]["id"] = mailbox.get_id();
-		json["mailbox"]["address"] = mailbox.get_address();
+		json["mailbox"]["email"] = mailbox.get_email();
 		json["mailbox"]["password"] = mailbox.get_password();
 		json["mailbox"]["maildir"] = mailbox.get_maildir();
 		json["mailbox"]["quota"] = mailbox.get_quota();
