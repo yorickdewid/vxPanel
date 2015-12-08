@@ -10,8 +10,8 @@ void mailbox::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO mailbox (address, password, maildir, quota, domain_name) "
-			"VALUES (?, ?, ?, ?, ?)" << _address << this->_password << this->_maildir << this->_quota << _domain->get_domain_name();
+			"INSERT INTO mailbox (email, password, maildir, quota, domain_name) "
+			"VALUES (?, ?, ?, ?, ?)" << _email << this->_password << this->_maildir << this->_quota << _domain->get_domain_name();
 		stat.exec();
 		stat.reset();
 
@@ -37,7 +37,7 @@ void mailbox::load()
 
 		while(r.next()) {
 			int tmp_active;
-			r >> this->id >> this->_address >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
+			r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
 			if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
@@ -71,7 +71,7 @@ void mailbox::load(std::string domain_name)
 
 		while(r.next()) {
 			int tmp_active;
-			r >> this->id >> this->_address >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
+			r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
 			if ( !domain_name.empty() ) {
 	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
@@ -133,9 +133,9 @@ bool mailbox::m_delete()
 }
 
 
-void mailbox::set_address(std::string address)
+void mailbox::set_email(std::string email)
 {
-	this->_address = address;
+	this->_email = email;
 }
 
 void mailbox::set_password(std::string password)
@@ -168,9 +168,9 @@ int mailbox::get_id()
 	return this->id;
 }
 
-std::string mailbox::get_address()
+std::string mailbox::get_email()
 {
-	return this->_address;
+	return this->_email;
 }
 
 std::string mailbox::get_password()

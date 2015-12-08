@@ -65,6 +65,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
+	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
+
 	/* TODO update */
 
 	bind("delete_user", cppcms::rpc::json_method(&master::delete_user, this), method_role);
@@ -225,12 +227,11 @@ void master::create_dns(std::string name, std::string domain_name)
 	return_result("OK");
 }
 
-void master::create_ftp_account(std::string ftp_username, std::string password, std::string permissions, int uid)
+void master::create_ftp_account(std::string ftp_username, std::string password, int uid)
 {
 	ftp_account ftp_account(get_database(),ftp_username);
 
 	ftp_account.set_password(password);
-	ftp_account.set_permissions(permissions);
 
 	std::shared_ptr<user> point(new user(get_database(),uid));
 	ftp_account.set_user(point);
@@ -256,11 +257,10 @@ void master::create_mailbox(std::vector<std::string> required_fields, std::strin
 {
 	mailbox mailbox(get_database(),0);
 
-	mailbox.set_address(required_fields[0]);
+	mailbox.set_email(required_fields[0]);
 	mailbox.set_password(required_fields[1]);
 	mailbox.set_maildir(required_fields[2]);
 	std::string tmp = required_fields[3];
-	std::cout << tmp << std::endl;
 	char tmp_char[tmp.length()];
 	tmp.copy(tmp_char,tmp.length(),0);
 	mailbox.set_quota(atoll(tmp_char));
@@ -398,6 +398,7 @@ void master::get_dns(std::string domain_name, int uid)
 	}
 }
 
+// TODO add missing fields
 void master::get_ftp_account(std::string ftp_username, int uid)
 {
 	cppcms::json::value json;
@@ -409,12 +410,7 @@ void master::get_ftp_account(std::string ftp_username, int uid)
 
 		json["ftp_account"]["username"] = ftp_account.get_username();
 		json["ftp_account"]["password"] = ftp_account.get_password();
-		json["ftp_account"]["permissions"] = ftp_account.get_permissions();
 		json["ftp_account"]["created"] = ftp_account.get_created();
-
-		if ( ftp_account.get_domain_ptr() !=  NULL ) { /* good enough? */
-			json["ftp_account"]["domain"] = ftp_account.get_domain().get_domain_name();
-		}
 
 		return_result(json);
 	}
@@ -448,7 +444,7 @@ void master::get_mailbox(std::string domain_name, int uid)
 
 	if ( mailbox.get_domain().get_domain_name().compare(domain_name) == 0) {
 		json["mailbox"]["id"] = mailbox.get_id();
-		json["mailbox"]["address"] = mailbox.get_address();
+		json["mailbox"]["email"] = mailbox.get_email();
 		json["mailbox"]["password"] = mailbox.get_password();
 		json["mailbox"]["maildir"] = mailbox.get_maildir();
 		json["mailbox"]["quota"] = mailbox.get_quota();
@@ -584,7 +580,14 @@ void master::get_ip()
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(int uid, std::vector<std::string> update_list)
 {
+	user user(get_database(),uid);
 
+	update_obj update;
+	update.field = "address_number";
+	update.value = 100;
+	if(user.update(update)) {
+		return_result("OK");
+	}
 }
 
 /* status, registrar, vhost_id */

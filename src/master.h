@@ -23,7 +23,7 @@ public:
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);
 	void create_dns(std::string name, std::string domain_name);
-	void create_ftp_account(std::string ftp_account,std::string password,std::string permissions, int uid);
+	void create_ftp_account(std::string ftp_account,std::string password, int uid);
 	void create_vhost(std::string domain_name, std::string custom_config, int uid);
 	void create_mailbox(std::vector<std::string> required_fields, std::string domain_name, int uid);
 	void create_shell(int uid);

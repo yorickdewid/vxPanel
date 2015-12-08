@@ -1,8 +1,9 @@
 #include <iostream>
+#include <sstream>
 
 #include "../config.h"
-#include "../sha1.h"
 #include "../model.h"
+#include <typeinfo>
 #include "user.h"
 
 void user::save()
@@ -13,12 +14,12 @@ void user::save()
 		if ( _note.empty() ) {
 			stat = db.session() << 
 				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
+				"VALUES (?, encrypt(?), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
 		}
 		else{
 			stat = db.session() << 
 				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) "
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
+				"VALUES (?, encrypt(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
 		}
 
 		stat.exec();
@@ -66,11 +67,37 @@ void user::load()
 	}
 }
 
-bool user::update(std::string field)
+bool user::update(update_obj update)
 {
-	 /* TODO */
-	(std::string)field;
-	return true;
+	try{
+		cppdb::statement stat;
+
+		// if(type_id(update.value) == int i)
+		// {
+		// 	std::cout << "le kaas" << std::endl;
+		// }
+
+		std::ostringstream query;
+		query << "UPDATE user set `" << update.field << "` = ? WHERE uid = ?";
+
+		stat = db.session() << 
+				query.str() << boost::any_cast<int>(update.value) << uid ;
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+		return false;
+	}
+	return false;
 }
 
 bool user::update(std::vector<update_obj> list)
@@ -117,13 +144,7 @@ void user::set_email(std::string email)
 
 void user::set_password(std::string password)
 {
-	unsigned char hash[20];
-	char hexstring[41];
-
-	sha1::calc(password.c_str(), password.size(), hash);
-	sha1::toHexString(hash, hexstring);
-
-	this->_password = std::string(hexstring);
+	this->_password = password;
 }
 
 void user::set_firstname(std::string firstname)

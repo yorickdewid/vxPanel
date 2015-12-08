@@ -12,7 +12,7 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
+	bool update(update_obj update);
 	bool update(std::vector<update_obj> list);
 	bool m_delete();
 
