@@ -586,12 +586,8 @@ void master::update_user(int uid, std::vector<std::string> update_list)
 	update.primary = "uid";
 	update.primary_value = uid;
 	update.field = "address_number";
-	update.value = 100;
-	user.update(update);
-	update.value = "kaas";
-	user.update(update);
-	update.value = true;
-	user.update(update);
+	update.value = 254;
+	user.model::update(update);
 }
 
 /* status, registrar, vhost_id */
