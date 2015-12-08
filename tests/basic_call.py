@@ -182,6 +182,11 @@ def test_rpc_get_database():
 
 ### update ###
 
+def test_rpc_update_user():
+	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
+	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":"200"}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 ### delete ###
 
 def test_rpc_delete_user():
@@ -279,6 +284,7 @@ test_rpc_get_database_types()
 test_rpc_get_database_user()
 test_rpc_get_database()
 
+test_rpc_update_user()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

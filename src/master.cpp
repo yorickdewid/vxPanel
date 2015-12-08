@@ -578,20 +578,30 @@ void master::get_ip()
 /* Update */
 
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-void master::update_user(int uid, std::vector<std::string> update_list)
+void master::update_user(int uid, cppcms::json::value object)
 {
 	user user(get_database(),uid);
 
 	update_obj update;
 	update.primary = "uid";
 	update.primary_value = uid;
-	update.field = "address_number";
-	update.value = 254;
-	user.model::update(update);
+
+	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+	for(cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p) {
+		if ( user.model::compare_field(p->first) == 0) {
+			update.field = p->first;
+			update.value = std::stoi(p->second.str());
+			user.model::update(update);
+		}
+		else{
+			return_error("Unrecognized field");
+		}
+	}  
 }
 
 /* status, registrar, vhost_id */
-void master::update_domain(int uid, std::string domain_name, std::vector<std::string> update_list)
+void master::update_domain(int uid, std::string domain_name, std::vector<cppcms::json::value> update_list)
 {
 
 }

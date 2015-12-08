@@ -46,8 +46,8 @@ public:
 	void get_database(std::string db_name, int uid);
 	void get_ip();
 
-	void update_user(int uid, std::vector<std::string> update_list); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-	void update_domain(int uid, std::string domain_name, std::vector<std::string> update_list); /* status, registrar, vhost_id */
+	void update_user(int uid, cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
+	void update_domain(int uid, std::string domain_name, std::vector<cppcms::json::value> update_list); /* status, registrar, vhost_id */
 	void update_dns(int uid, int dns_id, std::vector<std::string> update_list); /* address */
 	void update_ftp_account(int uid, std::string ftp_account, std::vector<std::string> update_list); /* password, permissions */
 	void update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list); /* name ?, custom_config */ 

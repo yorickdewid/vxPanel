@@ -52,7 +52,19 @@ bool model::update(update_obj update)
 	return false;
 }
 
-bool model::is_empty(std::string var){
+bool model::compare_field(std::string field)
+{
+	for(std::vector<std::string>::iterator it = this->field_list.begin(); it != this->field_list.end(); ++it) {
+    	if((*it).compare(field) == 0)
+    	{
+    		return true;
+    	}
+	}
+	return false;
+}
+
+bool model::is_empty(std::string var)
+{
 	if ( !var.empty() ) {
 		return false;
 	} else {

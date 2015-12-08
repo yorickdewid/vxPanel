@@ -29,12 +29,14 @@ public:
 
 	void add_to_statement(cppdb::statement& stat, boost::any& value);
 	bool update(update_obj update);
+	bool compare_field(std::string field); /* TODO move to validate class ? */
 
 	//virtual bool update(std::vector<update_obj> list) = 0;
 	virtual bool m_delete() = 0;
 
 	bool is_empty(std::string var);
 	bool get_saved(){ return this->saved; };
+	std::vector<std::string> get_fields() { return this->field_list; };
 
 protected:
 	backend& db;
