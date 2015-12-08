@@ -591,7 +591,7 @@ void master::update_user(int uid, cppcms::json::value object)
 		if ( user.model::compare_field(p->first) ) {
 			update_obj update;
 			update.field = p->first;
-			update.value = std::stoi(p->second.str());
+			this->check_json_types(p->second,update);
 			update_list.push_back(update);
 		}
 		else {
@@ -838,5 +838,30 @@ void master::write_ip_to_db()
 	stream << "Saved ip to db, " << remote_address;
 
 	return_result(stream.str());
+}
+
+void master::check_json_types(cppcms::json::value v, update_obj& update)
+{
+	std::string str = "string";
+	std::string boolean = "bool";
+	std::string number = "number";
+
+	switch(v.type())
+	{
+		case cppcms::json::json_type::is_string: 
+		update.value = v.str();  
+		break;
+		case cppcms::json::json_type::is_number:
+		update.value = (int)v.number(); /* no doubles ATM , needs proper fix*/
+		break;
+		case cppcms::json::json_type::is_boolean:
+		update.value = v.boolean();
+		break;
+		case cppcms::json::json_type::is_undefined:
+		case cppcms::json::json_type::is_null:
+		case cppcms::json::json_type::is_object:
+		case cppcms::json::json_type::is_array:
+		break;
+	}
 }
 

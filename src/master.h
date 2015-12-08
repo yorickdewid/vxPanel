@@ -5,6 +5,7 @@
 #include <cppcms/rpc_json.h>
 
 #include "backend.h"
+#include "update_obj.h"
 
 class master: public cppcms::rpc::json_rpc_server {
 
@@ -19,6 +20,8 @@ public:
 	void system_uptime();
 	void version();
 	void db_version();
+
+	void check_json_types(cppcms::json::value v, update_obj& update);
 
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);

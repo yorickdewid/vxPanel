@@ -62,6 +62,7 @@ bool model::update(std::vector<update_obj> update_list)
 		std::ostringstream query;
 		query << "UPDATE "<< this->table_name;
 
+		/* First generate the entire query .. */
 		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
 			if (!(*it).value.empty()) {
 				query << " set `" << (*it).field << "` = ?";
@@ -71,6 +72,7 @@ bool model::update(std::vector<update_obj> update_list)
 		query << " WHERE " << this->primary << " = ?";
 		stat = db.session() << query.str();
 
+		/* Now add the values .. */
 		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
 			if (!(*it).value.empty()) {
 				this->add_to_statement(stat, (*it).value);
@@ -81,9 +83,9 @@ bool model::update(std::vector<update_obj> update_list)
 
 		this->add_to_statement(stat, this->primary_value);
 
-		std::cout << query.str() << std::endl;
-
 		stat.exec();
+
+		std::cout << "Affected "<< stat.affected() << std::endl;
 
 		if ( stat.affected() == 1 ) {
 			stat.reset();

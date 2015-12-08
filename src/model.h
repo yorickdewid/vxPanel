@@ -3,16 +3,11 @@
 
 #include "exceptions.h"
 #include "backend.h"
+#include "update_obj.h"
 #include <boost/any.hpp>
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-struct update_obj{
-public:
-    std::string field;
-    boost::any value;
-};
 
 class model {
 
