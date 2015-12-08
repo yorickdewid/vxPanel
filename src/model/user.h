@@ -6,8 +6,8 @@
 class user: public model {
 
 public:
-	user(backend& db) : model(db) {};
-	user(backend& db, int uid) : model(db), uid(uid) { this->load(); };
+	user(backend& db) : model(db) { this->table_name = "user"; };
+	user(backend& db, int uid) : model(db), uid(uid) { this->table_name = "user"; this->load(); };
 
 	
 	void save();

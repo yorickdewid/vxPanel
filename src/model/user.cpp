@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 
 #include "../config.h"
 #include "../model.h"
@@ -65,39 +64,6 @@ void user::load()
 	{
 		std::cout << "Exception occured " << e.what() << std::endl;
 	}
-}
-
-bool user::update(update_obj update)
-{
-	try{
-		cppdb::statement stat;
-
-		// if(type_id(update.value) == int i)
-		// {
-		// 	std::cout << "le kaas" << std::endl;
-		// }
-
-		std::ostringstream query;
-		query << "UPDATE user set `" << update.field << "` = ? WHERE uid = ?";
-
-		stat = db.session() << 
-				query.str() << boost::any_cast<int>(update.value) << uid ;
-		stat.exec();
-
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-		return false;
-	}
-	return false;
 }
 
 bool user::update(std::vector<update_obj> list)

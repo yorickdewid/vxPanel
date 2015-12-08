@@ -583,11 +583,15 @@ void master::update_user(int uid, std::vector<std::string> update_list)
 	user user(get_database(),uid);
 
 	update_obj update;
+	update.primary = "uid";
+	update.primary_value = uid;
 	update.field = "address_number";
 	update.value = 100;
-	if(user.update(update)) {
-		return_result("OK");
-	}
+	user.update(update);
+	update.value = "kaas";
+	user.update(update);
+	update.value = true;
+	user.update(update);
 }
 
 /* status, registrar, vhost_id */
