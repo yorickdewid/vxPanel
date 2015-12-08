@@ -16,13 +16,14 @@ void model::add_to_statement(cppdb::statement& stat, boost::any& value)
 	}
 }
 
+// TODO SANITIZE VALUE
 bool model::update(update_obj update)
 {
 	try{
 		cppdb::statement stat;
 
 		std::ostringstream query;
-		query << "UPDATE "<< this->table_name << " set `" << update.field << "` = ? WHERE "<< update.primary << " = ?";
+		query << "UPDATE "<< this->table_name << " set `" << update.field << "` = ? WHERE "<< this->primary << " = ?";
 
 		std::cout << query.str() << std::endl;
 
@@ -32,7 +33,55 @@ bool model::update(update_obj update)
 			this->add_to_statement(stat, update.value);
 		}
 
-		this->add_to_statement(stat, update.primary_value);
+		this->add_to_statement(stat, this->primary_value);
+
+		stat.exec();
+
+		if ( stat.affected() == 1 ) {
+			stat.reset();
+			return true;
+		} else {
+			stat.reset();
+			return false;
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+		return false;
+	}
+	return false;
+}
+
+// TODO SANITIZE VALUE
+bool model::update(std::vector<update_obj> update_list)
+{
+	try{
+		cppdb::statement stat;
+
+		std::ostringstream query;
+		query << "UPDATE "<< this->table_name;
+
+		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
+			if (!(*it).value.empty()) {
+				query << " set `" << (*it).field << "` = ?";
+			}
+		}
+
+		query << " WHERE " << this->primary << " = ?";
+		stat = db.session() << query.str();
+
+		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
+			if (!(*it).value.empty()) {
+				this->add_to_statement(stat, (*it).value);
+			}
+		}
+
+		std::cout << query.str() << std::endl;
+
+		this->add_to_statement(stat, this->primary_value);
+
+		std::cout << query.str() << std::endl;
 
 		stat.exec();
 
@@ -54,6 +103,7 @@ bool model::update(update_obj update)
 
 bool model::compare_field(std::string field)
 {
+	std::cout << "Size " << this->field_list.size() << std::endl;
 	for(std::vector<std::string>::iterator it = this->field_list.begin(); it != this->field_list.end(); ++it) {
     	if((*it).compare(field) == 0)
     	{

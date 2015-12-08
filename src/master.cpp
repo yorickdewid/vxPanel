@@ -582,22 +582,29 @@ void master::update_user(int uid, cppcms::json::value object)
 {
 	user user(get_database(),uid);
 
-	update_obj update;
-	update.primary = "uid";
-	update.primary_value = uid;
+	std::vector<update_obj> update_list;
+	bool error = false;
 
 	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-	for(cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p) {
-		if ( user.model::compare_field(p->first) == 0) {
+	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+		if ( user.model::compare_field(p->first) ) {
+			update_obj update;
 			update.field = p->first;
 			update.value = std::stoi(p->second.str());
-			user.model::update(update);
+			update_list.push_back(update);
 		}
-		else{
+		else {
+			error = true;
 			return_error("Unrecognized field");
 		}
-	}  
+	}
+	if ( user.model::update(update_list) && !error){
+		return_result("OK");
+	}
+	else { 
+		return_error("Failed to update user");
+	}
 }
 
 /* status, registrar, vhost_id */

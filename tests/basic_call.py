@@ -184,7 +184,7 @@ def test_rpc_get_database():
 
 def test_rpc_update_user():
 	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
-	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":"200"}}]}'
+	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":"255"}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 ### delete ###

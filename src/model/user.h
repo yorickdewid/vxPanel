@@ -7,7 +7,8 @@ class user: public model {
 
 public:
 	user(backend& db) : model(db) { 
-		this->table_name = "user"; 
+		this->table_name = "user";
+		this->primary = "uid"; 
 		this->field_list.push_back("uid");
 		this->field_list.push_back("username"); 
 		this->field_list.push_back("password"); 
@@ -26,7 +27,29 @@ public:
 		this->field_list.push_back("created");
 		this->field_list.push_back("last_login");
 	};
-	user(backend& db, int uid) : model(db), uid(uid) { this->table_name = "user"; this->load(); };
+	user(backend& db, int uid) : model(db), uid(uid) { 
+		this->table_name = "user";
+		this->primary = "uid"; 
+		this->primary_value = uid;
+		this->field_list.push_back("uid");
+		this->field_list.push_back("username"); 
+		this->field_list.push_back("password"); 
+		this->field_list.push_back("email"); 
+		this->field_list.push_back("firstname"); 
+		this->field_list.push_back("lastname"); 
+		this->field_list.push_back("country");
+		this->field_list.push_back("city");
+		this->field_list.push_back("address");
+		this->field_list.push_back("address_number");
+		this->field_list.push_back("postal");
+		this->field_list.push_back("note");
+		this->field_list.push_back("remote");
+		this->field_list.push_back("user_type");
+		this->field_list.push_back("active");
+		this->field_list.push_back("created");
+		this->field_list.push_back("last_login");
+		this->load(); 
+	};
 
 	
 	void save();
