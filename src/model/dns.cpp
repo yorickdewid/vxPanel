@@ -54,7 +54,7 @@ void dns::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		std::cout << "Entity loaded dns " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -89,7 +89,7 @@ void dns::load(std::string domain_name)
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		std::cout << "Entity loaded dns (domain_name) " << std::endl;
 	}
 	catch(std::exception &e)
 	{

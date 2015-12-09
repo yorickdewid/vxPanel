@@ -50,9 +50,9 @@ public:
 	void get_ip();
 
 	void update_user(int uid, cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-	void update_domain(int uid, std::string domain_name, std::vector<cppcms::json::value> update_list); /* status, registrar, vhost_id */
-	void update_dns(int uid, int dns_id, std::vector<std::string> update_list); /* address */
-	void update_ftp_account(int uid, std::string ftp_account, std::vector<std::string> update_list); /* password, permissions */
+	void update_domain(std::string domain_name, cppcms::json::value object); /* status, registrar, vhost_id */
+	void update_dns(int dns_id, cppcms::json::value object); /* address */
+	void update_ftp_account(std::string ftp_account, cppcms::json::value object); /* password, permissions */
 	void update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list); /* name ?, custom_config */ 
 	void update_mailbox(int uid, std::string domain_name, std::vector<std::string> update_list); /* address */
 	void update_subdomain(int uid, std::string subdomain_name, std::vector<std::string> update_list); /* subdomain name , vhost_id */

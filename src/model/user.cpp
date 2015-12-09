@@ -62,7 +62,7 @@ void user::load()
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured user " << e.what() << std::endl;
 	}
 }
 

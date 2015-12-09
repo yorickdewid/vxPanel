@@ -4,6 +4,7 @@
 #include <cppcms/http_request.h>
 #include <iostream>
 #include <fstream>
+#include <typeinfo>
 
 #include "master.h"
 #include "config.h"
@@ -66,6 +67,9 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
+	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
+	bind("update_dns", cppcms::rpc::json_method(&master::update_dns, this), method_role);
+	bind("update_ftp_account", cppcms::rpc::json_method(&master::update_ftp_account, this), method_role);
 
 	/* TODO update */
 
@@ -608,21 +612,100 @@ void master::update_user(int uid, cppcms::json::value object)
 }
 
 /* status, registrar, vhost_id */
-void master::update_domain(int uid, std::string domain_name, std::vector<cppcms::json::value> update_list)
+void master::update_domain(std::string domain_name, cppcms::json::value object)
 {
+	domain domain(get_database(),domain_name);
 
+	std::vector<update_obj> update_list;
+	bool error = false;
+
+	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+		if ( domain.model::compare_field(p->first) ) {
+			update_obj update;
+			update.field = p->first;
+			this->check_json_types(p->second,update);
+			update_list.push_back(update);
+		}
+		else {
+			error = true;
+			return_error("Unrecognized field");
+		}
+	}
+	if ( !error && domain.model::update(update_list) ){
+		std::cout << " Executing update ..." << std::endl;
+		return_result("OK");
+	}
+	else { 
+		return_error("Failed to update domain");
+	}
 }
 
 /* address */
-void master::update_dns(int uid, int dns_id, std::vector<std::string> update_list)
+void master::update_dns(int dns_id, cppcms::json::value object)
 {
+	dns dns(get_database(),dns_id);
 
+	std::vector<update_obj> update_list;
+	bool error = false;
+
+	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+		if ( dns.model::compare_field(p->first) ) {
+			update_obj update;
+			update.field = p->first;
+			this->check_json_types(p->second,update);
+			update_list.push_back(update);
+		}
+		else {
+			error = true;
+			return_error("Unrecognized field");
+		}
+	}
+	if ( dns.model::update(update_list) && !error){
+		return_result("OK");
+	}
+	else { 
+		return_error("Failed to update dns");
+	}
 }
 
 /* password, permissions */
-void master::update_ftp_account(int uid, std::string ftp_account, std::vector<std::string> update_list)
+void master::update_ftp_account(std::string ftp_account_name, cppcms::json::value object)
 {
+	ftp_account ftp_account(get_database(),ftp_account_name);
 
+	std::vector<update_obj> update_list;
+	bool error = false;
+
+	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+		if ( ftp_account.model::compare_field(p->first) ) {
+			update_obj update;
+			update.field = p->first;
+			this->check_json_types(p->second,update);
+			update_list.push_back(update);
+		} else {
+			std::cout << "error situation" << std::endl;
+			error = true;
+			return_error("Unrecognized field");
+		}
+		if(error)
+		{
+			break;
+		}
+	}
+	if ( error == false) {
+		if ( ftp_account.model::update(update_list) ){
+			return_result("OK");
+		}
+		else { 
+			return_error("Failed to update ftp_account");
+		}
+	}
 }
 
 /* name ?, custom_config */ 
@@ -842,20 +925,25 @@ void master::write_ip_to_db()
 
 void master::check_json_types(cppcms::json::value v, update_obj& update)
 {
-	std::string str = "string";
-	std::string boolean = "bool";
-	std::string number = "number";
-
 	switch(v.type())
 	{
 		case cppcms::json::json_type::is_string: 
-		update.value = v.str();  
+		{
+			std::cout << v.str() << std::endl;
+			std::cout << typeid(v.str()).name() << std::endl;
+			std::string tmp (v.str());
+			update.value = tmp;
+		}
 		break;
 		case cppcms::json::json_type::is_number:
-		update.value = (int)v.number(); /* no doubles ATM , needs proper fix*/
+		{
+			update.value = (int)v.number(); /* no doubles ATM , needs proper fix*/
+		}
 		break;
 		case cppcms::json::json_type::is_boolean:
-		update.value = v.boolean();
+		{
+			update.value = v.boolean();
+		}
 		break;
 		case cppcms::json::json_type::is_undefined:
 		case cppcms::json::json_type::is_null:

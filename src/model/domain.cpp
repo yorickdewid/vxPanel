@@ -62,26 +62,12 @@ void domain::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		std::cout << "Entity loaded domain " << std::endl;
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured domain load " << e.what() << std::endl;
 	}
-}
-
-bool domain::update(std::string field)
-{
-	/* TODO */
-	(std::string)field;
-	return true;
-}
-
-bool domain::update(std::vector<update_obj> list)
-{
-	/* TODO */
-	(std::vector<update_obj>)list;
-	return true;
 }
 
 /* TODO Handle foreign key block correctly */

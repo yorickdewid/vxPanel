@@ -2,17 +2,30 @@
 
 void model::add_to_statement(cppdb::statement& stat, boost::any& value)
 {
-	std::string string = "PKc";
+	std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
+	std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
 	std::string boolean = "b";
 	std::string integer = "i";
 
+	std::cout << "Called add to statement" << std::endl;
+
 	const std::type_info &ti = value.type();
-	if (string.compare(ti.name()) == 0 ) {
-		stat << boost::any_cast<std::string>(value);
+	if (string.compare(ti.name()) == 0 || string2.compare(ti.name()) == 0 ) {
+		std::string s = boost::any_cast<std::string>(value);
+		std::cout << "string " << s << std::endl;
+		stat << s;
 	} else if (boolean.compare(ti.name()) == 0 ) {
-		stat << boost::any_cast<bool>(value);
+		bool b = boost::any_cast<bool>(value);
+		std::cout << "boolean " << b << std::endl;
+		stat << b;
 	} else if (integer.compare(ti.name()) == 0 ) {
-		stat << boost::any_cast<int>(value);
+		int i = boost::any_cast<int>(value);
+		std::cout << "Integer " << i << std::endl;
+		stat << i;
+	}
+	else {
+		std::cout << "Failed to identify type.." << std::endl;
+		std::cout << "Type was " << ti.name() << std::endl;
 	}
 }
 
@@ -47,7 +60,7 @@ bool model::update(update_obj update)
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured in update " << e.what() << std::endl;
 		return false;
 	}
 	return false;
@@ -62,10 +75,18 @@ bool model::update(std::vector<update_obj> update_list)
 		std::ostringstream query;
 		query << "UPDATE "<< this->table_name;
 
+		std::cout << "Table name " << this->table_name << std::endl;
+
 		/* First generate the entire query .. */
+		int count = 0;
 		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
 			if (!(*it).value.empty()) {
-				query << " set `" << (*it).field << "` = ?";
+				if ( count == 0) {
+					query << " set `" << (*it).field << "` = ?";
+				} else {
+					query << ", `" << (*it).field << "` = ?";
+				}
+				count++;
 			}
 		}
 
@@ -97,7 +118,7 @@ bool model::update(std::vector<update_obj> update_list)
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured in update (vector) " << e.what() << std::endl;
 		return false;
 	}
 	return false;
@@ -106,11 +127,14 @@ bool model::update(std::vector<update_obj> update_list)
 bool model::compare_field(std::string field)
 {
 	std::cout << "Size " << this->field_list.size() << std::endl;
-	for(std::vector<std::string>::iterator it = this->field_list.begin(); it != this->field_list.end(); ++it) {
-    	if((*it).compare(field) == 0)
-    	{
-    		return true;
-    	}
+	if ( this->field_list.size() > 1 ) {
+		for(std::vector<std::string>::iterator it = this->field_list.begin(); it != this->field_list.end(); ++it) {
+	    	if((*it).compare(field) == 0)
+	    	{
+	    		return true;
+	    	}
+		}
+		return false;
 	}
 	return false;
 }

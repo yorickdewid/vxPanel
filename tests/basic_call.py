@@ -184,8 +184,24 @@ def test_rpc_get_database():
 
 def test_rpc_update_user():
 	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
-	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":"255"}}]}'
+	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":255}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_domain():
+	print bcolors.OKBLUE + "Testcase: Update domain" + bcolors.ENDC
+	data = '{"id":0,"method":"update_domain","params":["trol.com",{"update_list":{"status":"kaas","active":0}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_dns():
+	print bcolors.OKBLUE + "Testcase: Update dns" + bcolors.ENDC
+	data = '{"id":0,"method":"update_dns","params":[1,{"update_list":{"name":"A www2.trol.com","active":0}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_ftp_account():
+	print bcolors.OKBLUE + "Testcase: Update ftp_account" + bcolors.ENDC
+	data = '{"id":0,"method":"update_ftp_account","params":["kaasje",{"update_list":{"homedir":"/usr/kaasie","count":1}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 ### delete ###
 
@@ -285,6 +301,9 @@ test_rpc_get_database_user()
 test_rpc_get_database()
 
 test_rpc_update_user()
+test_rpc_update_domain()
+test_rpc_update_dns()
+test_rpc_update_ftp_account()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

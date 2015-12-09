@@ -52,7 +52,7 @@ void vhost::load()
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured vhost load " << e.what() << std::endl;
 	}
 }
 
@@ -83,7 +83,7 @@ void vhost::load(std::string domain_name)
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+		std::cout << "Exception occured vhost load (domain_name) " << e.what() << std::endl;
 	}
 }
 
