@@ -21,7 +21,7 @@ public:
 	void version();
 	void db_version();
 
-	void check_json_types(cppcms::json::value v, update_obj& update);
+	int check_json_types(cppcms::json::value v);
 
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);

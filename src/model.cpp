@@ -1,6 +1,6 @@
 #include "model.h"
 
-void model::add_to_statement(cppdb::statement& stat, boost::any& value)
+void model::add_to_statement(cppdb::statement& stat, boost::any value)
 {
 	std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
 	std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
@@ -30,21 +30,19 @@ void model::add_to_statement(cppdb::statement& stat, boost::any& value)
 }
 
 // TODO SANITIZE VALUE
-bool model::update(update_obj update)
+bool model::update(std::unique_ptr<update_interface> update)
 {
 	try{
 		cppdb::statement stat;
 
 		std::ostringstream query;
-		query << "UPDATE "<< this->table_name << " set `" << update.field << "` = ? WHERE "<< this->primary << " = ?";
+		query << "UPDATE "<< this->table_name << " set `" << update->get_field() << "` = ? WHERE "<< this->primary << " = ?";
 
 		std::cout << query.str() << std::endl;
 
 		stat = db.session() << query.str();
-		if (!update.value.empty())
-		{
-			this->add_to_statement(stat, update.value);
-		}
+		
+		this->add_to_statement(stat, update->get_value());
 
 		this->add_to_statement(stat, this->primary_value);
 
@@ -67,7 +65,7 @@ bool model::update(update_obj update)
 }
 
 // TODO SANITIZE VALUE
-bool model::update(std::vector<update_obj> update_list)
+bool model::update(std::vector<std::unique_ptr<update_interface>> update_list)
 {
 	try{
 		cppdb::statement stat;
@@ -79,25 +77,21 @@ bool model::update(std::vector<update_obj> update_list)
 
 		/* First generate the entire query .. */
 		int count = 0;
-		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
-			if (!(*it).value.empty()) {
-				if ( count == 0) {
-					query << " set `" << (*it).field << "` = ?";
-				} else {
-					query << ", `" << (*it).field << "` = ?";
-				}
-				count++;
+		for(std::vector<std::unique_ptr<update_interface>>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
+			if ( count == 0) {
+				query << " set `" << (*it)->get_field() << "` = ?";
+			} else {
+				query << ", `" << (*it)->get_field() << "` = ?";
 			}
+			count++;
 		}
 
 		query << " WHERE " << this->primary << " = ?";
 		stat = db.session() << query.str();
 
 		/* Now add the values .. */
-		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
-			if (!(*it).value.empty()) {
-				this->add_to_statement(stat, (*it).value);
-			}
+		for(std::vector<std::unique_ptr<update_interface>>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
+			this->add_to_statement(stat, (*it)->get_value());
 		}
 
 		std::cout << query.str() << std::endl;

@@ -1,12 +1,28 @@
 #ifndef UPDATE_OBJ_H
 #define UPDATE_OBJ_H
 
-#include <boost/any.hpp>
+#include "any.h"
 
-struct update_obj{
+struct update_interface{
+	virtual std::string get_field() = 0;
+	virtual any get_value() = 0;
+};
+
+template<typename T>
+struct update_obj : public update_interface{
 public:
+    update_obj(std::string field, T value) : 
+    field(field),
+    value(value)
+    {};
     std::string field;
-    boost::any value;
+    T value;
+    any get_value(){
+    	return value;
+    }
+    std::string get_field(){
+    	return field;
+    }
 };
 
 

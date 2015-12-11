@@ -11,8 +11,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 
 	void set_key(std::string key);

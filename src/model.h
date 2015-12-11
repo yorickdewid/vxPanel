@@ -19,9 +19,9 @@ public:
 	virtual void save() = 0;
 	virtual void load() = 0;
 
-	void add_to_statement(cppdb::statement& stat, boost::any& value);
-	bool update(update_obj update);
-	bool update(std::vector<update_obj> update_list);
+	void add_to_statement(cppdb::statement& stat, boost::any value);
+	bool update(std::unique_ptr<update_interface> update);
+	bool update(std::vector<std::unique_ptr<update_interface>> update_list);
 	bool compare_field(std::string field); /* TODO move to validate class ? */
 
 	virtual bool m_delete() = 0;

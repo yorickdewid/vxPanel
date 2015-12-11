@@ -66,13 +66,6 @@ void user::load()
 	}
 }
 
-bool user::update(std::vector<update_obj> list)
-{
-	/* TODO */
-	(std::vector<update_obj>)list;
-	return true;
-}
-
 /* TODO Handle foreign key block correctly */
 bool user::m_delete()
 {

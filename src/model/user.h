@@ -54,8 +54,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(update_obj update);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 
 	/* Setters */

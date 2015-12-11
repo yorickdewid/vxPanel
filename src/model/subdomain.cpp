@@ -71,20 +71,6 @@ void subdomain::load()
 	}
 }
 
-bool subdomain::update(std::string field)
-{
-	/* TODO */
-	(std::string)field;
-	return true;
-}
-
-bool subdomain::update(std::vector<update_obj> list)
-{
-	/* TODO */
-	(std::vector<update_obj>)list;
-	return true;
-}
-
 bool subdomain::m_delete()
 {
 	try{
