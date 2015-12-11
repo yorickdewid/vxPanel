@@ -184,7 +184,7 @@ def test_rpc_get_database():
 
 def test_rpc_update_user():
 	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
-	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":255}}]}'
+	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":255,"address":"kaassstraat"}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_update_domain():
@@ -268,42 +268,42 @@ def test_rpc_delete_database():
 
 
 # Call the testcases
-test_rpc_sum()
-test_rpc_uptime()
-test_rpc_version()
-test_rpc_db_version()
+# test_rpc_sum()
+# test_rpc_uptime()
+# test_rpc_version()
+# test_rpc_db_version()
 
-## all 'perfect' scenarios ##
+# ## all 'perfect' scenarios ##
 
-test_rpc_create_user()
-test_rpc_create_domain()
-test_rpc_create_dns()
-test_rpc_create_ftp_account()
-test_rpc_create_vhost()
-test_rpc_create_mailbox()
-test_rpc_create_shell()
-test_rpc_create_subdomain()
-test_rpc_create_setting()
-test_rpc_create_db_user()
-test_rpc_create_database()
+# test_rpc_create_user()
+# test_rpc_create_domain()
+# test_rpc_create_dns()
+# test_rpc_create_ftp_account()
+# test_rpc_create_vhost()
+# test_rpc_create_mailbox()
+# test_rpc_create_shell()
+# test_rpc_create_subdomain()
+# test_rpc_create_setting()
+# test_rpc_create_db_user()
+# test_rpc_create_database()
 
-test_rpc_get_user()
-test_rpc_get_domain()
-test_rpc_get_dns()
-test_rpc_get_ftp_account()
-test_rpc_get_vhost()
-test_rpc_get_mailbox()
-test_rpc_get_shell()
-test_rpc_get_subdomain()
-test_rpc_get_setting()
-test_rpc_get_database_types()
-test_rpc_get_database_user()
-test_rpc_get_database()
+# test_rpc_get_user()
+# test_rpc_get_domain()
+# test_rpc_get_dns()
+# test_rpc_get_ftp_account()
+# test_rpc_get_vhost()
+# test_rpc_get_mailbox()
+# test_rpc_get_shell()
+# test_rpc_get_subdomain()
+# test_rpc_get_setting()
+# test_rpc_get_database_types()
+# test_rpc_get_database_user()
+# test_rpc_get_database()
 
 test_rpc_update_user()
-test_rpc_update_domain()
-test_rpc_update_dns()
-test_rpc_update_ftp_account()
+# test_rpc_update_domain()
+# test_rpc_update_dns()
+# test_rpc_update_ftp_account()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

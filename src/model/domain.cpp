@@ -44,11 +44,11 @@ void domain::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			int tmp_vhost_id;
+			int tmp_vhost_id = -1;
 			int tmp_active;
 			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> tmp_active;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
-	  		if ( tmp_vhost_id != false ) { /* TODO replace with vhost object) */
+	  		if ( tmp_vhost_id != -1 ) { /* TODO replace with vhost object) */
 	  			set_vhost(std::shared_ptr<vhost>(new vhost(db,tmp_vhost_id)));
 	  		}
 	  		if ( tmp_active == 1 ) {
