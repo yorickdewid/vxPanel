@@ -15,8 +15,10 @@ private:
         T value_;
     };
     base* ptr_;
+
 public:
-    template <typename T> any(T const& value): ptr_(new data<T>(value)) {}
+    template <typename T>
+    any(T const& value) : ptr_(new data<T>(value)) {}
     any(any const& other): ptr_(other.ptr_->clone()) {}
     any& operator= (any const& other) {
         any(other).swap(*this);
