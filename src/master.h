@@ -49,7 +49,7 @@ public:
 	void get_database(std::string db_name, int uid);
 	void get_ip();
 
-	void update_user(int uid, cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
+	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 	void update_domain(std::string domain_name, cppcms::json::value object); /* status, registrar, vhost_id */
 	void update_dns(int dns_id, cppcms::json::value object); /* address */
 	void update_ftp_account(std::string ftp_account, cppcms::json::value object); /* password, permissions */

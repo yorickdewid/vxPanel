@@ -14,12 +14,13 @@ class model {
 public:
 	model(backend& db) :
 		db(db),
-		saved(false)
+		saved(false),
+		primary_value(0)
 	{};
 	virtual void save() = 0;
 	virtual void load() = 0;
 
-	void add_to_statement(cppdb::statement& stat, boost::any value);
+	void add_to_statement(cppdb::statement& stat, any value, std::string try_first = "int");
 	bool update(std::unique_ptr<update_interface> update);
 	bool update(std::vector<std::unique_ptr<update_interface>> update_list);
 	bool compare_field(std::string field); /* TODO move to validate class ? */
@@ -36,7 +37,7 @@ protected:
 	std::vector<std::string> field_list;
 	std::string table_name;
 	std::string primary;
-    boost::any primary_value;
+    any primary_value;
 
 };
 

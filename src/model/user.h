@@ -57,6 +57,7 @@ public:
 	bool m_delete();
 
 	/* Setters */
+	void set_uid(int uid);
 	void set_username(std::string username);
 	void set_email(std::string email);
 	void set_password(std::string password);

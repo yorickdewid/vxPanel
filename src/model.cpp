@@ -1,31 +1,39 @@
 #include "model.h"
 
-void model::add_to_statement(cppdb::statement& stat, boost::any value)
+void model::add_to_statement(cppdb::statement& stat, any value, std::string try_first)
 {
-	std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
-	std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
-	std::string boolean = "b";
-	std::string integer = "i";
+	// std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
+	// std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
+	// std::string boolean = "b";
+	// std::string integer = "i";
 
-	std::cout << "Called add to statement" << std::endl;
+	// std::cout << "Called add to statement" << std::endl;
 
-	const std::type_info &ti = value.type();
-	if (string.compare(ti.name()) == 0 || string2.compare(ti.name()) == 0 ) {
-		std::string s = boost::any_cast<std::string>(value);
-		std::cout << "string " << s << std::endl;
-		stat << s;
-	} else if (boolean.compare(ti.name()) == 0 ) {
-		bool b = boost::any_cast<bool>(value);
-		std::cout << "boolean " << b << std::endl;
-		stat << b;
-	} else if (integer.compare(ti.name()) == 0 ) {
-		int i = boost::any_cast<int>(value);
-		std::cout << "Integer " << i << std::endl;
-		stat << i;
-	}
-	else {
-		std::cout << "Failed to identify type.." << std::endl;
-		std::cout << "Type was " << ti.name() << std::endl;
+	// const std::type_info &ti = value.type();
+	// if (string.compare(ti.name()) == 0 || string2.compare(ti.name()) == 0 ) {
+	// 	std::string s = boost::any_cast<std::string>(value);
+	// 	std::cout << "string " << s << std::endl;
+	// 	stat << s;
+	// } else if (boolean.compare(ti.name()) == 0 ) {
+	// 	bool b = boost::any_cast<bool>(value);
+	// 	std::cout << "boolean " << b << std::endl;
+	// 	stat << b;
+	// } else if (integer.compare(ti.name()) == 0 ) {
+	// 	int i = boost::any_cast<int>(value);
+	// 	std::cout << "Integer " << i << std::endl;
+	// 	stat << i;
+	// }
+	// else {
+	// 	std::cout << "Failed to identify type.." << std::endl;
+	// 	std::cout << "Type was " << ti.name() << std::endl;
+	// }
+	if( try_first.compare("int") == 0)
+	{
+		try { stat << value.get<int>(); std::cout << "casting worked" << std::endl; } catch (std::exception e) { this->add_to_statement(stat,value,"string");}
+	} else if(try_first.compare("string") == 0) {
+		try { stat << value.get<std::string>(); } catch (std::exception e) { this->add_to_statement(stat,value,"bool");}
+	} else if(try_first.compare("bool") == 0) {
+		try { stat << value.get<bool>(); } catch (std::exception e) { std::cout << "No casting possbile" << std::endl; }
 	}
 }
 
@@ -102,13 +110,7 @@ bool model::update(std::vector<std::unique_ptr<update_interface>> update_list)
 
 		std::cout << "Affected "<< stat.affected() << std::endl;
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+		return true;
 	}
 	catch(std::exception &e)
 	{

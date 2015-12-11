@@ -583,42 +583,63 @@ void master::get_ip()
 /* Update */
 
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-void master::update_user(int uid, cppcms::json::value object)
+void master::update_user(cppcms::json::value object)
 {
-	user user(get_database(),uid);
 
+	int uid = -1;
+	user tmp_user(get_database(),uid);
 	std::vector<std::unique_ptr<update_interface>> update_list;
 	bool error = false;
 
 	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
+	int count = 0;
 	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		if ( user.model::compare_field(p->first) ) {
-			if(this->check_json_types(p->second) == 1)
-			{
-				update_obj<int> *update = new update_obj<int>(p->first,(int)p->second.number());
-				update_list.push_back(std::unique_ptr<update_interface>(update));
-			} else if(this->check_json_types(p->second) == 2) {
-				update_obj<std::string> *update = new update_obj<std::string>(p->first,p->second.str());
-				update_list.push_back(std::unique_ptr<update_interface>(update));
-			} 
-			else if(this->check_json_types(p->second) == 3) {
-				update_obj<bool> *update = new update_obj<bool>(p->first,p->second.boolean());
-				update_list.push_back(std::unique_ptr<update_interface>(update));
-			} else {
-				return_error("Failure in creating update list");
+		std::cout << " Count == " << count << std::endl;
+		if(((std::string)"uid").compare(p->first) != 0){
+			std::cout << p->first << std::endl;
+			if ( tmp_user.model::compare_field(p->first) ) {
+				std::cout << "Field matches" << std::endl;
+				std::cout << "Does it fail here?" << std::endl;
+				if(this->check_json_types(p->second) == 1)
+				{
+					std::cout << "Integer" << std::endl;
+					update_obj<int> *update = new update_obj<int>(p->first,((int)p->second.number()));
+					std::cout << "No?" << std::endl;
+					update_list.push_back(std::unique_ptr<update_interface>(update));
+				} else if(this->check_json_types(p->second) == 2) {
+					std::cout << "String" << std::endl;
+					update_obj<std::string> *update = new update_obj<std::string>(p->first,((std::string)p->second.str()));
+					std::cout << "No?" << std::endl;
+					update_list.push_back(std::unique_ptr<update_interface>(update));
+				} 
+				else if(this->check_json_types(p->second) == 3) {
+					std::cout << "Boolean" << std::endl;
+					update_obj<bool> *update = new update_obj<bool>(p->first,p->second.boolean());
+					std::cout << "No?" << std::endl;
+					update_list.push_back(std::unique_ptr<update_interface>(update));
+				} else {
+					return_error("Failure in creating update list");
+				}
 			}
+			else {
+				error = true;
+				return_error("Unrecognized field");
+			}
+		} else {
+			std::cout << "set primary key" << std::endl;
+			uid = ((int)p->second.number());
 		}
-		else {
-			error = true;
-			return_error("Unrecognized field");
+		count++;
+	}
+	if(uid != -1) {
+		user user(get_database(),uid);
+		if ( user.model::update(std::move(update_list)) && !error){
+			return_result("OK");
 		}
-	}
-	if ( user.model::update(std::move(update_list)) && !error){
-		return_result("OK");
-	}
-	else { 
-		return_error("Failed to update user");
+		else { 
+			return_error("Failed to update user");
+		}
 	}
 }
 
@@ -938,12 +959,12 @@ int master::check_json_types(cppcms::json::value v)
 {
 	switch(v.type())
 	{
-		case cppcms::json::json_type::is_string: 
+		case cppcms::json::json_type::is_number: 
 		{
 			return 1;
 		}
 		break;
-		case cppcms::json::json_type::is_number:
+		case cppcms::json::json_type::is_string: 
 		{
 			return 2;
 		}

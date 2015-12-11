@@ -91,6 +91,11 @@ bool user::m_delete()
 	return false;
 }
 
+void user::set_uid(int uid)
+{
+	this->uid = uid;
+}
+
 void user::set_username(std::string username)
 {
 	this->username = username;
