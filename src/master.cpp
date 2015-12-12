@@ -10,7 +10,7 @@
 #include "config.h"
 #include "exceptions.h"
 #include "model.h"
-#include "update_obj.h"
+#include "any.h"
 
 #include "model/user.h"
 #include "model/domain.h"
@@ -585,61 +585,65 @@ void master::get_ip()
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(cppcms::json::value object)
 {
+	try{
+		int uid = -1;
+		user tmp_user(get_database(),uid);
+		std::map<std::string,any> update_list;
+		bool error = false;
 
-	int uid = -1;
-	user tmp_user(get_database(),uid);
-	std::vector<std::unique_ptr<update_interface>> update_list;
-	bool error = false;
+		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	int count = 0;
-	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		std::cout << " Count == " << count << std::endl;
-		if(((std::string)"uid").compare(p->first) != 0){
-			std::cout << p->first << std::endl;
-			if ( tmp_user.model::compare_field(p->first) ) {
-				std::cout << "Field matches" << std::endl;
-				std::cout << "Does it fail here?" << std::endl;
-				if(this->check_json_types(p->second) == 1)
-				{
-					std::cout << "Integer" << std::endl;
-					update_obj<int> *update = new update_obj<int>(p->first,((int)p->second.number()));
-					std::cout << "No?" << std::endl;
-					update_list.push_back(std::unique_ptr<update_interface>(update));
-				} else if(this->check_json_types(p->second) == 2) {
-					std::cout << "String" << std::endl;
-					update_obj<std::string> *update = new update_obj<std::string>(p->first,((std::string)p->second.str()));
-					std::cout << "No?" << std::endl;
-					update_list.push_back(std::unique_ptr<update_interface>(update));
-				} 
-				else if(this->check_json_types(p->second) == 3) {
-					std::cout << "Boolean" << std::endl;
-					update_obj<bool> *update = new update_obj<bool>(p->first,p->second.boolean());
-					std::cout << "No?" << std::endl;
-					update_list.push_back(std::unique_ptr<update_interface>(update));
-				} else {
-					return_error("Failure in creating update list");
+		int count = 0;
+		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+			std::cout << " Count == " << count << std::endl;
+			if(((std::string)"uid").compare(p->first) != 0){
+				std::cout << p->first << std::endl;
+				if ( tmp_user.model::compare_field(p->first) ) {
+					std::cout << "Field matches" << std::endl;
+					std::cout << "Does it fail here?" << std::endl;
+					if(this->check_json_types(p->second) == 1)
+					{
+						std::cout << "Integer" << std::endl;
+						update_list[p->first] = p->second;
+						std::cout << "After adding to update list" << std::endl;
+						std::cout << "pointer was null" << std::endl;
+					} else if(this->check_json_types(p->second) == 2) {
+						std::cout << "String" << std::endl;
+						update_list[p->first.str()] = (std::string)p->second.str();
+						std::cout << "After adding to update list" << std::endl;
+					} 
+					else if(this->check_json_types(p->second) == 3) {
+						std::cout << "Boolean" << std::endl;
+						update_list[p->first.str()] = (bool)p->second.boolean();
+						std::cout << "After adding to update list" << std::endl;
+					} else {
+						return_error("Failure in creating update list");
+					}
 				}
+				else {
+					error = true;
+					return_error("Unrecognized field");
+				}
+			} else {
+				std::cout << "set primary key" << std::endl;
+				uid = ((int)p->second.number());
 			}
-			else {
-				error = true;
-				return_error("Unrecognized field");
-			}
-		} else {
-			std::cout << "set primary key" << std::endl;
-			uid = ((int)p->second.number());
+			count++;
 		}
-		count++;
+		if(uid != -1) {
+			std::cout << "user id is " << uid << std::endl;
+			user user(get_database(),uid);
+			if ( user.model::update(update_list) && !error){
+				return_result("OK");
+			}
+			else { 
+				return_error("Failed to update user");
+			}
+		}
 	}
-	if(uid != -1) {
-		user user(get_database(),uid);
-		if ( user.model::update(std::move(update_list)) && !error){
-			return_result("OK");
-		}
-		else { 
-			return_error("Failed to update user");
-		}
+	catch(std::exception &e)
+	{
+		std::cout << "User update Exception : " << e.what() << std::endl;
 	}
 }
 

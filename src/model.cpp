@@ -2,31 +2,6 @@
 
 void model::add_to_statement(cppdb::statement& stat, any value, std::string try_first)
 {
-	// std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
-	// std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
-	// std::string boolean = "b";
-	// std::string integer = "i";
-
-	// std::cout << "Called add to statement" << std::endl;
-
-	// const std::type_info &ti = value.type();
-	// if (string.compare(ti.name()) == 0 || string2.compare(ti.name()) == 0 ) {
-	// 	std::string s = boost::any_cast<std::string>(value);
-	// 	std::cout << "string " << s << std::endl;
-	// 	stat << s;
-	// } else if (boolean.compare(ti.name()) == 0 ) {
-	// 	bool b = boost::any_cast<bool>(value);
-	// 	std::cout << "boolean " << b << std::endl;
-	// 	stat << b;
-	// } else if (integer.compare(ti.name()) == 0 ) {
-	// 	int i = boost::any_cast<int>(value);
-	// 	std::cout << "Integer " << i << std::endl;
-	// 	stat << i;
-	// }
-	// else {
-	// 	std::cout << "Failed to identify type.." << std::endl;
-	// 	std::cout << "Type was " << ti.name() << std::endl;
-	// }
 	if( try_first.compare("int") == 0)
 	{
 		try { stat << value.get<int>(); std::cout << "casting worked" << std::endl; } catch (std::exception e) { this->add_to_statement(stat,value,"string");}
@@ -38,31 +13,25 @@ void model::add_to_statement(cppdb::statement& stat, any value, std::string try_
 }
 
 // TODO SANITIZE VALUE
-bool model::update(std::unique_ptr<update_interface> update)
+bool model::update(std::string field, any value)
 {
 	try{
 		cppdb::statement stat;
 
 		std::ostringstream query;
-		query << "UPDATE "<< this->table_name << " set `" << update->get_field() << "` = ? WHERE "<< this->primary << " = ?";
+		query << "UPDATE "<< this->table_name << " set `" << field << "` = ? WHERE "<< this->primary << " = ?";
 
 		std::cout << query.str() << std::endl;
 
 		stat = db.session() << query.str();
 		
-		this->add_to_statement(stat, update->get_value());
+		this->add_to_statement(stat, value);
 
 		this->add_to_statement(stat, this->primary_value);
 
 		stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+		return true;
 	}
 	catch(std::exception &e)
 	{
@@ -73,7 +42,7 @@ bool model::update(std::unique_ptr<update_interface> update)
 }
 
 // TODO SANITIZE VALUE
-bool model::update(std::vector<std::unique_ptr<update_interface>> update_list)
+bool model::update(std::map<std::string,any> update_list)
 {
 	try{
 		cppdb::statement stat;
@@ -85,11 +54,11 @@ bool model::update(std::vector<std::unique_ptr<update_interface>> update_list)
 
 		/* First generate the entire query .. */
 		int count = 0;
-		for(std::vector<std::unique_ptr<update_interface>>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
+		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
 			if ( count == 0) {
-				query << " set `" << (*it)->get_field() << "` = ?";
+				query << " set `" << (*it).first << "` = ?";
 			} else {
-				query << ", `" << (*it)->get_field() << "` = ?";
+				query << ", `" << (*it).first << "` = ?";
 			}
 			count++;
 		}
@@ -98,8 +67,8 @@ bool model::update(std::vector<std::unique_ptr<update_interface>> update_list)
 		stat = db.session() << query.str();
 
 		/* Now add the values .. */
-		for(std::vector<std::unique_ptr<update_interface>>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
-			this->add_to_statement(stat, (*it)->get_value());
+		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
+			this->add_to_statement(stat, (*it).second);
 		}
 
 		std::cout << query.str() << std::endl;

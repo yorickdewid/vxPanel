@@ -5,7 +5,6 @@
 #include <cppcms/rpc_json.h>
 
 #include "backend.h"
-#include "update_obj.h"
 
 class master: public cppcms::rpc::json_rpc_server {
 
