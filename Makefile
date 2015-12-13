@@ -11,7 +11,7 @@ CPPCHECK = cppcheck
 INCLUDE_DIRS = .
 LIBRARY_DIRS = /usr/local/lib /usr/lib64 /usr/lib
 LIBRARIES = cppcms cppdb
-CPPFLAGS += -O0 -Wall -Werror -g -std=c++11
+CPPFLAGS += -O0 -Wall -Werror -g -DSAMPLE -std=c++11
 CPPFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
 LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
@@ -28,8 +28,7 @@ link:
 
 test: all
 	$(BINDIR)/$(NAME) -c $(NAMECNF) &
-	python tests/pre_run.py $(NAMECNF)
-	python tests/basic_call.py
+	python tests/basic_call.py $(NAMECNF)
 	killall $(NAME)
 
 clean:

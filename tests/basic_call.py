@@ -4,7 +4,8 @@ import urllib
 import urllib2
 import json
 import time
-import MySQLdb as mdb
+import sys
+import os
 
 class bcolors:
 	HEADER = '\033[95m'
@@ -15,11 +16,15 @@ class bcolors:
 	ENDC = '\033[0m'
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
+
 # Default settings
 url = 'http://localhost:8080/rpc'
 headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
 
-time.sleep(1)
+def open_config_file(configname):
+	file = open(configname,"r")
+	config = json.loads(file.read());
+	return config["db"]
 
 def rpc_call(data):
 	req = urllib2.Request(url, data, headers)
@@ -266,6 +271,10 @@ def test_rpc_delete_database():
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
+config = open_config_file(sys.argv[1])
+os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DATABASE IF EXISTS ' + config['database'] +'"')
+if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme/create.sql') is not 0:
+	sys.exit(1)
 
 # Call the testcases
 test_rpc_sum()

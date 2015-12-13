@@ -15,6 +15,7 @@ private:
         T value_;
     };
     base* ptr_;
+
 public:
     template <typename T> any(T const& value): ptr_(new data<T>(value)) {}
     any(){}

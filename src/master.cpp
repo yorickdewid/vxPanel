@@ -33,10 +33,12 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 {
 	init_backend();
 
+#ifdef SAMPLE
 	bind("sum", cppcms::rpc::json_method(&master::sum, this), method_role);
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
+#endif
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
@@ -110,6 +112,7 @@ backend& master::get_database()
 	return *db;
 }
 
+#ifdef SAMPLE
 void master::sum(int x, int y)
 {
 	std::cout << "Sum Called" << std::endl;
@@ -139,6 +142,7 @@ void master::both(std::string msg)
 		return_result("call:" + msg);
 	}
 }
+#endif
 
 std::string master::format_uptime(std::string sec){
 	std::ostringstream os;
