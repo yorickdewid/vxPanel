@@ -118,6 +118,7 @@ void master::sum(int x, int y)
 	std::cout << "Sum Called" << std::endl;
 	return_result(x + y);
 }
+#endif
 
 void master::div(int x, int y)
 {
@@ -142,7 +143,6 @@ void master::both(std::string msg)
 		return_result("call:" + msg);
 	}
 }
-#endif
 
 std::string master::format_uptime(std::string sec){
 	std::ostringstream os;
@@ -606,7 +606,6 @@ void master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 				update_list[first.str()] = any((bool)second.boolean());
 				break;
 			}
-
 			default:
 				break;
 		}
@@ -655,10 +654,12 @@ void master::update_user(cppcms::json::value object)
 
 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
+		std::string primary_field = tmp_user.get_primary();
 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
 			if( uid == -1) {
-				uid = this->get_identifier(tmp_user.get_primary(), p->first, p->second).integer;
-			} else {
+				uid = this->get_identifier(primary_field, p->first, p->second).integer;
+			} 
+			if( primary_field.compare(p->first.str()) != 0){
 				this->convert(std::unique_ptr<model>(new user(get_database(),uid)), p->first, p->second, update_list);
 			}
 		}
@@ -689,10 +690,12 @@ void master::update_domain(std::string domain_name, cppcms::json::value object)
 
 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
+		std::string primary_field = tmp_domain.get_primary();
 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-			if( domain_name.empty() ) {
-				domain_name = this->get_identifier(tmp_domain.get_primary(), p->first, p->second).integer;
-			} else {
+			if(domain_name.empty()) {
+				domain_name = this->get_identifier(primary_field, p->first, p->second).string;
+			} 
+			if( primary_field.compare(p->first.str()) != 0){
 				this->convert(std::unique_ptr<model>(new domain(get_database(),domain_name)), p->first, p->second, update_list);
 			}
 		}
@@ -702,13 +705,13 @@ void master::update_domain(std::string domain_name, cppcms::json::value object)
 				return_result("OK");
 			}
 			else { 
-				return_error("Failed to update user");
+				return_error("Failed to update domain");
 			}
 		}
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "User update Exception : " << e.what() << std::endl;
+		std::cout << "Domain update Exception : " << e.what() << std::endl;
 	}
 }
 
