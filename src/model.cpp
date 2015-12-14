@@ -1,14 +1,16 @@
 #include "model.h"
 
-void model::add_to_statement(cppdb::statement& stat, any value, std::string try_first)
+void model::add_to_statement(cppdb::statement& stat, any value)
 {
-	if( try_first.compare("int") == 0)
-	{
-		try { stat << value.get<int>(); std::cout << "casting worked" << std::endl; } catch (std::exception e) { this->add_to_statement(stat,value,"string");}
-	} else if(try_first.compare("string") == 0) {
-		try { stat << value.get<std::string>(); } catch (std::exception e) { this->add_to_statement(stat,value,"bool");}
-	} else if(try_first.compare("bool") == 0) {
-		try { stat << value.get<bool>(); } catch (std::exception e) { std::cout << "No casting possbile" << std::endl; }
+		switch (value.tag) {
+		case any::CHAR:
+			stat << value.string;
+			break;
+		case any::INT:
+			stat << value.integer;
+			break;
+		case any::BOOL:
+			stat << value.boolean;
 	}
 }
 

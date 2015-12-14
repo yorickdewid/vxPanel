@@ -21,7 +21,7 @@ public:
 	virtual void save() = 0;
 	virtual void load() = 0;
 
-	void add_to_statement(cppdb::statement& stat, any value, std::string try_first = "int");
+	void add_to_statement(cppdb::statement& stat, any value);
 	bool update(std::string field, any value);
 	bool update(std::map<std::string, any> update_list);
 	bool compare_field(std::string field); /* TODO move to validate class ? */

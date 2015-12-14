@@ -608,17 +608,17 @@ void master::update_user(cppcms::json::value object)
 					if(this->check_json_types(p->second) == 1)
 					{
 						std::cout << "Integer" << std::endl;
-						update_list[p->first] = p->second;
+						update_list[p->first] = any((int)p->second.number());
 						std::cout << "After adding to update list" << std::endl;
 						std::cout << "pointer was null" << std::endl;
 					} else if(this->check_json_types(p->second) == 2) {
 						std::cout << "String" << std::endl;
-						update_list[p->first.str()] = (std::string)p->second.str();
+						update_list[p->first.str()] = any((std::string)p->second.str());
 						std::cout << "After adding to update list" << std::endl;
 					} 
 					else if(this->check_json_types(p->second) == 3) {
 						std::cout << "Boolean" << std::endl;
-						update_list[p->first.str()] = (bool)p->second.boolean();
+						update_list[p->first.str()] = any((bool)p->second.boolean());
 						std::cout << "After adding to update list" << std::endl;
 					} else {
 						return_error("Failure in creating update list");

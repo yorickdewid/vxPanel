@@ -1,7 +1,7 @@
 MODDIR = model
 CXX_SRCS = $(wildcard *.cpp)
 CXX_OBJS = ${CXX_SRCS:.cpp=.o}
-CPPFLAGS += -O0 -Wall -Werror -g -std=c++11 -DSAMPLE
+CPPFLAGS += -O0 -Wall -Werror -Wno-reorder -g -std=c++11 -DSAMPLE
 LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 
 .PHONY: all clean distclean
