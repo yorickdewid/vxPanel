@@ -586,6 +586,65 @@ void master::get_ip()
 
 /* Update */
 
+void master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
+{
+	if ( tmp->model::compare_field(first.str()) ) {
+		switch(second.type())
+		{
+			case cppcms::json::json_type::is_number: 
+			{
+				update_list[first.str()] = any((int)second.number());
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				update_list[first.str()] = any((std::string)second.str());
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				update_list[first.str()] = any((bool)second.boolean());
+				break;
+			}
+
+			default:
+				break;
+		}
+	} else {
+		return_error("Unrecognized field");
+	}
+}
+
+any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
+{
+	if( primary_field.compare(first.str()) == 0){
+		switch(second.type())
+		{
+			case cppcms::json::json_type::is_number: 
+			{
+				return (int)second.number();
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				return (std::string)second.str();
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				return (bool)second.boolean();
+				break;
+			}
+			default:
+			{
+				return -1;
+				break;
+			}
+		}
+	}
+	return -1;
+}
+
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(cppcms::json::value object)
 {
@@ -593,51 +652,20 @@ void master::update_user(cppcms::json::value object)
 		int uid = -1;
 		user tmp_user(get_database(),uid);
 		std::map<std::string,any> update_list;
-		bool error = false;
 
 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-		int count = 0;
 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-			std::cout << " Count == " << count << std::endl;
-			if(((std::string)"uid").compare(p->first) != 0){
-				std::cout << p->first << std::endl;
-				if ( tmp_user.model::compare_field(p->first) ) {
-					std::cout << "Field matches" << std::endl;
-					std::cout << "Does it fail here?" << std::endl;
-					if(this->check_json_types(p->second) == 1)
-					{
-						std::cout << "Integer" << std::endl;
-						update_list[p->first] = any((int)p->second.number());
-						std::cout << "After adding to update list" << std::endl;
-						std::cout << "pointer was null" << std::endl;
-					} else if(this->check_json_types(p->second) == 2) {
-						std::cout << "String" << std::endl;
-						update_list[p->first.str()] = any((std::string)p->second.str());
-						std::cout << "After adding to update list" << std::endl;
-					} 
-					else if(this->check_json_types(p->second) == 3) {
-						std::cout << "Boolean" << std::endl;
-						update_list[p->first.str()] = any((bool)p->second.boolean());
-						std::cout << "After adding to update list" << std::endl;
-					} else {
-						return_error("Failure in creating update list");
-					}
-				}
-				else {
-					error = true;
-					return_error("Unrecognized field");
-				}
+			if( uid == -1) {
+				uid = this->get_identifier(tmp_user.get_primary(), p->first, p->second).integer;
 			} else {
-				std::cout << "set primary key" << std::endl;
-				uid = ((int)p->second.number());
+				this->convert(std::unique_ptr<model>(new user(get_database(),uid)), p->first, p->second, update_list);
 			}
-			count++;
 		}
 		if(uid != -1) {
 			std::cout << "user id is " << uid << std::endl;
 			user user(get_database(),uid);
-			if ( user.model::update(update_list) && !error){
+			if ( user.model::update(update_list)){
 				return_result("OK");
 			}
 			else { 
@@ -654,98 +682,46 @@ void master::update_user(cppcms::json::value object)
 /* status, registrar, vhost_id */
 void master::update_domain(std::string domain_name, cppcms::json::value object)
 {
-	// domain domain(get_database(),domain_name);
+	try{
+		std::string domain_name;
+		domain tmp_domain(get_database(), domain_name);
+		std::map<std::string,any> update_list;
 
-	// std::vector<update_obj> update_list;
-	// bool error = false;
+		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-	// cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	// for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-	// 	if ( domain.model::compare_field(p->first) ) {
-	// 		update_obj update;
-	// 		update.field = p->first;
-	// 		this->check_json_types(p->second,update);
-	// 		update_list.push_back(update);
-	// 	}
-	// 	else {
-	// 		error = true;
-	// 		return_error("Unrecognized field");
-	// 	}
-	// }
-	// if ( !error && domain.model::update(update_list) ){
-	// 	std::cout << " Executing update ..." << std::endl;
-	// 	return_result("OK");
-	// }
-	// else { 
-	// 	return_error("Failed to update domain");
-	// }
+		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+			if( domain_name.empty() ) {
+				domain_name = this->get_identifier(tmp_domain.get_primary(), p->first, p->second).integer;
+			} else {
+				this->convert(std::unique_ptr<model>(new domain(get_database(),domain_name)), p->first, p->second, update_list);
+			}
+		}
+		if(!domain_name.empty()) {
+			domain domain(get_database(),domain_name);
+			if ( domain.model::update(update_list)){
+				return_result("OK");
+			}
+			else { 
+				return_error("Failed to update user");
+			}
+		}
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "User update Exception : " << e.what() << std::endl;
+	}
 }
 
 /* address */
 void master::update_dns(int dns_id, cppcms::json::value object)
 {
-	// dns dns(get_database(),dns_id);
 
-	// std::vector<update_obj> update_list;
-	// bool error = false;
-
-	// cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	// for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-	// 	if ( dns.model::compare_field(p->first) ) {
-	// 		update_obj update;
-	// 		update.field = p->first;
-	// 		this->check_json_types(p->second,update);
-	// 		update_list.push_back(update);
-	// 	}
-	// 	else {
-	// 		error = true;
-	// 		return_error("Unrecognized field");
-	// 	}
-	// }
-	// if ( dns.model::update(update_list) && !error){
-	// 	return_result("OK");
-	// }
-	// else { 
-	// 	return_error("Failed to update dns");
-	// }
 }
 
 /* password, permissions */
 void master::update_ftp_account(std::string ftp_account_name, cppcms::json::value object)
 {
-	// ftp_account ftp_account(get_database(),ftp_account_name);
 
-	// std::vector<update_obj> update_list;
-	// bool error = false;
-
-	// cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	// for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-	// 	if ( ftp_account.model::compare_field(p->first) ) {
-	// 		update_obj update;
-	// 		update.field = p->first;
-	// 		this->check_json_types(p->second,update);
-	// 		update_list.push_back(update);
-	// 	} else {
-	// 		std::cout << "error situation" << std::endl;
-	// 		error = true;
-	// 		return_error("Unrecognized field");
-	// 	}
-	// 	if(error)
-	// 	{
-	// 		break;
-	// 	}
-	// }
-	// if ( error == false) {
-	// 	if ( ftp_account.model::update(update_list) ){
-	// 		return_result("OK");
-	// 	}
-	// 	else { 
-	// 		return_error("Failed to update ftp_account");
-	// 	}
-	// }
 }
 
 /* name ?, custom_config */ 
@@ -961,33 +937,5 @@ void master::write_ip_to_db()
 	stream << "Saved ip to db, " << remote_address;
 
 	return_result(stream.str());
-}
-
-int master::check_json_types(cppcms::json::value v)
-{
-	switch(v.type())
-	{
-		case cppcms::json::json_type::is_number: 
-		{
-			return 1;
-		}
-		break;
-		case cppcms::json::json_type::is_string: 
-		{
-			return 2;
-		}
-		break;
-		case cppcms::json::json_type::is_boolean:
-		{
-			return 3;
-		}
-		break;
-		case cppcms::json::json_type::is_undefined:
-		case cppcms::json::json_type::is_null:
-		case cppcms::json::json_type::is_object:
-		case cppcms::json::json_type::is_array:
-		return -1;
-	}
-	return -1;
 }
 

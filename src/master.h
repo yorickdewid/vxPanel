@@ -5,6 +5,8 @@
 #include <cppcms/rpc_json.h>
 
 #include "backend.h"
+#include "any.h"
+#include "model.h"
 
 class master: public cppcms::rpc::json_rpc_server {
 
@@ -19,8 +21,6 @@ public:
 	void system_uptime();
 	void version();
 	void db_version();
-
-	int check_json_types(cppcms::json::value v);
 
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);
@@ -48,6 +48,8 @@ public:
 	void get_database(std::string db_name, int uid);
 	void get_ip();
 
+	void convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
+	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 	void update_domain(std::string domain_name, cppcms::json::value object); /* status, registrar, vhost_id */
 	void update_dns(int dns_id, cppcms::json::value object); /* address */

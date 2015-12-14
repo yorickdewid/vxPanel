@@ -30,6 +30,7 @@ public:
 
 	bool is_empty(std::string var);
 	bool get_saved(){ return this->saved; };
+	std::string get_primary(){ return this->primary; };
 	std::vector<std::string> get_fields() { return this->field_list; };
 
 protected:
