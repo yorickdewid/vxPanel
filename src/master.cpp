@@ -646,22 +646,28 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 
 bool master::check_default(any value)
 {
+	std::cout << "Is this even called??" << std::endl;
 	switch (value.tag) {
 		case any::CHAR:
+			std::cout << " String " << std::endl;
 			if( ((std::string)value.string).empty() )
 			{
+				std::cout << "Default == TRUE" << std::endl;
 				return true;
 			}
 			return false;
 			break;
 		case any::INT:
+			std::cout << " Integer " << std::endl;
 			if( value.integer == -1 )
 			{
+				std::cout << "Default == TRUE" << std::endl;
 				return true;
 			}
 			return false;
 			break;
 		default: 
+			std::cout << "Default case" << std::endl;
 			return true;
 	}
 }
@@ -691,11 +697,11 @@ bool master::check_default(std::vector<any> primary_list)
 	}
 	if(count_defaults == 0 )
 	{
-		std::cout << "Shall not pass" << count_loop << std::endl;
-		return true;
-	} else {
-		std::cout << "It shall pass" << count_loop << std::endl;
+		std::cout << "Shall not pass " << "looped times " << count_loop << std::endl;
 		return false;
+	} else {
+		std::cout << "It shall pass " << count_loop << std::endl;
+		return true;
 	}
 }
 
@@ -714,7 +720,7 @@ void master::abstract(cppcms::json::value object, std::unique_ptr<model> tmp, Mo
 			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
 				std::cout << temp++ << std::endl;
 				std::cout << "Field name " << p->first << " Default " << (*it).second.integer << std::endl;
-				if( tmp->model::compare_primary_field(p->first) && this->check_default( (*it).second )) {
+				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) ) {
 					std::cout << "Primary" << std::endl;
 					primary_list.push_back(this->get_identifier( (*it).first, p->first, p->second));
 					std::cout << "Primary value" << primary_list[0].integer << std::endl;
