@@ -2,7 +2,7 @@
 
 void model::add_to_statement(cppdb::statement& stat, any value)
 {
-		switch (value.tag) {
+	switch (value.tag) {
 		case any::CHAR:
 			stat << value.string;
 			break;
@@ -11,6 +11,7 @@ void model::add_to_statement(cppdb::statement& stat, any value)
 			break;
 		case any::BOOL:
 			stat << value.boolean;
+			break;
 	}
 }
 

@@ -4,7 +4,7 @@
 class user_dbuser_db : public model {
 
 public:
-	user_dbuser_db(backend& db, std::string db_username,std::string db_name) :
+	user_dbuser_db(backend& db, std::string db_username, std::string db_name) :
 		model(db),
 		db_username(db_username),
 		db_name(db_name)

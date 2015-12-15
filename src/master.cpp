@@ -11,6 +11,7 @@
 #include "exceptions.h"
 #include "model.h"
 #include "any.h"
+#include "ModelFactory.h"
 
 #include "model/user.h"
 #include "model/domain.h"
@@ -643,6 +644,61 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 	}
 	return -1;
 }
+
+// bool master::check_default(any value)
+// {
+// 	switch (value.tag) {
+// 		case any::CHAR:
+// 			if(value.string.empty())
+// 			{
+// 				return true;
+// 			}
+// 			return false;
+// 			break;
+// 		case any::INT:
+// 			if(value.integer == -1)
+// 			{
+// 				return true;
+// 			}
+// 			return false;
+// 			break;
+// 		default: 
+// 			return true;
+// 	}
+// }
+
+// void master::abstract(std::unique_ptr<model> tmp, any primary_value)
+// {
+// 	try{
+// 		std::map<std::string,any> update_list;
+
+// 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+// 		std::string primary_field = tmp->get_primary();
+// 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+// 			if( this->check_default(primary_value)) {
+// 				uid = this->get_identifier(primary_field, p->first, p->second).integer;
+// 			} 
+// 			if( primary_field.compare(p->first.str()) != 0){
+// 				this->convert(std::unique_ptr<model>(new user(get_database(),uid)), p->first, p->second, update_list);
+// 			}
+// 		}
+// 		if(uid != -1) {
+// 			std::cout << "user id is " << uid << std::endl;
+// 			user user(get_database(),uid);
+// 			if ( user.model::update(update_list)){
+// 				return_result("OK");
+// 			}
+// 			else { 
+// 				return_error("Failed to update user");
+// 			}
+// 		}
+// 	}
+// 	catch(std::exception &e)
+// 	{
+// 		std::cout << "User update Exception : " << e.what() << std::endl;
+// 	}
+// }
 
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(cppcms::json::value object)
