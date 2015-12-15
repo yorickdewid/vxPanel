@@ -7,13 +7,15 @@
 class domain: public model {
 
 public:
+	domain(backend& db) :
+		model(db)
+	{};
 	domain(backend& db, std::string domain_name) :
 		model(db),
 		name(domain_name)
 	{
 		this->table_name = "domain";
-		this->primary = "name"; 
-		this->primary_value = domain_name;
+		this->primary_info["name"] = domain_name;
 		this->field_list.push_back("name");
 		this->field_list.push_back("status"); 
 		this->field_list.push_back("registrar"); 

@@ -5,6 +5,9 @@
 class database_type : public model {
 
 public:
+	database_type(backend& db) :
+		model(db)
+	{};
 	database_type(backend& db, std::string name) :
 		model(db),
 		name(name)

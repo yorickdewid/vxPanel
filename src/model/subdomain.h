@@ -7,6 +7,9 @@
 class subdomain : public model {
 
 public:
+	subdomain(backend& db) :
+		model(db)
+	{};
 	subdomain(backend& db, std::string name, std::string domain_name) :
 		model(db),
 		name(name),

@@ -6,6 +6,9 @@
 class database : public model {
 
 public:
+	database(backend& db) :
+		model(db)
+	{};
 	database(backend& db, std::string name) :
 		model(db),
 		name(name)

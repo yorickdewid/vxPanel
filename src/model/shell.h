@@ -5,6 +5,9 @@
 class shell : public model {
 
 public:
+	shell(backend& db) :
+		model(db)
+	{};
 	shell(backend& db, int id) :
 		model(db),
 		id(id)

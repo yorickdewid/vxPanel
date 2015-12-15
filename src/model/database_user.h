@@ -5,6 +5,9 @@
 class database_user : public model {
 
 public:
+	database_user(backend& db) :
+		model(db)
+	{};
 	database_user(backend& db, std::string name) :
 		model(db),
 		name(name)

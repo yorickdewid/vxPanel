@@ -5,6 +5,9 @@
 class mailbox : public model {
 
 public:
+	mailbox(backend& db) :
+		model(db)
+	{};
 	mailbox(backend& db, int id) :
 		model(db),
 		id(id)

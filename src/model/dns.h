@@ -5,13 +5,15 @@
 class dns : public model {
 
 public:
+	dns(backend& db) :
+		model(db)
+	{};
 	dns(backend& db, int id) :
 		model(db),
 		id(id)
 	{
 		this->table_name = "dns";
-		this->primary = "id"; 
-		this->primary_value = id;
+		this->primary_info["id"] = id; 
 		this->field_list.push_back("id");
 		this->field_list.push_back("name"); 
 		this->field_list.push_back("created"); 

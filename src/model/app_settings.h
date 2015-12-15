@@ -4,6 +4,9 @@
 class app_settings : public model {
 
 public:
+	app_settings(backend& db) :
+		model(db)
+	{};
 	app_settings(backend& db, std::string key) :
 		model(db),
 		key(key)

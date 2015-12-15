@@ -4,6 +4,9 @@
 class vhost : public model {
 
 public:
+	vhost(backend& db) :
+		model(db)
+	{};
 	vhost(backend& db, int id) :
 		model(db),
 		id(id)

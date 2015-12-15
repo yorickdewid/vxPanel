@@ -11,7 +11,6 @@
 #include "exceptions.h"
 #include "model.h"
 #include "any.h"
-#include "ModelFactory.h"
 
 #include "model/user.h"
 #include "model/domain.h"
@@ -204,8 +203,8 @@ void master::create_user(std::string username)
 	user.set_username(username);
 	user.set_password("kaas");
 	user.set_email("info@kaas.nl");
-	// std::string remote = cppcms::application::request().remote_addr();
-	// user.set_remote(remote);
+	// // std::string remote = cppcms::application::request().remote_addr();
+	// // user.set_remote(remote);
 
 	user.save();
 
@@ -645,84 +644,100 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 	return -1;
 }
 
-// bool master::check_default(any value)
-// {
-// 	switch (value.tag) {
-// 		case any::CHAR:
-// 			if(value.string.empty())
-// 			{
-// 				return true;
-// 			}
-// 			return false;
-// 			break;
-// 		case any::INT:
-// 			if(value.integer == -1)
-// 			{
-// 				return true;
-// 			}
-// 			return false;
-// 			break;
-// 		default: 
-// 			return true;
-// 	}
-// }
+bool master::check_default(any value)
+{
+	switch (value.tag) {
+		case any::CHAR:
+			if( ((std::string)value.string).empty() )
+			{
+				return true;
+			}
+			return false;
+			break;
+		case any::INT:
+			if( value.integer == -1 )
+			{
+				return true;
+			}
+			return false;
+			break;
+		default: 
+			return true;
+	}
+}
 
-// void master::abstract(std::unique_ptr<model> tmp, any primary_value)
-// {
-// 	try{
-// 		std::map<std::string,any> update_list;
+bool master::check_default(std::vector<any> primary_list)
+{
+	int count_defaults = 0;
+	int count_loop = 0;
+	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
+		count_loop++;
+		switch ((*it).tag) {
+			case any::CHAR:
+				if( ((std::string)(*it).string).empty() )
+				{
+					count_defaults++;
+				}
+				break;
+			case any::INT:
+				if( (*it).integer == -1 )
+				{
+					count_defaults++;
+				}
+				break;
+			default: 
+				count_defaults++;
+		}
+	}
+	if(count_defaults == 0 )
+	{
+		std::cout << "Shall not pass" << count_loop << std::endl;
+		return true;
+	} else {
+		std::cout << "It shall pass" << count_loop << std::endl;
+		return false;
+	}
+}
 
-// 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-// 		std::string primary_field = tmp->get_primary();
-// 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-// 			if( this->check_default(primary_value)) {
-// 				uid = this->get_identifier(primary_field, p->first, p->second).integer;
-// 			} 
-// 			if( primary_field.compare(p->first.str()) != 0){
-// 				this->convert(std::unique_ptr<model>(new user(get_database(),uid)), p->first, p->second, update_list);
-// 			}
-// 		}
-// 		if(uid != -1) {
-// 			std::cout << "user id is " << uid << std::endl;
-// 			user user(get_database(),uid);
-// 			if ( user.model::update(update_list)){
-// 				return_result("OK");
-// 			}
-// 			else { 
-// 				return_error("Failed to update user");
-// 			}
-// 		}
-// 	}
-// 	catch(std::exception &e)
-// 	{
-// 		std::cout << "User update Exception : " << e.what() << std::endl;
-// 	}
-// }
-
-/* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-void master::update_user(cppcms::json::value object)
+void master::abstract(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
 {
 	try{
-		int uid = -1;
-		user tmp_user(get_database(),uid);
 		std::map<std::string,any> update_list;
 
 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-		std::string primary_field = tmp_user.get_primary();
+		std::vector<any> primary_list;
+		std::map<std::string, any> primary_info = tmp->get_primary_info();
 		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-			if( uid == -1) {
-				uid = this->get_identifier(primary_field, p->first, p->second).integer;
-			} 
-			if( primary_field.compare(p->first.str()) != 0){
-				this->convert(std::unique_ptr<model>(new user(get_database(),uid)), p->first, p->second, update_list);
+			bool primary_added = false;
+			int temp = 0;
+			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
+				std::cout << temp++ << std::endl;
+				std::cout << "Field name " << p->first << " Default " << (*it).second.integer << std::endl;
+				if( tmp->model::compare_primary_field(p->first) && this->check_default( (*it).second )) {
+					std::cout << "Primary" << std::endl;
+					primary_list.push_back(this->get_identifier( (*it).first, p->first, p->second));
+					std::cout << "Primary value" << primary_list[0].integer << std::endl;
+				} 
+				std::cout << primary_list.size() << "  "  <<primary_info.size() << std::endl;
+				if(primary_list.size() == primary_info.size())
+				{
+					primary_added = true;
+					std::cout << "Primary value" << primary_list[0].integer << std::endl;
+				}
+			}
+			if(primary_added == false)
+			{
+				std::cout << "Trying convert" << std::endl;
+				this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
+				std::cout << "After convert" << std::endl;
 			}
 		}
-		if(uid != -1) {
-			std::cout << "user id is " << uid << std::endl;
-			user user(get_database(),uid);
-			if ( user.model::update(update_list)){
+		std::cout << "Before checking default" << std::endl;
+		if( !this->check_default(primary_list) ) {
+			std::cout << "Before checking default" << std::endl;
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
+			if ( model_obj->model::update(update_list) ){
 				return_result("OK");
 			}
 			else { 
@@ -736,39 +751,48 @@ void master::update_user(cppcms::json::value object)
 	}
 }
 
+/* password,email,fname,lname,country,city,address,postal,note,user_type,active */
+void master::update_user(cppcms::json::value object)
+{
+	int uid = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(uid);
+	this->abstract(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
+}
+
 /* status, registrar, vhost_id */
 void master::update_domain(std::string domain_name, cppcms::json::value object)
 {
-	try{
-		std::string domain_name;
-		domain tmp_domain(get_database(), domain_name);
-		std::map<std::string,any> update_list;
+	// try{
+	// 	std::string domain_name;
+	// 	domain tmp_domain(get_database(), domain_name);
+	// 	std::map<std::string,any> update_list;
 
-		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+	// 	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
 
-		std::string primary_field = tmp_domain.get_primary();
-		for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-			if(domain_name.empty()) {
-				domain_name = this->get_identifier(primary_field, p->first, p->second).string;
-			} 
-			if( primary_field.compare(p->first.str()) != 0){
-				this->convert(std::unique_ptr<model>(new domain(get_database(),domain_name)), p->first, p->second, update_list);
-			}
-		}
-		if(!domain_name.empty()) {
-			domain domain(get_database(),domain_name);
-			if ( domain.model::update(update_list)){
-				return_result("OK");
-			}
-			else { 
-				return_error("Failed to update domain");
-			}
-		}
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Domain update Exception : " << e.what() << std::endl;
-	}
+	// 	std::string primary_field = tmp_domain.get_primary();
+	// 	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
+	// 		if(domain_name.empty()) {
+	// 			domain_name = this->get_identifier(primary_field, p->first, p->second).string;
+	// 		} 
+	// 		if( primary_field.compare(p->first.str()) != 0){
+	// 			this->convert(std::unique_ptr<model>(new domain(get_database(),domain_name)), p->first, p->second, update_list);
+	// 		}
+	// 	}
+	// 	if(!domain_name.empty()) {
+	// 		domain domain(get_database(),domain_name);
+	// 		if ( domain.model::update(update_list)){
+	// 			return_result("OK");
+	// 		}
+	// 		else { 
+	// 			return_error("Failed to update domain");
+	// 		}
+	// 	}
+	// }
+	// catch(std::exception &e)
+	// {
+	// 	std::cout << "Domain update Exception : " << e.what() << std::endl;
+	// }
 }
 
 /* address */

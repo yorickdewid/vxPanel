@@ -7,6 +7,7 @@
 #include "backend.h"
 #include "any.h"
 #include "model.h"
+#include "ModelFactory.h"
 
 class master: public cppcms::rpc::json_rpc_server {
 
@@ -48,8 +49,12 @@ public:
 	void get_database(std::string db_name, int uid);
 	void get_ip();
 
+	bool check_default(any value);
+	bool check_default(std::vector<any> primary_list);
+	void abstract(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
 	void convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
+
 	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 	void update_domain(std::string domain_name, cppcms::json::value object); /* status, registrar, vhost_id */
 	void update_dns(int dns_id, cppcms::json::value object); /* address */

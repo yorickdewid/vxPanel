@@ -6,14 +6,16 @@
 class ftp_account : public model {
 
 public:
+	ftp_account(backend& db) :
+		model(db)
+	{};
 	ftp_account(backend& db, std::string username) :
 		model(db),
 		_name(username),
 		_user(NULL)
 	{
 		this->table_name = "ftpuser";
-		this->primary = "name";  // not the primary
-		this->primary_value = username;
+		this->primary_info["name"] = username;
 		this->field_list.push_back("id");
 		this->field_list.push_back("name"); 
 		this->field_list.push_back("password"); 

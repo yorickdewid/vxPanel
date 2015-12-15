@@ -6,9 +6,9 @@
 class user: public model {
 
 public:
-	user(backend& db) : model(db) { 
+	user(backend& db) : model(db), _address_number(-1){ 
 		this->table_name = "user";
-		this->primary = "uid"; 
+		this->primary_info["uid"] = -1; 
 		this->field_list.push_back("uid");
 		this->field_list.push_back("username"); 
 		this->field_list.push_back("password"); 
@@ -27,10 +27,9 @@ public:
 		this->field_list.push_back("created");
 		this->field_list.push_back("last_login");
 	};
-	user(backend& db, int uid) : model(db), uid(uid) { 
+	user(backend& db, int uid) : model(db), uid(uid), _address_number(-1) { 
 		this->table_name = "user";
-		this->primary = "uid"; 
-		this->primary_value = uid;
+		this->primary_info["uid"] = uid;
 		this->field_list.push_back("uid");
 		this->field_list.push_back("username"); 
 		this->field_list.push_back("password"); 
