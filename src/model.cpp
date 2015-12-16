@@ -88,15 +88,18 @@ bool model::compare_field(std::string field)
 bool model::compare_primary_field(std::string field)
 {
 	std::cout << " Primary Size " << this->primary_info.size() << std::endl;
-	if ( this->primary_info.size() > 1 ) {
+	if ( this->primary_info.size() > 0 ) {
 		for(auto it = this->primary_info.begin(); it != this->primary_info.end(); ++it) {
 	    	if(it->first.compare(field) == 0)
 	    	{
+	    		std::cout << "Primary field matches" << std::endl;
 	    		return true;
 	    	}
 		}
+		std::cout << "Primary field matches" << std::endl;
 		return false;
 	}
+	std::cout << "Primary fields == 0" << std::endl;
 	return false;
 }
 
