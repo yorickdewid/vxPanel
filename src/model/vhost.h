@@ -10,7 +10,15 @@ public:
 	vhost(backend& db, int id) :
 		model(db),
 		id(id)
-	{};
+	{
+		this->table_name = "vhost";
+		this->primary_info["id"] = id; 
+		this->field_list.push_back("id");
+		this->field_list.push_back("name"); 
+		this->field_list.push_back("custom_config"); 
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("active");
+	};
 	
 	void save();
 	void load();

@@ -607,7 +607,7 @@ void dump_map(const std::map<std::string,any>& map) {
 	}
 }
 
-void master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
+bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
 {
 	if ( tmp->model::compare_field(first.str()) ) {
 		switch(second.type()) {
@@ -631,8 +631,9 @@ void master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 				break;
 		}
 		dump_map(update_list);
+		return true;
 	} else {
-		return_error("Unrecognized field");
+		return false;
 	}
 }
 
@@ -727,7 +728,7 @@ bool master::check_default(std::vector<any> primary_list)
 	}
 }
 
-void master::abstract(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
+void master::update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
 {
 	try{
 		std::map<std::string, any> update_list;
@@ -757,7 +758,10 @@ void master::abstract(cppcms::json::value object, std::unique_ptr<model> tmp, Mo
 
 			if (!primary_added) {
 				std::cout << "Trying convert" << std::endl;
-				this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
+				if ( !this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list) ) {
+					return_error("Unrecognized field");
+					break;
+				}
 				std::cout << "After convert" << std::endl;
 			}
 		}
@@ -782,88 +786,74 @@ void master::update_user(cppcms::json::value object)
 	int uid = -1;
 	std::vector<any> primary_list;
 	primary_list.push_back(uid);
-	this->abstract(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
 }
 
 /* status, registrar, vhost_id */
-void master::update_domain(std::string domain_name, cppcms::json::value object)
+void master::update_domain(cppcms::json::value object)
 {
-	// try{
-	// 	std::string domain_name;
-	// 	domain tmp_domain(get_database(), domain_name);
-	// 	std::map<std::string,any> update_list;
-
-	// 	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	// 	std::string primary_field = tmp_domain.get_primary();
-	// 	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-	// 		if(domain_name.empty()) {
-	// 			domain_name = this->get_identifier(primary_field, p->first, p->second).string;
-	// 		} 
-	// 		if( primary_field.compare(p->first.str()) != 0){
-	// 			this->convert(std::unique_ptr<model>(new domain(get_database(),domain_name)), p->first, p->second, update_list);
-	// 		}
-	// 	}
-	// 	if(!domain_name.empty()) {
-	// 		domain domain(get_database(),domain_name);
-	// 		if ( domain.model::update(update_list)){
-	// 			return_result("OK");
-	// 		}
-	// 		else { 
-	// 			return_error("Failed to update domain");
-	// 		}
-	// 	}
-	// }
-	// catch(std::exception &e)
-	// {
-	// 	std::cout << "Domain update Exception : " << e.what() << std::endl;
-	// }
+	std::string domain_name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(domain_name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
 }
 
 /* address */
-void master::update_dns(int dns_id, cppcms::json::value object)
+void master::update_dns(cppcms::json::value object)
 {
-
+	int dns_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(dns_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
 }
 
 /* password, permissions */
-void master::update_ftp_account(std::string ftp_account_name, cppcms::json::value object)
+void master::update_ftp_account(cppcms::json::value object)
 {
-
+	std::string ftp_account = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(ftp_account);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
 }
 
 /* name ?, custom_config */ 
-void master::update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list)
+void master::update_vhost(cppcms::json::value object)
 {
-
+	int vhost_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(vhost_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
 }
 
 /* address */
-void master::update_mailbox(int uid, std::string domain_name, std::vector<std::string> update_list)
+void master::update_mailbox(cppcms::json::value object)
 {
-
+	int mailbox_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(mailbox_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
 }
 
 /* subdomain name , vhost_id */
-void master::update_subdomain(int uid, std::string subdomain_name, std::vector<std::string> update_list)
+void master::update_subdomain(cppcms::json::value object)
 {
 
 }
 
 /* value, default, description */
-void master::update_setting(std::string key)
+void master::update_setting(cppcms::json::value object)
 {
 
 }
 
 /* password, permissions */
-void master::update_database_user(int uid, std::string username)
+void master::update_database_user(cppcms::json::value object)
 {
 
 }
 
 /* database_type */
-void master::update_database(int uid, std::string db_name, std::vector<std::string> update_list)
+void master::update_database(cppcms::json::value object)
 {
 
 }

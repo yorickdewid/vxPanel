@@ -51,20 +51,20 @@ public:
 
 	bool check_default(any value);
 	bool check_default(std::vector<any> primary_list);
-	void abstract(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
-	void convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
+	void update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
+	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 
 	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-	void update_domain(std::string domain_name, cppcms::json::value object); /* status, registrar, vhost_id */
-	void update_dns(int dns_id, cppcms::json::value object); /* address */
-	void update_ftp_account(std::string ftp_account, cppcms::json::value object); /* password, permissions */
-	void update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list); /* name ?, custom_config */ 
-	void update_mailbox(int uid, std::string domain_name, std::vector<std::string> update_list); /* address */
-	void update_subdomain(int uid, std::string subdomain_name, std::vector<std::string> update_list); /* subdomain name , vhost_id */
-	void update_setting(std::string key); /* value, default, description */
-	void update_database_user(int uid, std::string username); /* password, permissions */
-	void update_database(int uid, std::string db_name, std::vector<std::string> update_list); /* database_type */
+	void update_domain(cppcms::json::value object); /* status, registrar, vhost_id */
+	void update_dns( cppcms::json::value object); /* address */
+	void update_ftp_account(cppcms::json::value object); /* password, permissions */
+	void update_vhost(cppcms::json::value object); /* name ?, custom_config */ 
+	void update_mailbox(cppcms::json::value object); /* address */
+	void update_subdomain(cppcms::json::value object); /* subdomain name , vhost_id */
+	void update_setting(cppcms::json::value object); /* value, default, description */
+	void update_database_user(cppcms::json::value object); /* password, permissions */
+	void update_database(cppcms::json::value object); /* database_type */
 
 	void delete_user(std::string username, int uid);
 	void delete_domain(std::string domain_name, int uid);
