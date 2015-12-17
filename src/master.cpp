@@ -632,9 +632,9 @@ bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 		}
 		dump_map(update_list);
 		return true;
-	} else {
-		return false;
 	}
+	throw unrecognized_field_ex();
+	return false;
 }
 
 any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
@@ -758,10 +758,7 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 
 			if (!primary_added) {
 				std::cout << "Trying convert" << std::endl;
-				if ( !this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list) ) {
-					return_error("Unrecognized field");
-					break;
-				}
+				this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
 				std::cout << "After convert" << std::endl;
 			}
 		}
@@ -777,6 +774,7 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 		}
 	} catch(std::exception &e) {
 		std::cout << "User update Exception : " << e.what() << std::endl;
+		return_error("Unrecognized field");
 	}
 }
 

@@ -8,7 +8,22 @@ class ftp_account : public model {
 public:
 	ftp_account(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "ftpuser";
+		this->primary_info["name"] = "";
+		this->field_list.push_back("id");
+		this->field_list.push_back("name"); 
+		this->field_list.push_back("password"); 
+		this->field_list.push_back("uid"); //linux
+		this->field_list.push_back("gid");
+		this->field_list.push_back("homedir");
+		this->field_list.push_back("shell");
+		this->field_list.push_back("count");
+		this->field_list.push_back("userid");
+		this->field_list.push_back("created");
+		this->field_list.push_back("accessed");
+		this->field_list.push_back("modified");
+	};
 	ftp_account(backend& db, std::string username) :
 		model(db),
 		_name(username),
