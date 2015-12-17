@@ -6,14 +6,31 @@
 class ftp_account : public model {
 
 public:
+	ftp_account(backend& db) :
+		model(db)
+	{
+		this->table_name = "ftpuser";
+		this->primary_info["name"] = "";
+		this->field_list.push_back("id");
+		this->field_list.push_back("name"); 
+		this->field_list.push_back("password"); 
+		this->field_list.push_back("uid"); //linux
+		this->field_list.push_back("gid");
+		this->field_list.push_back("homedir");
+		this->field_list.push_back("shell");
+		this->field_list.push_back("count");
+		this->field_list.push_back("userid");
+		this->field_list.push_back("created");
+		this->field_list.push_back("accessed");
+		this->field_list.push_back("modified");
+	};
 	ftp_account(backend& db, std::string username) :
 		model(db),
 		_name(username),
 		_user(NULL)
 	{
 		this->table_name = "ftpuser";
-		this->primary = "name";  // not the primary
-		this->primary_value = username;
+		this->primary_info["name"] = username;
 		this->field_list.push_back("id");
 		this->field_list.push_back("name"); 
 		this->field_list.push_back("password"); 
@@ -30,8 +47,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	void set_username(std::string username);

@@ -4,16 +4,25 @@
 class vhost : public model {
 
 public:
+	vhost(backend& db) :
+		model(db)
+	{};
 	vhost(backend& db, int id) :
 		model(db),
 		id(id)
-	{};
+	{
+		this->table_name = "vhost";
+		this->primary_info["id"] = id; 
+		this->field_list.push_back("id");
+		this->field_list.push_back("name"); 
+		this->field_list.push_back("custom_config"); 
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("active");
+	};
 	
 	void save();
 	void load();
 	void load(std::string domain_name);
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	void set_name(std::string name);

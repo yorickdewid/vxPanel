@@ -60,20 +60,6 @@ void user_dbuser_db::load(std::string db_username, std::string db_name = "false"
 	}
 }
 
-bool user_dbuser_db::update(std::string field)
-{
-	/* TODO */
-	(std::string)field;
-	return true;
-}
-
-bool user_dbuser_db::update(std::vector<update_obj> list)
-{
-	/* TODO */
-	(std::vector<update_obj>)list;
-	return true;
-}
-
 bool user_dbuser_db::m_delete()
 {
 	try{

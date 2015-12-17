@@ -66,13 +66,6 @@ void user::load()
 	}
 }
 
-bool user::update(std::vector<update_obj> list)
-{
-	/* TODO */
-	(std::vector<update_obj>)list;
-	return true;
-}
-
 /* TODO Handle foreign key block correctly */
 bool user::m_delete()
 {
@@ -96,6 +89,11 @@ bool user::m_delete()
 		std::cout << "Exception occured " << e.what() << std::endl;
 	}
 	return false;
+}
+
+void user::set_uid(int uid)
+{
+	this->uid = uid;
 }
 
 void user::set_username(std::string username)

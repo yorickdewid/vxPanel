@@ -6,15 +6,23 @@
 class database : public model {
 
 public:
+	database(backend& db) :
+		model(db)
+	{};
 	database(backend& db, std::string name) :
 		model(db),
 		name(name)
-	{};
+	{
+		this->table_name = "user_db";
+		this->primary_info["name"] = name;
+		this->field_list.push_back("name");
+		this->field_list.push_back("created");
+		this->field_list.push_back("uid"); 
+		this->field_list.push_back("db_type");
+	};
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	void set_name(std::string name);

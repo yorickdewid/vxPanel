@@ -5,6 +5,9 @@
 class shell : public model {
 
 public:
+	shell(backend& db) :
+		model(db)
+	{};
 	shell(backend& db, int id) :
 		model(db),
 		id(id)
@@ -12,8 +15,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	void set_user(std::shared_ptr<user> user);

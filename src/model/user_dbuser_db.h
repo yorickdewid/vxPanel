@@ -4,7 +4,10 @@
 class user_dbuser_db : public model {
 
 public:
-	user_dbuser_db(backend& db, std::string db_username,std::string db_name) :
+	user_dbuser_db(backend& db) :
+		model(db)
+	{};
+	user_dbuser_db(backend& db, std::string db_username, std::string db_name) :
 		model(db),
 		db_username(db_username),
 		db_name(db_name)
@@ -13,8 +16,6 @@ public:
 	void save();
 	void load();
 	void load(std::string db_username,std::string db_name);
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 
 	void set_db_username(std::string db_username);

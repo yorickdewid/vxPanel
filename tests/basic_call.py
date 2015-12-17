@@ -4,7 +4,8 @@ import urllib
 import urllib2
 import json
 import time
-import MySQLdb as mdb
+import sys
+import os
 
 class bcolors:
 	HEADER = '\033[95m'
@@ -15,11 +16,15 @@ class bcolors:
 	ENDC = '\033[0m'
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
+
 # Default settings
 url = 'http://localhost:8080/rpc'
 headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
 
-time.sleep(1)
+def open_config_file(configname):
+	file = open(configname,"r")
+	config = json.loads(file.read());
+	return config["db"]
 
 def rpc_call(data):
 	req = urllib2.Request(url, data, headers)
@@ -184,22 +189,22 @@ def test_rpc_get_database():
 
 def test_rpc_update_user():
 	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
-	data = '{"id":0,"method":"update_user","params":[1000,{"update_list":{"address_number":255,"address":"kaassstraat"}}]}'
+	data = '{"id":0,"method":"update_user","params":[{"update_list":{"uid":1000,"address_number":255,"address":"kaassstraat"}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_update_domain():
 	print bcolors.OKBLUE + "Testcase: Update domain" + bcolors.ENDC
-	data = '{"id":0,"method":"update_domain","params":["trol.com",{"update_list":{"status":"kaas","active":0}}]}'
+	data = '{"id":0,"method":"update_domain","params":[{"update_list":{"name":"trol.com","status":"kaas","active":0}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_update_dns():
 	print bcolors.OKBLUE + "Testcase: Update dns" + bcolors.ENDC
-	data = '{"id":0,"method":"update_dns","params":[1,{"update_list":{"name":"A www2.trol.com","active":0}}]}'
+	data = '{"id":0,"method":"update_dns","params":[{"update_list":{"id":1,"name":"A www2.trol.com","active":0}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 def test_rpc_update_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Update ftp_account" + bcolors.ENDC
-	data = '{"id":0,"method":"update_ftp_account","params":["kaasje",{"update_list":{"homedir":"/usr/kaasie","count":1}}]}'
+	data = '{"id":0,"method":"update_ftp_account","params":[{"update_list":{"name":"kaasje","homedir":"/usr/kaasie","count":1}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
@@ -266,44 +271,48 @@ def test_rpc_delete_database():
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
+config = open_config_file(sys.argv[1])
+os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DATABASE IF EXISTS ' + config['database'] +'"')
+if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme/create.sql') is not 0:
+	sys.exit(1)
 
 # Call the testcases
-# test_rpc_sum()
-# test_rpc_uptime()
-# test_rpc_version()
-# test_rpc_db_version()
+test_rpc_sum()
+test_rpc_uptime()
+test_rpc_version()
+test_rpc_db_version()
 
-# ## all 'perfect' scenarios ##
+## all 'perfect' scenarios ##
 
-# test_rpc_create_user()
-# test_rpc_create_domain()
-# test_rpc_create_dns()
-# test_rpc_create_ftp_account()
-# test_rpc_create_vhost()
-# test_rpc_create_mailbox()
-# test_rpc_create_shell()
-# test_rpc_create_subdomain()
-# test_rpc_create_setting()
-# test_rpc_create_db_user()
-# test_rpc_create_database()
+test_rpc_create_user()
+test_rpc_create_domain()
+test_rpc_create_dns()
+test_rpc_create_ftp_account()
+test_rpc_create_vhost()
+test_rpc_create_mailbox()
+test_rpc_create_shell()
+test_rpc_create_subdomain()
+test_rpc_create_setting()
+test_rpc_create_db_user()
+test_rpc_create_database()
 
-# test_rpc_get_user()
-# test_rpc_get_domain()
-# test_rpc_get_dns()
-# test_rpc_get_ftp_account()
-# test_rpc_get_vhost()
-# test_rpc_get_mailbox()
-# test_rpc_get_shell()
-# test_rpc_get_subdomain()
-# test_rpc_get_setting()
-# test_rpc_get_database_types()
-# test_rpc_get_database_user()
-# test_rpc_get_database()
+test_rpc_get_user()
+test_rpc_get_domain()
+test_rpc_get_dns()
+test_rpc_get_ftp_account()
+test_rpc_get_vhost()
+test_rpc_get_mailbox()
+test_rpc_get_shell()
+test_rpc_get_subdomain()
+test_rpc_get_setting()
+test_rpc_get_database_types()
+test_rpc_get_database_user()
+test_rpc_get_database()
 
 test_rpc_update_user()
-# test_rpc_update_domain()
-# test_rpc_update_dns()
-# test_rpc_update_ftp_account()
+test_rpc_update_domain()
+test_rpc_update_dns()
+test_rpc_update_ftp_account()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

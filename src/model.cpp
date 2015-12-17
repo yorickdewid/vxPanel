@@ -1,73 +1,22 @@
 #include "model.h"
 
-void model::add_to_statement(cppdb::statement& stat, boost::any& value)
+void model::add_to_statement(cppdb::statement& stat, any value)
 {
-	std::string string = "PKc"; /* occurs when directly adding string to boost::any e.g = "example" */
-	std::string string2 = "NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE";
-	std::string boolean = "b";
-	std::string integer = "i";
-
-	std::cout << "Called add to statement" << std::endl;
-
-	const std::type_info &ti = value.type();
-	if (string.compare(ti.name()) == 0 || string2.compare(ti.name()) == 0 ) {
-		std::string s = boost::any_cast<std::string>(value);
-		std::cout << "string " << s << std::endl;
-		stat << s;
-	} else if (boolean.compare(ti.name()) == 0 ) {
-		bool b = boost::any_cast<bool>(value);
-		std::cout << "boolean " << b << std::endl;
-		stat << b;
-	} else if (integer.compare(ti.name()) == 0 ) {
-		int i = boost::any_cast<int>(value);
-		std::cout << "Integer " << i << std::endl;
-		stat << i;
-	}
-	else {
-		std::cout << "Failed to identify type.." << std::endl;
-		std::cout << "Type was " << ti.name() << std::endl;
+	switch (value.tag) {
+		case any::CHAR:
+			stat << value.string;
+			break;
+		case any::INT:
+			stat << value.integer;
+			break;
+		case any::BOOL:
+			stat << value.boolean;
+			break;
 	}
 }
 
 // TODO SANITIZE VALUE
-bool model::update(update_obj update)
-{
-	try{
-		cppdb::statement stat;
-
-		std::ostringstream query;
-		query << "UPDATE "<< this->table_name << " set `" << update.field << "` = ? WHERE "<< this->primary << " = ?";
-
-		std::cout << query.str() << std::endl;
-
-		stat = db.session() << query.str();
-		if (!update.value.empty())
-		{
-			this->add_to_statement(stat, update.value);
-		}
-
-		this->add_to_statement(stat, this->primary_value);
-
-		stat.exec();
-
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured in update " << e.what() << std::endl;
-		return false;
-	}
-	return false;
-}
-
-// TODO SANITIZE VALUE
-bool model::update(std::vector<update_obj> update_list)
+bool model::update(std::map<std::string, any> update_list)
 {
 	try{
 		cppdb::statement stat;
@@ -77,47 +26,43 @@ bool model::update(std::vector<update_obj> update_list)
 
 		std::cout << "Table name " << this->table_name << std::endl;
 
-		/* First generate the entire query .. */
+		std::cout << "update_list.size() is " << update_list.size() << '\n';
+
 		int count = 0;
-		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
-			if (!(*it).value.empty()) {
-				if ( count == 0) {
-					query << " set `" << (*it).field << "` = ?";
-				} else {
-					query << ", `" << (*it).field << "` = ?";
-				}
-				count++;
+		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
+			if ( count == 0) {
+				query << " set `" << (*it).first << "` = ?";
+			} else {
+				query << ", `" << (*it).first << "` = ?";
 			}
+			count++;
 		}
 
-		query << " WHERE " << this->primary << " = ?";
+		query << " WHERE ";
+		for ( auto it =this->primary_info.begin(); it != this->primary_info.end(); ++it ) {
+			query << (*it).first << " = ? ";
+		}
+
 		stat = db.session() << query.str();
 
 		/* Now add the values .. */
-		for(std::vector<update_obj>::iterator it = update_list.begin(); it != update_list.end(); ++it) {
-			if (!(*it).value.empty()) {
-				this->add_to_statement(stat, (*it).value);
-			}
+		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
+			this->add_to_statement(stat, (*it).second);
 		}
 
 		std::cout << query.str() << std::endl;
 
-		this->add_to_statement(stat, this->primary_value);
+		/* Now add the values .. */
+		for ( auto it = this->primary_info.begin(); it != this->primary_info.end(); ++it ) {
+			this->add_to_statement(stat, (*it).second);
+		}
 
 		stat.exec();
 
 		std::cout << "Affected "<< stat.affected() << std::endl;
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
-	}
-	catch(std::exception &e)
-	{
+		return true;
+	} catch (std::exception &e) {
 		std::cout << "Exception occured in update (vector) " << e.what() << std::endl;
 		return false;
 	}
@@ -128,7 +73,7 @@ bool model::compare_field(std::string field)
 {
 	std::cout << "Size " << this->field_list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
-		for(std::vector<std::string>::iterator it = this->field_list.begin(); it != this->field_list.end(); ++it) {
+		for(auto it = this->field_list.begin(); it != this->field_list.end(); ++it) {
 	    	if((*it).compare(field) == 0)
 	    	{
 	    		return true;
@@ -136,6 +81,24 @@ bool model::compare_field(std::string field)
 		}
 		return false;
 	}
+	return false;
+}
+
+bool model::compare_primary_field(std::string field)
+{
+	std::cout << " Primary Size " << this->primary_info.size() << std::endl;
+	if ( this->primary_info.size() > 0 ) {
+		for(auto it = this->primary_info.begin(); it != this->primary_info.end(); ++it) {
+	    	if(it->first.compare(field) == 0)
+	    	{
+	    		std::cout << "Primary field matches" << std::endl;
+	    		return true;
+	    	}
+		}
+		std::cout << "Primary field matches" << std::endl;
+		return false;
+	}
+	std::cout << "Primary fields == 0" << std::endl;
 	return false;
 }
 

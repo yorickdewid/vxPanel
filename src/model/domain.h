@@ -7,13 +7,26 @@
 class domain: public model {
 
 public:
-	domain(backend& db, std::string domain_name) :
-		model(db),
-		name(domain_name)
+	domain(backend& db) :
+		model(db)
 	{
 		this->table_name = "domain";
-		this->primary = "name"; 
-		this->primary_value = domain_name;
+		this->primary_info["name"] = "";
+		this->field_list.push_back("name");
+		this->field_list.push_back("status"); 
+		this->field_list.push_back("registrar"); 
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("uid"); 
+		this->field_list.push_back("vhost_id");
+		this->field_list.push_back("active");
+	};
+	domain(backend& db, std::string domain_name) :
+		model(db),
+		name(domain_name),
+		_active(false)
+	{
+		this->table_name = "domain";
+		this->primary_info["name"] = domain_name;
 		this->field_list.push_back("name");
 		this->field_list.push_back("status"); 
 		this->field_list.push_back("registrar"); 
@@ -26,8 +39,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 
 	/* Setters */

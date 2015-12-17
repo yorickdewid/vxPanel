@@ -5,6 +5,9 @@
 class database_type : public model {
 
 public:
+	database_type(backend& db) :
+		model(db)
+	{};
 	database_type(backend& db, std::string name) :
 		model(db),
 		name(name)
@@ -12,8 +15,6 @@ public:
 	
 	void save();
 	void load();
-	bool update(std::string field);
-	bool update(std::vector<update_obj> list);
 	bool m_delete();
 	
 	std::vector<database_type> load_all();

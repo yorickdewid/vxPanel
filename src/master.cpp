@@ -10,6 +10,7 @@
 #include "config.h"
 #include "exceptions.h"
 #include "model.h"
+#include "any.h"
 
 #include "model/user.h"
 #include "model/domain.h"
@@ -32,10 +33,12 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 {
 	init_backend();
 
+#ifdef SAMPLE
 	bind("sum", cppcms::rpc::json_method(&master::sum, this), method_role);
 	bind("div", cppcms::rpc::json_method(&master::div, this), method_role);
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
+#endif
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
@@ -109,11 +112,13 @@ backend& master::get_database()
 	return *db;
 }
 
+#ifdef SAMPLE
 void master::sum(int x, int y)
 {
 	std::cout << "Sum Called" << std::endl;
 	return_result(x + y);
 }
+#endif
 
 void master::div(int x, int y)
 {
@@ -198,8 +203,8 @@ void master::create_user(std::string username)
 	user.set_username(username);
 	user.set_password("kaas");
 	user.set_email("info@kaas.nl");
-	// std::string remote = cppcms::application::request().remote_addr();
-	// user.set_remote(remote);
+	// // std::string remote = cppcms::application::request().remote_addr();
+	// // user.set_remote(remote);
 
 	user.save();
 
@@ -581,167 +586,288 @@ void master::get_ip()
 
 /* Update */
 
-/* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-void master::update_user(int uid, cppcms::json::value object)
+/* Dump map contents */
+void dump_map(const std::map<std::string,any>& map) {
+	for (std::map<std::string, any>::const_iterator it = map.begin(); it != map.end(); it++) {
+		std::cout << "Key: " << it->first << std::endl;
+		std::cout << "Value: " << std::endl;
+		switch (it->second.tag) {
+			case any::CHAR:
+				puts(it->second.string);
+				break;
+			case any::INT:
+				printf("%d\n", it->second.integer);
+				break;
+			case any::BOOL:
+				printf("%d\n", it->second.boolean);
+				break;
+		}
+
+
+	}
+}
+
+bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
 {
-	user user(get_database(),uid);
-
-	std::vector<update_obj> update_list;
-	bool error = false;
-
-	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		if ( user.model::compare_field(p->first) ) {
-			update_obj update;
-			update.field = p->first;
-			this->check_json_types(p->second,update);
-			update_list.push_back(update);
+	if ( tmp->model::compare_field(first.str()) ) {
+		switch(second.type()) {
+			case cppcms::json::json_type::is_number: 
+			{
+				update_list[first.str()] = any((int)second.number());
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				std::string val = (std::string)second.str();
+				update_list[first.str()] = any(val);
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				update_list[first.str()] = any((bool)second.boolean());
+				break;
+			}
+			default:
+				break;
 		}
-		else {
-			error = true;
-			return_error("Unrecognized field");
+		dump_map(update_list);
+		return true;
+	}
+	throw unrecognized_field_ex();
+	return false;
+}
+
+any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
+{
+	if( primary_field.compare(first.str()) == 0){
+		switch(second.type())
+		{
+			case cppcms::json::json_type::is_number: 
+			{
+				return (int)second.number();
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				return (std::string)second.str();
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				return (bool)second.boolean();
+				break;
+			}
+			default:
+			{
+				return -1;
+				break;
+			}
 		}
 	}
-	if ( user.model::update(update_list) && !error){
-		return_result("OK");
+	return -1;
+}
+
+bool master::check_default(any value)
+{
+	std::cout << "Is this even called??" << std::endl;
+	switch (value.tag) {
+		case any::CHAR:
+			std::cout << " String " << std::endl;
+			if( ((std::string)value.string).empty() )
+			{
+				std::cout << "Default == TRUE" << std::endl;
+				return true;
+			}
+			return false;
+			break;
+		case any::INT:
+			std::cout << " Integer " << std::endl;
+			if( value.integer == -1 )
+			{
+				std::cout << "Default == TRUE" << std::endl;
+				return true;
+			}
+			return false;
+			break;
+		default: 
+			std::cout << "Default case" << std::endl;
+			return true;
 	}
-	else { 
-		return_error("Failed to update user");
+}
+
+bool master::check_default(std::vector<any> primary_list)
+{
+	int count_defaults = 0;
+	int count_loop = 0;
+	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
+		count_loop++;
+		switch ((*it).tag) {
+			case any::CHAR:
+				if( ((std::string)(*it).string).empty() )
+				{
+					count_defaults++;
+				}
+				break;
+			case any::INT:
+				if( (*it).integer == -1 )
+				{
+					count_defaults++;
+				}
+				break;
+			default: 
+				count_defaults++;
+		}
 	}
+	if(count_defaults == 0 )
+	{
+		std::cout << "Shall not pass " << "looped times " << count_loop << std::endl;
+		return false;
+	} else {
+		std::cout << "It shall pass " << count_loop << std::endl;
+		return true;
+	}
+}
+
+void master::update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
+{
+	try{
+		std::map<std::string, any> update_list;
+
+		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+
+		std::vector<any> primary_list;
+		std::map<std::string, any> primary_info = tmp->get_primary_info();
+		for (cppcms::json::object::const_iterator p=ob.begin(); p!=ob.end(); ++p) {
+			bool primary_added = false;
+			int temp = 0;
+			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
+				std::cout << temp++ << std::endl;
+				std::cout << "Field name " << p->first << " Default " << (*it).second.integer << std::endl;
+				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) ) {
+					std::cout << "Primary" << std::endl;
+					primary_list.push_back(this->get_identifier( (*it).first, p->first, p->second));
+					std::cout << "Primary value" << primary_list[0].integer << std::endl;
+				} 
+				std::cout << primary_list.size() << "  "  <<primary_info.size() << std::endl;
+
+				if (primary_list.size() == primary_info.size()) {
+					primary_added = true;
+					std::cout << "Primary value" << primary_list[0].integer << std::endl;
+				}
+			}
+
+			if (!primary_added) {
+				std::cout << "Trying convert" << std::endl;
+				this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
+				std::cout << "After convert" << std::endl;
+			}
+		}
+		std::cout << "Before checking default" << std::endl;
+		if (!this->check_default(primary_list)) {
+			std::cout << "Before checking default" << std::endl;
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
+			if (model_obj->model::update(update_list)) {
+				return_result("OK");
+			} else { 
+				return_error("Failed to update user");
+			}
+		}
+	} catch(std::exception &e) {
+		std::cout << "User update Exception : " << e.what() << std::endl;
+		return_error("Unrecognized field");
+	}
+}
+
+/* password,email,fname,lname,country,city,address,postal,note,user_type,active */
+void master::update_user(cppcms::json::value object)
+{
+	int uid = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(uid);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
 }
 
 /* status, registrar, vhost_id */
-void master::update_domain(std::string domain_name, cppcms::json::value object)
+void master::update_domain(cppcms::json::value object)
 {
-	domain domain(get_database(),domain_name);
-
-	std::vector<update_obj> update_list;
-	bool error = false;
-
-	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		if ( domain.model::compare_field(p->first) ) {
-			update_obj update;
-			update.field = p->first;
-			this->check_json_types(p->second,update);
-			update_list.push_back(update);
-		}
-		else {
-			error = true;
-			return_error("Unrecognized field");
-		}
-	}
-	if ( !error && domain.model::update(update_list) ){
-		std::cout << " Executing update ..." << std::endl;
-		return_result("OK");
-	}
-	else { 
-		return_error("Failed to update domain");
-	}
+	std::string domain_name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(domain_name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
 }
 
 /* address */
-void master::update_dns(int dns_id, cppcms::json::value object)
+void master::update_dns(cppcms::json::value object)
 {
-	dns dns(get_database(),dns_id);
-
-	std::vector<update_obj> update_list;
-	bool error = false;
-
-	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		if ( dns.model::compare_field(p->first) ) {
-			update_obj update;
-			update.field = p->first;
-			this->check_json_types(p->second,update);
-			update_list.push_back(update);
-		}
-		else {
-			error = true;
-			return_error("Unrecognized field");
-		}
-	}
-	if ( dns.model::update(update_list) && !error){
-		return_result("OK");
-	}
-	else { 
-		return_error("Failed to update dns");
-	}
+	int dns_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(dns_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
 }
 
 /* password, permissions */
-void master::update_ftp_account(std::string ftp_account_name, cppcms::json::value object)
+void master::update_ftp_account(cppcms::json::value object)
 {
-	ftp_account ftp_account(get_database(),ftp_account_name);
-
-	std::vector<update_obj> update_list;
-	bool error = false;
-
-	cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-
-	for ( cppcms::json::object::const_iterator p=ob.begin();p!=ob.end();++p ) {
-		if ( ftp_account.model::compare_field(p->first) ) {
-			update_obj update;
-			update.field = p->first;
-			this->check_json_types(p->second,update);
-			update_list.push_back(update);
-		} else {
-			std::cout << "error situation" << std::endl;
-			error = true;
-			return_error("Unrecognized field");
-		}
-		if(error)
-		{
-			break;
-		}
-	}
-	if ( error == false) {
-		if ( ftp_account.model::update(update_list) ){
-			return_result("OK");
-		}
-		else { 
-			return_error("Failed to update ftp_account");
-		}
-	}
+	std::string ftp_account = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(ftp_account);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
 }
 
 /* name ?, custom_config */ 
-void master::update_vhost(int uid, std::string domain_name, std::vector<std::string> update_list)
+void master::update_vhost(cppcms::json::value object)
 {
-
+	int vhost_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(vhost_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
 }
 
 /* address */
-void master::update_mailbox(int uid, std::string domain_name, std::vector<std::string> update_list)
+void master::update_mailbox(cppcms::json::value object)
 {
-
+	int mailbox_id = -1;
+	std::vector<any> primary_list;
+	primary_list.push_back(mailbox_id);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
 }
 
 /* subdomain name , vhost_id */
-void master::update_subdomain(int uid, std::string subdomain_name, std::vector<std::string> update_list)
+void master::update_subdomain(cppcms::json::value object)
 {
-
+	std::string domain_name = "";
+	std::string subdomain_name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(domain_name);
+	primary_list.push_back(subdomain_name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
 }
 
 /* value, default, description */
-void master::update_setting(std::string key)
+void master::update_setting(cppcms::json::value object)
 {
-
+	std::string key = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(key);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
 }
 
 /* password, permissions */
-void master::update_database_user(int uid, std::string username)
+void master::update_database_user(cppcms::json::value object)
 {
-
+	std::string username = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(username);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
 }
 
 /* database_type */
-void master::update_database(int uid, std::string db_name, std::vector<std::string> update_list)
+void master::update_database(cppcms::json::value object)
 {
-
+	std::string name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
 }
 
 /* delete */
@@ -921,35 +1047,5 @@ void master::write_ip_to_db()
 	stream << "Saved ip to db, " << remote_address;
 
 	return_result(stream.str());
-}
-
-void master::check_json_types(cppcms::json::value v, update_obj& update)
-{
-	switch(v.type())
-	{
-		case cppcms::json::json_type::is_string: 
-		{
-			std::cout << v.str() << std::endl;
-			std::cout << typeid(v.str()).name() << std::endl;
-			std::string tmp (v.str());
-			update.value = tmp;
-		}
-		break;
-		case cppcms::json::json_type::is_number:
-		{
-			update.value = (int)v.number(); /* no doubles ATM , needs proper fix*/
-		}
-		break;
-		case cppcms::json::json_type::is_boolean:
-		{
-			update.value = v.boolean();
-		}
-		break;
-		case cppcms::json::json_type::is_undefined:
-		case cppcms::json::json_type::is_null:
-		case cppcms::json::json_type::is_object:
-		case cppcms::json::json_type::is_array:
-		break;
-	}
 }
 
