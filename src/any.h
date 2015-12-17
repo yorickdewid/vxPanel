@@ -1,16 +1,20 @@
 #ifndef ANY_H
 #define ANY_H
 
+#include <string.h>
+
 struct any {
     enum {CHAR, INT, BOOL} tag;
     union {
-        const char *string;
+        char *string = NULL;
         int integer;
         bool boolean;
     };
     any(){}
     any(const std::string& str) {
-        string = str.c_str();
+        string = (char *)calloc(1, str.size() + 1);
+        strncpy(string, str.c_str(), str.size());
+        string[str.size()] = '\0';
         tag = CHAR;
     }
     any(int i) : integer(i), tag(INT) {}

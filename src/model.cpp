@@ -16,7 +16,7 @@ void model::add_to_statement(cppdb::statement& stat, any value)
 }
 
 // TODO SANITIZE VALUE
-bool model::update(std::map<std::string,any> update_list)
+bool model::update(std::map<std::string, any> update_list)
 {
 	try{
 		cppdb::statement stat;
@@ -26,7 +26,8 @@ bool model::update(std::map<std::string,any> update_list)
 
 		std::cout << "Table name " << this->table_name << std::endl;
 
-		/* First generate the entire query .. */
+		std::cout << "update_list.size() is " << update_list.size() << '\n';
+
 		int count = 0;
 		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
 			if ( count == 0) {
@@ -61,9 +62,7 @@ bool model::update(std::map<std::string,any> update_list)
 		std::cout << "Affected "<< stat.affected() << std::endl;
 
 		return true;
-	}
-	catch(std::exception &e)
-	{
+	} catch (std::exception &e) {
 		std::cout << "Exception occured in update (vector) " << e.what() << std::endl;
 		return false;
 	}

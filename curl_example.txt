@@ -1,0 +1,1 @@
+curl -d '{"id":0,"method":"update_user","params":[{"update_list":{"uid":1000,"address_number":255,"address":"kaassstraat"}}]}' -H 'content-type: application/json;' http://localhost:8080/rpc
