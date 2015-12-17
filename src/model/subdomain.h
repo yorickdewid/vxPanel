@@ -14,7 +14,16 @@ public:
 		model(db),
 		name(name),
 		_domain(new domain(db,domain_name))
-	{};
+	{
+		this->table_name = "subdomain";
+		this->primary_info["name"] = name;
+		this->primary_info["domain_name"] = domain_name;
+		this->field_list.push_back("name");
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("domain_name"); 
+		this->field_list.push_back("vhost_id");
+		this->field_list.push_back("active");
+	};
 	
 	void save();
 	void load();

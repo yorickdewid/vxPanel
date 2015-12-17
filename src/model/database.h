@@ -12,7 +12,14 @@ public:
 	database(backend& db, std::string name) :
 		model(db),
 		name(name)
-	{};
+	{
+		this->table_name = "user_db";
+		this->primary_info["name"] = name;
+		this->field_list.push_back("name");
+		this->field_list.push_back("created");
+		this->field_list.push_back("uid"); 
+		this->field_list.push_back("db_type");
+	};
 	
 	void save();
 	void load();

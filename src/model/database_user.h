@@ -11,7 +11,15 @@ public:
 	database_user(backend& db, std::string name) :
 		model(db),
 		name(name)
-	{};
+	{
+		this->table_name = "user_db_user";
+		this->primary_info["name"] = name;
+		this->field_list.push_back("name");
+		this->field_list.push_back("password");
+		this->field_list.push_back("permissions"); 
+		this->field_list.push_back("created");
+		this->field_list.push_back("uid");
+	};
 	
 	void save();
 	void load();

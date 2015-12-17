@@ -837,25 +837,39 @@ void master::update_mailbox(cppcms::json::value object)
 /* subdomain name , vhost_id */
 void master::update_subdomain(cppcms::json::value object)
 {
-
+	std::string domain_name = "";
+	std::string subdomain_name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(domain_name);
+	primary_list.push_back(subdomain_name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
 }
 
 /* value, default, description */
 void master::update_setting(cppcms::json::value object)
 {
-
+	std::string key = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(key);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
 }
 
 /* password, permissions */
 void master::update_database_user(cppcms::json::value object)
 {
-
+	std::string username = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(username);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
 }
 
 /* database_type */
 void master::update_database(cppcms::json::value object)
 {
-
+	std::string name = "";
+	std::vector<any> primary_list;
+	primary_list.push_back(name);
+	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
 }
 
 /* delete */
