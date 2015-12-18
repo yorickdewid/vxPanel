@@ -73,6 +73,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
 	bind("update_dns", cppcms::rpc::json_method(&master::update_dns, this), method_role);
 	bind("update_ftp_account", cppcms::rpc::json_method(&master::update_ftp_account, this), method_role);
+	bind("update_vhost", cppcms::rpc::json_method(&master::update_vhost, this), method_role);
+	bind("update_mailbox", cppcms::rpc::json_method(&master::update_mailbox, this), method_role);
 
 	/* TODO update */
 
@@ -669,13 +671,11 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 
 bool master::check_default(any value)
 {
-	std::cout << "Is this even called??" << std::endl;
 	switch (value.tag) {
 		case any::CHAR:
 			std::cout << " String " << std::endl;
 			if( ((std::string)value.string).empty() )
 			{
-				std::cout << "Default == TRUE" << std::endl;
 				return true;
 			}
 			return false;
@@ -684,7 +684,6 @@ bool master::check_default(any value)
 			std::cout << " Integer " << std::endl;
 			if( value.integer == -1 )
 			{
-				std::cout << "Default == TRUE" << std::endl;
 				return true;
 			}
 			return false;
@@ -720,10 +719,8 @@ bool master::check_default(std::vector<any> primary_list)
 	}
 	if(count_defaults == 0 )
 	{
-		std::cout << "Shall not pass " << "looped times " << count_loop << std::endl;
 		return false;
 	} else {
-		std::cout << "It shall pass " << count_loop << std::endl;
 		return true;
 	}
 }
@@ -740,31 +737,25 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 		for (cppcms::json::object::const_iterator p=ob.begin(); p!=ob.end(); ++p) {
 			bool primary_added = false;
 			int temp = 0;
+			if(primary_list.size() ==  0) /* so that primary_added stays false */ 
 			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
-				std::cout << temp++ << std::endl;
+				std::cout << " Looped primary " << temp++ << " times" << std::endl;
 				std::cout << "Field name " << p->first << " Default " << (*it).second.integer << std::endl;
 				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) ) {
-					std::cout << "Primary" << std::endl;
 					primary_list.push_back(this->get_identifier( (*it).first, p->first, p->second));
-					std::cout << "Primary value" << primary_list[0].integer << std::endl;
 				} 
 				std::cout << primary_list.size() << "  "  <<primary_info.size() << std::endl;
-
 				if (primary_list.size() == primary_info.size()) {
 					primary_added = true;
-					std::cout << "Primary value" << primary_list[0].integer << std::endl;
+					std::cout << "Primary value " << primary_list[0].integer << std::endl;
 				}
 			}
-
 			if (!primary_added) {
-				std::cout << "Trying convert" << std::endl;
+				std::cout << "Field " << p->first << std::endl;
 				this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
-				std::cout << "After convert" << std::endl;
 			}
 		}
-		std::cout << "Before checking default" << std::endl;
 		if (!this->check_default(primary_list)) {
-			std::cout << "Before checking default" << std::endl;
 			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
 			if (model_obj->model::update(update_list)) {
 				return_result("OK");

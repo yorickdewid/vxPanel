@@ -207,6 +207,16 @@ def test_rpc_update_ftp_account():
 	data = '{"id":0,"method":"update_ftp_account","params":[{"update_list":{"name":"kaasje","homedir":"/usr/kaasie","count":1}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_update_vhost():
+	print bcolors.OKBLUE + "Testcase: Update vhost" + bcolors.ENDC
+	data = '{"id":0,"method":"update_vhost","params":[{"update_list":{"id":1,"name":"trol.com","custom_config":"enable_write:true"}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_mailbox():
+	print bcolors.OKBLUE + "Testcase: Update mailbox" + bcolors.ENDC
+	data = '{"id":0,"method":"update_mailbox","params":[{"update_list":{"id":1,"maildir":"/usr/kaasie","messages":10}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 ### delete ###
 
@@ -313,6 +323,8 @@ test_rpc_update_user()
 test_rpc_update_domain()
 test_rpc_update_dns()
 test_rpc_update_ftp_account()
+test_rpc_update_vhost()
+test_rpc_update_mailbox()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()
