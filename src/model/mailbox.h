@@ -7,7 +7,20 @@ class mailbox : public model {
 public:
 	mailbox(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "mailbox";
+		this->primary_info["id"] = -1; 
+		this->field_list.push_back("id");
+		this->field_list.push_back("email"); 
+		this->field_list.push_back("password"); 
+		this->field_list.push_back("maildir"); 
+		this->field_list.push_back("quota");
+		this->field_list.push_back("created");
+		this->field_list.push_back("domain_name");
+		this->field_list.push_back("bytes");
+		this->field_list.push_back("messages");
+		this->field_list.push_back("active");
+	};
 	mailbox(backend& db, int id) :
 		model(db),
 		id(id)

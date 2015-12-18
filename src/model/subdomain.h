@@ -9,7 +9,16 @@ class subdomain : public model {
 public:
 	subdomain(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "subdomain";
+		this->primary_info["name"] = "";
+		this->primary_info["domain_name"] = "";
+		this->field_list.push_back("name");
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("domain_name"); 
+		this->field_list.push_back("vhost_id");
+		this->field_list.push_back("active");
+	};
 	subdomain(backend& db, std::string name, std::string domain_name) :
 		model(db),
 		name(name),

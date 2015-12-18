@@ -51,6 +51,7 @@ public:
 
 	bool check_default(any value);
 	bool check_default(std::vector<any> primary_list);
+	bool check_primary_field(std::vector<any> primary_list, std::string field);
 	void update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
 	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);

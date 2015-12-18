@@ -39,9 +39,15 @@ bool model::update(std::map<std::string, any> update_list)
 		}
 
 		query << " WHERE ";
-		for ( auto it =this->primary_info.begin(); it != this->primary_info.end(); ++it ) {
-			query << (*it).first << " = ? ";
+		count = 0;
+		for ( auto it =this->primary_info.begin(); it != this->primary_info.end(); ++it,count++) {
+			if(count > 0) {
+				query << "AND `" <<  (*it).first << "` = ? ";
+			} else {
+				query << "`" << (*it).first << "` = ? ";
+			}
 		}
+		std::cout << query.str() << std::endl;
 
 		stat = db.session() << query.str();
 
@@ -50,9 +56,7 @@ bool model::update(std::map<std::string, any> update_list)
 			this->add_to_statement(stat, (*it).second);
 		}
 
-		std::cout << query.str() << std::endl;
-
-		/* Now add the values .. */
+		/* Now add the primary values .. */
 		for ( auto it = this->primary_info.begin(); it != this->primary_info.end(); ++it ) {
 			this->add_to_statement(stat, (*it).second);
 		}
