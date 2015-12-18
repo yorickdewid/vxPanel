@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-class user: public model {
+class user : public model {
 
 public:
 	user(backend& db) : model(db), _address_number(-1){ 

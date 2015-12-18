@@ -14,5 +14,6 @@
 #include "database_user.h"
 #include "database_type.h"
 #include "user_dbuser_db.h"
+#include "queue.h"
 
 #endif /* MODEL_H */

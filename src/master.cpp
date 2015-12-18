@@ -11,20 +11,7 @@
 #include "exceptions.h"
 #include "model.h"
 #include "any.h"
-
-#include "model/user.h"
-#include "model/domain.h"
-#include "model/dns.h"
-#include "model/ftp_account.h"
-#include "model/vhost.h"
-#include "model/mailbox.h"
-#include "model/shell.h"
-#include "model/subdomain.h"
-#include "model/app_settings.h"
-#include "model/database.h"
-#include "model/database_user.h"
-#include "model/database_type.h"
-#include "model/user_dbuser_db.h"
+#include "model/models.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -54,6 +41,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("create_setting",cppcms::rpc::json_method(&master::create_setting, this), method_role);
 	bind("create_database_user", cppcms::rpc::json_method(&master::create_database_user, this), method_role);
 	bind("create_database", cppcms::rpc::json_method(&master::create_database, this), method_role);
+	bind("create_queue", cppcms::rpc::json_method(&master::create_queue, this), method_role);
 
 	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
 	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
@@ -67,6 +55,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
+	bind("get_queue", cppcms::rpc::json_method(&master::get_queue, this), method_role);
+
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
@@ -356,6 +346,12 @@ void master::create_database(std::string db_name, std::string db_type, std::stri
 	}
 }
 
+void master::create_queue(cppcms::json::value object)
+{
+	//required_fields qid,action,created,uid
+	//optional_fields params,started,finished,status,result
+}
+
 /* get */
 
 void master::get_user(int uid)
@@ -582,6 +578,18 @@ void master::get_database(std::string db_name, int uid)
 	else {
 		return_error("Unauthorized");
 	}
+}
+
+void master::get_queue(int qid)
+{
+	cppcms::json::value json;
+
+	queue queue(get_database(),qid);
+	queue.load();
+
+	std::vector<std::string> field_list = queue.get_fields();
+
+	return_result(json);
 }
 
 void master::get_ip()

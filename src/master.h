@@ -34,6 +34,7 @@ public:
 	void create_setting(std::string key, std::string value, bool default_, std::string description);
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
 	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
+	void create_queue(cppcms::json::value object);
 
 	void get_user(int uid);
 	void get_domain(std::string domain_name, int uid);
@@ -47,6 +48,7 @@ public:
 	void get_database_types();
 	void get_database_user(std::string username, int uid);
 	void get_database(std::string db_name, int uid);
+	void get_queue(int qid);
 	void get_ip();
 
 	bool check_default(any value);
