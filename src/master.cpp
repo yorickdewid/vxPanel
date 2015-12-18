@@ -647,6 +647,7 @@ bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
 {
 	std::cout << "Called get get_identifier" << std::endl;
+	std::cout << first.str() << primary_field << std::endl;
 	if( primary_field.compare(first.str()) == 0){
 		switch(second.type())
 		{
@@ -666,6 +667,13 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 				return (bool)second.boolean();
 				break;
 			}
+			case cppcms::json::json_type::is_undefined:
+			{
+				std::cout << "Undefined type detected, trying to convert to string" << std::endl;
+				std::string val = (std::string)second.str();
+				return val;
+				break;
+			}
 			default:
 			{
 				return -1;
@@ -673,6 +681,7 @@ any master::get_identifier(std::string primary_field, cppcms::string_key first, 
 			}
 		}
 	}
+	std::cout << " Primary field doesnt match " << std::endl;
 	return -1;
 }
 
@@ -701,25 +710,26 @@ bool master::check_default(any value)
 	}
 }
 
-bool master::check_default(std::vector<any> primary_list)
+bool master::check_default(std::map<std::string,any> primary_list)
 {
 	int count_defaults = 0;
 	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
-		switch ((*it).tag) {
+		switch ((*it).second.tag) {
 			case any::CHAR:
-				if( ((std::string)(*it).string).empty() )
+				if( ((std::string)(*it).second.string).empty() )
 				{
 					count_defaults++;
 				}
 				break;
 			case any::INT:
-				if( (*it).integer == -1 )
+				if( (*it).second.integer == -1 )
 				{
 					count_defaults++;
 				}
 				break;
 			default: 
 				count_defaults++;
+				break;
 		}
 	}
 	if(count_defaults == 0 )
@@ -746,30 +756,25 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 	try{
 		std::map<std::string, any> update_list;
 		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-		std::vector<any> primary_list;
+		std::map<std::string, any> primary_list;
+		std::map<std::string, any> primary_list_empty;
 		std::map<std::string, any> primary_info = tmp->get_primary_info();
 
 		for (cppcms::json::object::const_iterator p=ob.begin(); p!=ob.end(); ++p) {
-			int temp = 0;
 			bool primary = false;
-			if( primary_list.size() != primary_info.size() ) {
-				for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
-					std::cout << " Looped primary " << temp++ << " times" << std::endl;
-					std::cout << "Field name " << p->first << " Default " << (*it).second.integer << std::endl;
-					if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) ) {
-						primary_list.push_back(this->get_identifier( (*it).first, p->first, p->second));
-						primary = true;
-						std::cout << "Check_default true" << std::endl;
-					} 
-				}
+			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
+				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) && (it->first.compare(p->first) == 0) ) {
+					primary_list[it->first] = this->get_identifier( (*it).first, p->first.str(), p->second);
+					primary = true;
+				} 
 			}
 			if ( primary ) {
 				continue; // skip primary value
 			}
-			this->convert(ModelFactory::createModel(type, get_database(), primary_list), p->first, p->second, update_list);
+			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, update_list);
 		}
+		dump_map(primary_list);
 		if ( !this->check_default(primary_list) ) {
-			std::cout << "before creating model" << std::endl;
 			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
 			if (model_obj->model::update(update_list)) {
 				return_result("OK");
@@ -787,8 +792,8 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 void master::update_user(cppcms::json::value object)
 {
 	int uid = -1;
-	std::vector<any> primary_list;
-	primary_list.push_back(uid);
+	std::map<std::string,any> primary_list;
+	primary_list["uid"] = uid;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
 }
 
@@ -796,8 +801,8 @@ void master::update_user(cppcms::json::value object)
 void master::update_domain(cppcms::json::value object)
 {
 	std::string domain_name = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(domain_name);
+	std::map<std::string,any> primary_list;
+	primary_list["domain_name"] = domain_name;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
 }
 
@@ -805,8 +810,8 @@ void master::update_domain(cppcms::json::value object)
 void master::update_dns(cppcms::json::value object)
 {
 	int dns_id = -1;
-	std::vector<any> primary_list;
-	primary_list.push_back(dns_id);
+	std::map<std::string,any> primary_list;
+	primary_list["id"] = dns_id;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
 }
 
@@ -814,8 +819,8 @@ void master::update_dns(cppcms::json::value object)
 void master::update_ftp_account(cppcms::json::value object)
 {
 	std::string ftp_account = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(ftp_account);
+	std::map<std::string,any> primary_list;
+	primary_list["name"] = ftp_account;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
 }
 
@@ -823,8 +828,8 @@ void master::update_ftp_account(cppcms::json::value object)
 void master::update_vhost(cppcms::json::value object)
 {
 	int vhost_id = -1;
-	std::vector<any> primary_list;
-	primary_list.push_back(vhost_id);
+	std::map<std::string,any> primary_list;
+	primary_list["id"] = vhost_id;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
 }
 
@@ -832,8 +837,8 @@ void master::update_vhost(cppcms::json::value object)
 void master::update_mailbox(cppcms::json::value object)
 {
 	int mailbox_id = -1;
-	std::vector<any> primary_list;
-	primary_list.push_back(mailbox_id);
+	std::map<std::string,any> primary_list;
+	primary_list["id"] = mailbox_id;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
 }
 
@@ -842,9 +847,9 @@ void master::update_subdomain(cppcms::json::value object)
 {
 	std::string domain_name = "";
 	std::string subdomain_name = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(domain_name);
-	primary_list.push_back(subdomain_name);
+	std::map<std::string,any> primary_list;
+	primary_list["name"] = subdomain_name;
+	primary_list["domain_name"] = domain_name;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
 }
 
@@ -852,8 +857,8 @@ void master::update_subdomain(cppcms::json::value object)
 void master::update_setting(cppcms::json::value object)
 {
 	std::string key = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(key);
+	std::map<std::string,any> primary_list;
+	primary_list["key"] = key;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
 }
 
@@ -861,8 +866,8 @@ void master::update_setting(cppcms::json::value object)
 void master::update_database_user(cppcms::json::value object)
 {
 	std::string username = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(username);
+	std::map<std::string,any> primary_list;
+	primary_list["name"] = username;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
 }
 
@@ -870,8 +875,8 @@ void master::update_database_user(cppcms::json::value object)
 void master::update_database(cppcms::json::value object)
 {
 	std::string name = "";
-	std::vector<any> primary_list;
-	primary_list.push_back(name);
+	std::map<std::string,any> primary_list;
+	primary_list["name"] = name;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
 }
 

@@ -8,7 +8,14 @@ class database : public model {
 public:
 	database(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "user_db";
+		this->primary_info["name"] = "";
+		this->field_list.push_back("name");
+		this->field_list.push_back("created");
+		this->field_list.push_back("uid"); 
+		this->field_list.push_back("db_type");
+	};
 	database(backend& db, std::string name) :
 		model(db),
 		name(name)

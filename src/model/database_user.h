@@ -7,7 +7,15 @@ class database_user : public model {
 public:
 	database_user(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "user_db_user";
+		this->primary_info["name"] = "";
+		this->field_list.push_back("name");
+		this->field_list.push_back("password");
+		this->field_list.push_back("permissions"); 
+		this->field_list.push_back("created");
+		this->field_list.push_back("uid");
+	};
 	database_user(backend& db, std::string name) :
 		model(db),
 		name(name)
