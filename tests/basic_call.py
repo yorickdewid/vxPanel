@@ -189,6 +189,11 @@ def test_rpc_get_database():
 	data = '{"id":0,"method":"get_database","params":["kaas",1000]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
+def test_rpc_get_queue():
+	print bcolors.OKBLUE + "Testcase: Get queue" + bcolors.ENDC
+	data = '{"id":0,"method":"get_queue","params":[1]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 
 ### update ###
 
@@ -344,6 +349,7 @@ test_rpc_get_setting()
 test_rpc_get_database_types()
 test_rpc_get_database_user()
 test_rpc_get_database()
+test_rpc_get_queue()
 
 test_rpc_update_user()
 test_rpc_update_domain()

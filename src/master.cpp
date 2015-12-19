@@ -650,7 +650,15 @@ void master::get_queue(int qid)
 	queue queue(get_database(),qid);
 	queue.load();
 
-	std::vector<std::string> field_list = queue.get_fields();
+	json["queue"]["id"] = queue.qid;
+	json["queue"]["action"] = queue._action;
+	json["queue"]["params"] = queue._params;
+	json["queue"]["created"] = queue.get_created();
+	json["queue"]["started"] = queue._started;
+	json["queue"]["finished"] = queue._finished;
+	json["queue"]["uid"] = queue.get_user().get_uid();
+	json["queue"]["status"] = queue._status;
+	json["queue"]["result"] = queue.get_result();
 
 	return_result(json);
 }
