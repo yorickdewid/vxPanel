@@ -687,8 +687,6 @@ void dump_map(const std::map<std::string,any>& map) {
 				printf("%d\n", it->second.boolean);
 				break;
 		}
-
-
 	}
 }
 
@@ -881,7 +879,7 @@ void master::update_domain(cppcms::json::value object)
 {
 	std::string domain_name = "";
 	std::map<std::string,any> primary_list;
-	primary_list["domain_name"] = domain_name;
+	primary_list["name"] = domain_name;
 	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
 }
 
