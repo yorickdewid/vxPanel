@@ -18,7 +18,8 @@ public:
 		Subdomain,
 		User,
 		UserDbUserDb,
-		Vhost
+		Vhost,
+		Queue
 	};
 
 	static std::unique_ptr<model> createModel(ModelType modeltype, backend& db, std::map<std::string,any> primary) {
@@ -39,6 +40,7 @@ public:
 				case User : return std::make_unique<user>(db, primary["uid"].integer);
 				case UserDbUserDb : return std::make_unique<user_dbuser_db>(db, primary["username"].string, primary["name"].string);
 				case Vhost : return std::make_unique<vhost>(db, primary["id"].integer);
+				case Queue : return std::make_unique<queue>(db, primary["qid"].integer);
 			}
 			throw "invalid model type.";
 		}
@@ -58,6 +60,7 @@ public:
 				case User : return std::make_unique<user>(db);
 				case UserDbUserDb : return std::make_unique<user_dbuser_db>(db);
 				case Vhost : return std::make_unique<vhost>(db);
+				case Queue : return std::make_unique<queue>(db);
 			}
 			throw "invalid model type.";
 		}

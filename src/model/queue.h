@@ -8,11 +8,31 @@ class queue : public model {
 
 public:
 	queue(backend& db) :
-		model(db)
-	{};
+		model(db),
+		_params(""),
+		_started(""),
+		_finished(""),
+		_status("")
+	{
+		this->table_name = "queue";
+		this->primary_info["qid"] = -1; 
+		this->field_list.push_back("qid");
+		this->field_list.push_back("action"); 
+		this->field_list.push_back("params"); 
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("started");
+		this->field_list.push_back("finished");
+		this->field_list.push_back("uid");
+		this->field_list.push_back("status");
+		this->field_list.push_back("result");
+	};
 	queue(backend& db, int qid) :
 		model(db),
-		qid(qid)
+		qid(qid),
+		_params(""),
+		_started(""),
+		_finished(""),
+		_status("")
 	{
 		this->table_name = "queue";
 		this->primary_info["qid"] = qid; 

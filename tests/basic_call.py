@@ -122,6 +122,11 @@ def test_rpc_create_database():
 	data = '{"id":0,"method":"create_database","params":["kaas","mysql","arie",1000]}'
 	result_test(rpc_call(data), None);
 
+def test_rpc_create_queue():
+	print bcolors.OKBLUE + "Testcase: Create queue" + bcolors.ENDC
+	data = '{"id":0,"method":"create_queue","params":[{"required_list":{"action":"USERADD","uid":1000}, "optional_list":{"params":"kaas"}}]}'
+	result_test(rpc_call(data), None);
+
 
 ### get ###
 def test_rpc_get_user():
@@ -325,6 +330,7 @@ test_rpc_create_subdomain()
 test_rpc_create_setting()
 test_rpc_create_db_user()
 test_rpc_create_database()
+test_rpc_create_queue()
 
 test_rpc_get_user()
 test_rpc_get_domain()

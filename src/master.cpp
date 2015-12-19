@@ -350,6 +350,69 @@ void master::create_queue(cppcms::json::value object)
 {
 	//required_fields qid,action,created,uid
 	//optional_fields params,started,finished,status,result
+	/*
+	std::string _action;
+	std::string _params;
+	std::string _started;
+	std::string _finished;
+	std::string _status;
+	*/
+
+	try{
+		bool error = false;
+		cppcms::json::object ob_req;
+		cppcms::json::object ob_opt;
+		try {
+			ob_req = object.get<cppcms::json::object>("required_list");
+			ob_opt = object.get<cppcms::json::object>("optional_list");
+		}	catch(std::exception &e) {
+			throw missing_params_ex();
+		}
+		if ( !error ) {
+			ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
+			std::map<std::string, any> list;
+			std::map<std::string, any> primary_list_empty;
+
+			for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
+				this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+			}
+
+			for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
+				this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+			}
+
+			queue queue(get_database());
+
+			queue._action = list["action"].string;
+			queue.set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+			// optional
+			if ( list.count("params") == 1 ) {
+				queue._params = list.at("params").string;
+			}
+			if ( list.count("started") == 1 ) {
+		    	queue._started = list.at("started").string;
+		    }
+		    if ( list.count("finished") == 1 ) {
+		    	queue._finished = list.at("finished").string;
+			}
+			if ( list.count("status") == 1 ) {
+	    		queue._status = list.at("status").string;
+	    	}
+
+			queue.save();
+
+			std::cout << "After saving called" << std::endl;
+
+			if( queue.model::get_saved() ) {
+				return_result("OK");
+			} else {
+				return_error("Failed to save entity");
+			}
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* get */

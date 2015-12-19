@@ -7,9 +7,56 @@ void queue::save()
 	try{
 		cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO queue (action, uid) "
-			"VALUES (?, ?)" << _action << this->get_user().get_uid();
+		std::ostringstream query;
+		query << "INSERT INTO queue (action, uid ";
+
+		if ( !_params.empty() ) {
+			query << ", params";
+		}
+		if ( !_started.empty() ) {
+			query << ", started";
+		}
+		if ( !_finished.empty() ) {
+			query << ", finished";
+		}
+		if ( !_status.empty() ) {
+			query << ", status";
+		}
+
+		query << ")";
+	    query << " VALUES (?, ?";
+
+	    if ( !_params.empty() ) {
+			query << ", ?";
+		}
+		if ( !_started.empty() ) {
+			query << ", ?";
+		}
+		if ( !_finished.empty() ) {
+			query << ", ?";
+		}
+		if ( !_status.empty() ) {
+			query << ", ?";
+		}
+
+		query << ")";
+
+		stat = db.session() << query.str();
+
+		stat << _action << this->get_user().get_uid();
+
+		if ( !_params.empty() ) {
+			stat << _params;
+		}
+		if ( !_started.empty() ) {
+			stat << _started;
+		}
+		if ( !_finished.empty() ) {
+			stat << _finished;
+		}
+		if ( !_status.empty() ) {
+			stat << _status;
+		}
 
 		stat.exec();
 		stat.reset();

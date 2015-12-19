@@ -19,5 +19,13 @@ class unrecognized_field_ex: public std::exception
   }
 };
 
+class missing_params_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Missing params";
+  }
+};
+
 #endif /* EXCEPTIONS_H */
 
