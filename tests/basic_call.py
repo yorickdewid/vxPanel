@@ -122,6 +122,11 @@ def test_rpc_create_database():
 	data = '{"id":0,"method":"create_database","params":["kaas","mysql","arie",1000]}'
 	result_test(rpc_call(data), None);
 
+def test_rpc_create_queue():
+	print bcolors.OKBLUE + "Testcase: Create queue" + bcolors.ENDC
+	data = '{"id":0,"method":"create_queue","params":[{"required_list":{"action":"USERADD","uid":1000}, "optional_list":{"params":"kaas"}}]}'
+	result_test(rpc_call(data), None);
+
 
 ### get ###
 def test_rpc_get_user():
@@ -205,6 +210,36 @@ def test_rpc_update_dns():
 def test_rpc_update_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Update ftp_account" + bcolors.ENDC
 	data = '{"id":0,"method":"update_ftp_account","params":[{"update_list":{"name":"kaasje","homedir":"/usr/kaasie","count":1}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_vhost():
+	print bcolors.OKBLUE + "Testcase: Update vhost" + bcolors.ENDC
+	data = '{"id":0,"method":"update_vhost","params":[{"update_list":{"id":1,"name":"trol.com","custom_config":"enable_write:true"}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_mailbox():
+	print bcolors.OKBLUE + "Testcase: Update mailbox" + bcolors.ENDC
+	data = '{"id":0,"method":"update_mailbox","params":[{"update_list":{"id":1,"maildir":"/usr/kaasie","messages":10}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_subdomain():
+	print bcolors.OKBLUE + "Testcase: Update subdomain" + bcolors.ENDC
+	data = '{"id":0,"method":"update_subdomain","params":[{"update_list":{"name":"kaas.","domain_name":"trol.com","active":0}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_setting():
+	print bcolors.OKBLUE + "Testcase: Update setting" + bcolors.ENDC
+	data = '{"id":0,"method":"update_setting","params":[{"update_list":{"key":"reboot","value":"off"}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_database_user():
+	print bcolors.OKBLUE + "Testcase: Update database_user" + bcolors.ENDC
+	data = '{"id":0,"method":"update_database_user","params":[{"update_list":{"name":"arie","permissions":"RWXR"}}]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
+def test_rpc_update_database():
+	print bcolors.OKBLUE + "Testcase: Update database" + bcolors.ENDC
+	data = '{"id":0,"method":"update_database","params":[{"update_list":{"name":"kaas","db_type":"postgresql"}}]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
@@ -295,6 +330,7 @@ test_rpc_create_subdomain()
 test_rpc_create_setting()
 test_rpc_create_db_user()
 test_rpc_create_database()
+test_rpc_create_queue()
 
 test_rpc_get_user()
 test_rpc_get_domain()
@@ -313,6 +349,12 @@ test_rpc_update_user()
 test_rpc_update_domain()
 test_rpc_update_dns()
 test_rpc_update_ftp_account()
+test_rpc_update_vhost()
+test_rpc_update_mailbox()
+test_rpc_update_subdomain()
+test_rpc_update_setting()
+test_rpc_update_database_user()
+test_rpc_update_database()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

@@ -6,7 +6,16 @@ class app_settings : public model {
 public:
 	app_settings(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "`settings`";
+		this->primary_info["key"] = "";
+		this->field_list.push_back("key");
+		this->field_list.push_back("value"); 
+		this->field_list.push_back("default"); 
+		this->field_list.push_back("description");
+		this->field_list.push_back("updated");
+		this->field_list.push_back("created");
+	};
 	app_settings(backend& db, std::string key) :
 		model(db),
 		key(key)
@@ -16,7 +25,7 @@ public:
 		this->field_list.push_back("key");
 		this->field_list.push_back("value"); 
 		this->field_list.push_back("default"); 
-		this->field_list.push_back("description"); //linux
+		this->field_list.push_back("description");
 		this->field_list.push_back("updated");
 		this->field_list.push_back("created");
 	};

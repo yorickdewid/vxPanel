@@ -34,6 +34,7 @@ public:
 	void create_setting(std::string key, std::string value, bool default_, std::string description);
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
 	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
+	void create_queue(cppcms::json::value object);
 
 	void get_user(int uid);
 	void get_domain(std::string domain_name, int uid);
@@ -47,10 +48,12 @@ public:
 	void get_database_types();
 	void get_database_user(std::string username, int uid);
 	void get_database(std::string db_name, int uid);
+	void get_queue(int qid);
 	void get_ip();
 
 	bool check_default(any value);
-	bool check_default(std::vector<any> primary_list);
+	bool check_default(std::map<std::string,any> primary_list);
+	bool check_primary_field(std::vector<any> primary_list, std::string field);
 	void update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
 	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);

@@ -8,7 +8,8 @@ class domain: public model {
 
 public:
 	domain(backend& db) :
-		model(db)
+		model(db),
+		_active(false)
 	{
 		this->table_name = "domain";
 		this->primary_info["name"] = "";

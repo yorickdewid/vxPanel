@@ -6,7 +6,15 @@ class vhost : public model {
 public:
 	vhost(backend& db) :
 		model(db)
-	{};
+	{
+		this->table_name = "vhost";
+		this->primary_info["id"] = -1; 
+		this->field_list.push_back("id");
+		this->field_list.push_back("name"); 
+		this->field_list.push_back("custom_config"); 
+		this->field_list.push_back("created"); 
+		this->field_list.push_back("active");
+	};
 	vhost(backend& db, int id) :
 		model(db),
 		id(id)
