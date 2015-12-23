@@ -21,7 +21,7 @@ LDFLAGS += $(foreach library,$(LIBRARIES),-l$(library))
 all: $(NAME) link
 
 $(NAME):
-	cd $(SRCDIR); $(MAKE) $(MFLAGS)
+	$(MAKE) -C $(SRCDIR) $(MFLAGS)
 
 link:
 	$(LINK.cc) $(CXX_OBJS) -o $(BINDIR)/$(NAME)
@@ -34,7 +34,7 @@ test: all
 clean:
 	@- $(RM) $(BINDIR)/$(NAME)
 	@- $(RM) $(LD_CXX_OBJS)
-	cd $(SRCDIR); $(MAKE) clean
+	$(MAKE) -C $(SRCDIR) clean
 
 memcheck: all
 	$(GRIND) $(GRINDFLAGS) $(BINDIR)/$(NAME) -c $(NAMECNF)

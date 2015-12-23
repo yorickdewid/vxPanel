@@ -5,4 +5,4 @@ dist/
 # Files
 *.o
 *.sublime-workspace
-dist*.tar.gz
+*.tar.gz
