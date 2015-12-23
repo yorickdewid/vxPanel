@@ -265,7 +265,7 @@ CREATE TABLE `auth_token` (
   `uid` INT(10) UNSIGNED NOT NULL,
   `refresh` CHAR(40) NOT NULL,
   `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `valid` TIMESTAMP NULL DEFAULT NULL,
+  `valid` TIMESTAMP NOT NULL,
   PRIMARY KEY (`sessionid`, `remote`),
   UNIQUE INDEX `refresh` (`refresh`),
   INDEX `FK_auth_token_user` (`uid`),
