@@ -4,6 +4,7 @@
 #include "exceptions.h"
 #include "backend.h"
 #include "any.h"
+#include "config.h"
 
 #include <iostream>
 #include <sstream>

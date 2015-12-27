@@ -23,6 +23,9 @@ public:
 	void version();
 	void db_version();
 
+	void authenticate(std::string username, std::string password);
+	bool check_authenticated(std::string token);
+
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);
 	void create_dns(std::string name, std::string domain_name);
@@ -35,6 +38,8 @@ public:
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
 	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
 	void create_queue(cppcms::json::value object);
+
+	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 
 	void get_user(int uid);
 	void get_domain(std::string domain_name, int uid);
@@ -88,6 +93,7 @@ protected:
 	std::string format_uptime(std::string sec);
 
 private:
+	bool create_auth_token(int uid);
 	backend *db = NULL;
 	void init_backend();
 

@@ -9,15 +9,15 @@ void auth_token::save()
 	try{
 		cppdb::statement stat;
 
-		if ( _valid.empty() ) {
-			stat = db.session() << 
-				"INSERT INTO auth_token (name, status, uid, refresh, created, valid) "
-				"VALUES (?, ?, ?, ?, ?, ?)" << session_id << _remote << get_user().get_uid() << _refresh << _created << _valid; 
-		} else {
-				stat = db.session() << 
-				"INSERT INTO auth_token (name, status, uid, refresh, created) "
-				"VALUES (?, ?, ?, ?, ?)" << session_id << _remote << get_user().get_uid() << _refresh << _created; 
-		}
+		stat = db.session() << "SELECT sha1(concat(now(), RAND()))";
+		cppdb::result r = stat.query();
+		r.fetch(0, session_id);
+
+		stat.reset();
+
+		stat = db.session() << 
+			"INSERT INTO auth_token (session_id, remote, uid, refresh, valid) "
+			"VALUES (?, inet6_aton(?), ?, sha1(concat(now(), RAND())), now()+" << TOKEN_VALID << ")" << session_id << remote << get_user().get_uid(); 
 
 		stat.exec();
 		stat.reset();
@@ -38,12 +38,12 @@ void auth_token::load()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"SELECT * FROM auth_token WHERE session_id = ? AND remote = ?" << session_id << _remote;
+				"SELECT session_id, INET6_NTOA(remote), uid, refresh, created, valid FROM auth_token WHERE session_id = ? AND remote = inet6_aton(?)" << session_id << remote;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
 			int uid;
-			r >> this->session_id >> this->_remote >> uid >> this->_refresh >> this->_created >> this->_valid;
+			r >> this->session_id >> this->remote >> uid >> this->_refresh >> this->_created >> this->_valid;
 	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
 	    }
 
@@ -66,7 +66,7 @@ bool auth_token::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM auth_token WHERE session_id = ? AND remote = ?" << session_id << _remote;
+				"DELETE FROM auth_token WHERE session_id = ? AND remote = inet6_aton(?)" << session_id << remote;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {

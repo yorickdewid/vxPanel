@@ -26,6 +26,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 #endif
+	bind("authenticate", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
@@ -191,6 +192,50 @@ void master::db_version()
 {
 	return_result(db->version().c_str());
 }
+
+void master::authenticate(std::string username, std::string password)
+{
+	cppdb::statement stat;
+
+	stat = get_database().session() << 
+		"SELECT * FROM user WHERE username = ? AND password = sha1(?)" << username << password;
+	cppdb::result r = stat.query();
+
+	if(r.next())
+	{
+		int uid = -1;
+		r.fetch(0, uid);
+		if(this->create_auth_token(uid)){
+			//return_result();
+		} else {
+			return_error("Failed to create token");
+		}
+	} else {
+		return_error("Incorrect credentials");
+	}
+}
+
+bool master::check_authenticated(std::string token)
+{
+	cppdb::statement stat;
+
+	std::string remote = cppcms::application::request().remote_addr();
+
+	stat = get_database().session() << 
+		"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?)" << token << remote;
+	cppdb::result r = stat.query();
+
+	if(r.next()){
+		return true;
+	} else {
+		return false;
+	}
+	return false;
+}
+
+/*
+	Create
+*/
 
 void master::create_user(std::string username)
 {
@@ -359,7 +404,69 @@ void master::create_queue(cppcms::json::value object)
 	*/
 
 	try{
-		bool error = false;
+		ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
+		std::map<std::string, any> list = this->create_generic(object, type);
+
+		queue queue(get_database());
+
+		queue._action = list["action"].string;
+		queue.set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		// optional
+		if ( list.count("params") == 1 ) {
+			queue._params = list.at("params").string;
+		}
+		if ( list.count("started") == 1 ) {
+	    	queue._started = list.at("started").string;
+	    }
+	    if ( list.count("finished") == 1 ) {
+	    	queue._finished = list.at("finished").string;
+		}
+		if ( list.count("status") == 1 ) {
+    		queue._status = list.at("status").string;
+    	}
+
+		queue.save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( queue.model::get_saved() ) {
+			return_result("OK");
+		} else {
+			return_error("Failed to save entity");
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+bool master::create_auth_token(int uid)
+{
+	try{
+		std::string remote_address = cppcms::application::request().remote_addr();
+
+		auth_token auth_token(get_database());
+
+		auth_token.remote = remote_address;
+		auth_token.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+
+		auth_token.save();
+
+		auth_token.load();
+
+		if( auth_token.model::get_saved() ) {
+			return true;
+		} else {
+			return false;
+		}
+	} catch(std::exception &e) {
+		return false;
+	}
+}
+
+std::map<std::string, any> master::create_generic(cppcms::json::value object, ModelFactory::ModelType type)
+{
+	try{
 		cppcms::json::object ob_req;
 		cppcms::json::object ob_opt;
 		try {
@@ -368,50 +475,20 @@ void master::create_queue(cppcms::json::value object)
 		}	catch(std::exception &e) {
 			throw missing_params_ex();
 		}
-		if ( !error ) {
-			ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
-			std::map<std::string, any> list;
-			std::map<std::string, any> primary_list_empty;
+		std::map<std::string, any> list;
+		std::map<std::string, any> primary_list_empty;
 
-			for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
-				this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-			}
-
-			for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
-				this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-			}
-
-			queue queue(get_database());
-
-			queue._action = list["action"].string;
-			queue.set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
-
-			// optional
-			if ( list.count("params") == 1 ) {
-				queue._params = list.at("params").string;
-			}
-			if ( list.count("started") == 1 ) {
-		    	queue._started = list.at("started").string;
-		    }
-		    if ( list.count("finished") == 1 ) {
-		    	queue._finished = list.at("finished").string;
-			}
-			if ( list.count("status") == 1 ) {
-	    		queue._status = list.at("status").string;
-	    	}
-
-			queue.save();
-
-			std::cout << "After saving called" << std::endl;
-
-			if( queue.model::get_saved() ) {
-				return_result("OK");
-			} else {
-				return_error("Failed to save entity");
-			}
+		for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
+			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
 		}
+
+		for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
+			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+		}
+		return list;
 	} catch(std::exception &e) {
 		return_error(e.what());
+		return std::map<std::string, any>();
 	}
 }
 
@@ -679,6 +756,9 @@ void dump_map(const std::map<std::string,any>& map) {
 		switch (it->second.tag) {
 			case any::CHAR:
 				puts(it->second.string);
+				break;
+			case any::LONG_INT:
+				printf("%ld\n", it->second.long_integer);
 				break;
 			case any::INT:
 				printf("%d\n", it->second.integer);

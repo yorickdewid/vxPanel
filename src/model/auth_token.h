@@ -3,6 +3,7 @@
 
 #include "user.h"
 
+
 class auth_token : public model {
 
 public:
@@ -11,7 +12,7 @@ public:
 	{
 		this->table_name = "auth_token";
 		this->primary_info["session_id"] = "";
-		this->primary_info["remote"] = 0;
+		this->primary_info["remote"] = "";
 		this->field_list.push_back("session_id");
 		this->field_list.push_back("remote"); 
 		this->field_list.push_back("uid"); 
@@ -19,10 +20,10 @@ public:
 		this->field_list.push_back("created");
 		this->field_list.push_back("valid");
 	};
-	auth_token(backend& db, std::string session_id, long int remote) :
+	auth_token(backend& db, std::string session_id, std::string remote) :
 		model(db),
 		session_id(session_id),
-		_remote(remote)
+		remote(remote)
 	{
 		this->table_name = "auth_token";
 		this->primary_info["session_id"] = session_id;
@@ -45,7 +46,7 @@ public:
 	user get_user();
 
 	std::string session_id;
-	long int _remote;
+	std::string remote;
 	std::string _refresh;
 	std::string _created;
     std::string _valid;

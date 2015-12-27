@@ -311,6 +311,11 @@ def test_rpc_delete_database():
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
+def test_rpc_authenticate():
+	print bcolors.OKBLUE + "Testcase: Authenticate" + bcolors.ENDC
+	data = '{"id":0,"method":"authtenticate","params":["kaasie","kaas"]}'
+	result_test(rpc_call(data), None); #TODO json object comparison
+
 config = open_config_file(sys.argv[1])
 os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DATABASE IF EXISTS ' + config['database'] +'"')
 if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme/create.sql') is not 0:
