@@ -28,7 +28,7 @@ void auth_token::save()
 		std::ostringstream query;
 
 		query << "INSERT INTO auth_token (sessionid, remote, uid, refresh, valid) ";
-		query << "VALUES (?, inet6_aton(?), ?, sha1(concat(now(), RAND())), now()+" << TOKEN_VALID << ")";
+		query << "VALUES (?, inet6_aton(?), ?, sha1(concat(now(), RAND())), now()+ INTERVAL " << TOKEN_VALID << " MINUTE )";
 		stat = db.session() << query.str() << session_id << remote << get_user().get_uid(); 
 
 		stat.exec();
