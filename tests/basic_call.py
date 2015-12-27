@@ -313,7 +313,7 @@ def test_rpc_delete_database():
 
 def test_rpc_authenticate():
 	print bcolors.OKBLUE + "Testcase: Authenticate" + bcolors.ENDC
-	data = '{"id":0,"method":"authtenticate","params":["kaasie","kaas"]}'
+	data = '{"id":0,"method":"authenticate","params":["kaasie","kaas"]}'
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 config = open_config_file(sys.argv[1])
@@ -327,7 +327,7 @@ test_rpc_uptime()
 test_rpc_version()
 test_rpc_db_version()
 
-## all 'perfect' scenarios ##
+# ## all 'perfect' scenarios ##
 
 test_rpc_create_user()
 test_rpc_create_domain()
@@ -366,6 +366,8 @@ test_rpc_update_subdomain()
 test_rpc_update_setting()
 test_rpc_update_database_user()
 test_rpc_update_database()
+
+test_rpc_authenticate()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

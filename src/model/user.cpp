@@ -10,15 +10,16 @@ void user::save()
 	try{
 		cppdb::statement stat;
 
+		std::ostringstream query;
 		if ( _note.empty() ) {
-			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) "
-				"VALUES (?, encrypt(?), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
+			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) ";
+		 	query << "VALUES (?, encrypt(?,'"<< SALT <<"'), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
+		 	stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
 		}
 		else{
-			stat = db.session() << 
-				"INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) "
-				"VALUES (?, encrypt(?), ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)" << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
+			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) ";
+			query << "VALUES (?, encrypt(?,'"<< SALT <<"'), ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
+			stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
 		}
 
 		stat.exec();

@@ -93,7 +93,7 @@ protected:
 	std::string format_uptime(std::string sec);
 
 private:
-	bool create_auth_token(int uid);
+	std::string create_auth_token(int uid);
 	backend *db = NULL;
 	void init_backend();
 

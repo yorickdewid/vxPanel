@@ -26,7 +26,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 #endif
-	bind("authenticate", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
+	bind("authenticate", cppcms::rpc::json_method(&master::authenticate, this), method_role);
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
@@ -196,18 +196,34 @@ void master::db_version()
 void master::authenticate(std::string username, std::string password)
 {
 	cppdb::statement stat;
+	std::ostringstream query;
 
-	stat = get_database().session() << 
-		"SELECT * FROM user WHERE username = ? AND password = sha1(?)" << username << password;
+	query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,'"<< SALT << "')";
+	stat = get_database().session() << query.str() << username << password;
 	cppdb::result r = stat.query();
+	bool error;
 
 	if(r.next())
 	{
 		int uid = -1;
 		r.fetch(0, uid);
-		if(this->create_auth_token(uid)){
-			//return_result();
+		std::cout << "UID == " << uid << std::endl;
+		if( uid != -1 ) {
+			std::string auth_token;
+			auth_token = this->create_auth_token(uid);
+			if ( !auth_token.empty() ){
+				cppcms::json::value json;
+				std::cout << "Auth " << auth_token << std::endl;
+				json["auth"]["token"] = auth_token;
+
+				return_result(json);
+			} else {
+				error = true;
+			}
 		} else {
+			error = true;
+		}
+		if( error ) {
 			return_error("Failed to create token");
 		}
 	} else {
@@ -440,7 +456,7 @@ void master::create_queue(cppcms::json::value object)
 	}
 }
 
-bool master::create_auth_token(int uid)
+std::string master::create_auth_token(int uid)
 {
 	try{
 		std::string remote_address = cppcms::application::request().remote_addr();
@@ -452,15 +468,13 @@ bool master::create_auth_token(int uid)
 
 		auth_token.save();
 
-		auth_token.load();
-
 		if( auth_token.model::get_saved() ) {
-			return true;
+			return auth_token.session_id;
 		} else {
-			return false;
+			return "";
 		}
 	} catch(std::exception &e) {
-		return false;
+		return "";
 	}
 }
 

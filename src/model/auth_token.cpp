@@ -9,18 +9,29 @@ void auth_token::save()
 	try{
 		cppdb::statement stat;
 
-		stat = db.session() << "SELECT sha1(concat(now(), RAND()))";
-		cppdb::result r = stat.query();
-		r.fetch(0, session_id);
-
-		stat.reset();
-
-		stat = db.session() << 
-			"INSERT INTO auth_token (session_id, remote, uid, refresh, valid) "
-			"VALUES (?, inet6_aton(?), ?, sha1(concat(now(), RAND())), now()+" << TOKEN_VALID << ")" << session_id << remote << get_user().get_uid(); 
-
+		stat = db.session() << "CREATE TEMPORARY TABLE IF NOT EXISTS `token_gen`(`token` char(40) NOT NULL)";
 		stat.exec();
 		stat.reset();
+
+		stat = db.session() << "INSERT INTO token_gen (`token`) VALUES(sha1(concat(now(), RAND())))";
+		stat.exec();
+		stat.reset();
+
+		stat = db.session() << "SELECT * FROM token_gen";
+		cppdb::result r = stat.query();
+
+		if( r.next() ) {
+			r >> session_id;
+		}
+		stat.reset();
+
+		std::ostringstream query;
+
+		query << "INSERT INTO auth_token (sessionid, remote, uid, refresh, valid) ";
+		query << "VALUES (?, inet6_aton(?), ?, sha1(concat(now(), RAND())), now()+" << TOKEN_VALID << ")";
+		stat = db.session() << query.str() << session_id << remote << get_user().get_uid(); 
+
+		stat.exec();
 
 		this->saved = true;
 
@@ -38,7 +49,7 @@ void auth_token::load()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"SELECT session_id, INET6_NTOA(remote), uid, refresh, created, valid FROM auth_token WHERE session_id = ? AND remote = inet6_aton(?)" << session_id << remote;
+				"SELECT sessionid, INET6_NTOA(remote), uid, refresh, created, valid FROM auth_token WHERE sessionid = ? AND remote = inet6_aton(?)" << session_id << remote;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
@@ -66,7 +77,7 @@ bool auth_token::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM auth_token WHERE session_id = ? AND remote = inet6_aton(?)" << session_id << remote;
+				"DELETE FROM auth_token WHERE sessionid = ? AND remote = inet6_aton(?)" << session_id << remote;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {
