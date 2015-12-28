@@ -26,7 +26,7 @@ public:
 
 	void authenticate(std::string username, std::string password);
 
-	void create_user(std::string username);
+	void create_user(cppcms::json::value object);
 	void create_domain(std::string domain_name, int uid);
 	void create_dns(std::string name, std::string domain_name);
 	void create_ftp_account(std::string ftp_account,std::string password, int uid);
@@ -94,7 +94,7 @@ protected:
 
 private:
 	std::string create_auth_token(int uid);
-	bool check_authenticated(std::string token);
+	bool check_authenticated();
 	backend *db = NULL;
 	void init_backend();
 

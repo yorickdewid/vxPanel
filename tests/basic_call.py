@@ -34,16 +34,18 @@ def rpc_call(data):
 def result_test(result, expected):
 	if not result:
 		return
-	rs = json.loads(result)
-	print rs
-	if rs['error']:
-		print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
-		return
-	if expected:
-		if rs['result'] != expected:
+	try:
+		rs = json.loads(result)
+		if rs['error']:
 			print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 			return
-	print bcolors.OKGREEN + "Testcase: passed" + bcolors.ENDC
+		if expected:
+			if rs['result'] != expected:
+				print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
+				return
+		print bcolors.OKGREEN + "Testcase: passed" + bcolors.ENDC
+	except ValueError:
+		print "Json parsing failed"	
 
 def test_rpc_sum():
 	print bcolors.OKBLUE + "Testcase: Sum two integers" + bcolors.ENDC
@@ -69,7 +71,7 @@ def test_rpc_db_version():
 ### create ###
 def test_rpc_create_user():
 	print bcolors.OKBLUE + "Testcase: Create new user" + bcolors.ENDC
-	data = '{"id":0,"method":"create_user","params":["kaasie"]}'
+	data = '{"id":0,"method":"create_user","params":[{"required_list":{"username":"kaasie"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None)
 
 def test_rpc_create_domain():

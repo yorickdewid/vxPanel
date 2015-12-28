@@ -146,7 +146,7 @@ void master::both(std::string msg)
 void master::header()
 {
 	std::map<std::string,std::string> env = cppcms::application::request().getenv();
-	std::string env2 = cppcms::application::request().getenv("HTTP_X_AUTH");
+	std::string env2 = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN");
 	std::cout << env2 << std::endl;
 
 	for (auto p=env.begin(); p!=env.end(); ++p) {
@@ -226,10 +226,12 @@ void master::authenticate(std::string username, std::string password)
 			std::string token;
 			token = this->create_auth_token(uid);
 			if ( !token.empty() ){
+				cppcms::json::value json;
 				std::string remote_address = cppcms::application::request().remote_addr();
+
 				auth_token auth_token(get_database(),token,remote_address);
 				auth_token.load();
-				cppcms::json::value json;
+
 				json["auth"]["token"] = auth_token.session_id;
 				json["auth"]["refresh_token"] = auth_token._refresh;
 				json["auth"]["valid"] = auth_token._valid;
@@ -249,20 +251,25 @@ void master::authenticate(std::string username, std::string password)
 	}
 }
 
-bool master::check_authenticated(std::string token)
+bool master::check_authenticated()
 {
 	cppdb::statement stat;
 
 	std::string remote = cppcms::application::request().remote_addr();
+	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN");
 
-	stat = get_database().session() << 
-		"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
-	cppdb::result r = stat.query();
-
-	if(r.next()){
-		return true;
+	if(token.size() != 40) {
+		return_error("invalid token supplied");
 	} else {
-		return false;
+		stat = get_database().session() << 
+			"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
+		cppdb::result r = stat.query();
+
+		if(r.next()){
+			return true;
+		} else {
+			return false;
+		}
 	}
 	return false;
 }
@@ -271,19 +278,71 @@ bool master::check_authenticated(std::string token)
 	Create
 */
 
-void master::create_user(std::string username)
+void master::create_user(cppcms::json::value object)
 {
-	user user(get_database());
+	std::map<std::string,any> primary_list;
 
-	user.set_username(username);
-	user.set_password("kaas");
-	user.set_email("info@kaas.nl");
-	// // std::string remote = cppcms::application::request().remote_addr();
-	// // user.set_remote(remote);
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	user.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list);
+		user* tmp = dynamic_cast<user*>(model_obj.get());
+		std::unique_ptr<user> user_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    user_obj.reset(tmp);
+		}
+		
+		user_obj->set_username(list["username"].string);
+		user_obj->set_password(list["password"].string);
+		user_obj->set_email(list["email"].string);
 
-	return_result("OK");
+		// optional
+		if ( list.count("firstname") == 1 ) {
+			user_obj->_firstname = list.at("firstname").string;
+		}
+		if ( list.count("lastname") == 1 ) {
+	    	user_obj->_lastname = list.at("lastname").string;
+	    }
+	    if ( list.count("country") == 1 ) {
+	    	user_obj->_country = list.at("country").string;
+		}
+		if ( list.count("city") == 1 ) {
+    		user_obj->_city = list.at("city").string;
+    	}
+    	if ( list.count("address") == 1 ) {
+    		user_obj->_address = list.at("address").string;
+    	}
+    	if ( list.count("address_number") == 1 ) {
+    		user_obj->_address_number = list.at("address_number").integer;
+    	}
+    	if ( list.count("postal") == 1 ) {
+    		user_obj->_postal = list.at("postal").string;
+    	}
+    	if ( list.count("note") == 1 ) {
+    		user_obj->_note = list.at("note").string;
+    	}
+    	if ( list.count("remote") == 1 ) {
+    		user_obj->_remote = list.at("remote").string;
+    	}
+
+    	user_obj->set_user_type(list["user_type"].string);
+		user_obj->set_active(list["active"].boolean);
+
+		user_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( user_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			return_error("Failed to save entity");
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_domain(std::string domain_name, int uid)

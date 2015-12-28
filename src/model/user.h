@@ -58,17 +58,8 @@ public:
 	/* Setters */
 	void set_uid(int uid);
 	void set_username(std::string username);
-	void set_email(std::string email);
 	void set_password(std::string password);
-	void set_firstname(std::string firstname);
-	void set_lastname(std::string lastname);
-	void set_country(std::string country);
-	void set_city(std::string city);
-	void set_address(std::string address);
-	void set_address_number(int address_number);
-	void set_postal(std::string postal);
-	void set_remote(std::string remote);
-	void set_note(std::string note);
+	void set_email(std::string email);
 	void set_user_type(std::string user_type);
 	void set_active(bool active);
 	void set_lastlogin(std::string lastlogin);
@@ -77,15 +68,6 @@ public:
 	std::string get_username();
 	std::string get_password();
 	std::string get_email();
-	std::string get_firstname();
-	std::string get_lastname();
-	std::string get_country();
-	std::string get_city();
-	std::string get_address();
-	int get_address_number();
-	std::string get_postal();
-	std::string get_note();
-	std::string get_remote();
 	std::string get_user_type();
 	bool get_active();
 	std::string get_created(); /* no altering */
@@ -97,11 +79,6 @@ public:
 		return output;
 	}
 
-private:
-	int uid;
-	std::string username;
-	std::string _password;
-	std::string _email;
 	std::string _firstname;
 	std::string _lastname;
 	std::string _country;
@@ -111,6 +88,12 @@ private:
 	std::string _postal;
 	std::string _note;
 	std::string _remote; // ip_address on save
+
+private:
+	int uid;
+	std::string username;
+	std::string _password;
+	std::string _email;
 	std::string _user_type;
 	bool _active;
 	std::string _created;

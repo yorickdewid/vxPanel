@@ -112,51 +112,6 @@ void user::set_password(std::string password)
 	this->_password = password;
 }
 
-void user::set_firstname(std::string firstname)
-{
-	this->_firstname = firstname;
-}
-
-void user::set_lastname(std::string lastname)
-{
-	this->_lastname = lastname;
-}
-
-void user::set_country(std::string country)
-{
-	this->_country = country;
-}
-
-void user::set_city(std::string city)
-{
-	this->_city = city;
-}
-
-void user::set_address(std::string address)
-{
-	this->_address = address;
-}
-
-void user::set_address_number(int address_number)
-{
-	this->_address_number = address_number;
-}
-
-void user::set_postal(std::string postal)
-{
-	this->_postal = postal;
-}
-
-void user::set_note(std::string note)
-{
-	this->_note = note;
-}
-
-void user::set_remote(std::string remote)
-{
-	this->_remote = remote;
-}
-
 void user::set_user_type(std::string user_type)
 {
 	this->_user_type = user_type;
@@ -190,56 +145,6 @@ std::string user::get_password()
 std::string user::get_email()
 {
 	return this->_email;
-}
-
-std::string user::get_firstname()
-{
-	return this->_firstname;
-}
-
-std::string user::get_lastname()
-{
-	return this->_lastname;
-}
-
-std::string user::get_country()
-{
-	return this->_country;
-}
-
-std::string user::get_city()
-{
-	return this->_city;
-}
-
-std::string user::get_address()
-{
-	return this->_address;
-}
-
-int user::get_address_number()
-{
-	return this->_address_number;
-}
-
-std::string user::get_postal()
-{
-	return this->_postal;
-}
-
-std::string user::get_note()
-{
-	return this->_note;
-}
-
-std::string user::get_user_type()
-{
-	return this->_user_type;
-}
-
-std::string user::get_remote()
-{
-	return this->_remote;
 }
 
 bool user::get_active()
