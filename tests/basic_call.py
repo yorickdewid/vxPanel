@@ -83,7 +83,7 @@ def test_rpc_create_domain():
 
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
-	data = '{"id":0,"method":"create_dns","params":["A www trol.com","trol.com"]}'
+	data = '{"id":0,"method":"create_dns","params":[{"required_list":{"name":"A www trol.com","domain_name":"trol.com"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_ftp_account():
@@ -335,7 +335,7 @@ test_rpc_db_version()
 
 test_rpc_create_user()
 test_rpc_create_domain()
-# test_rpc_create_dns()
+test_rpc_create_dns()
 # test_rpc_create_ftp_account()
 # test_rpc_create_vhost()
 # test_rpc_create_mailbox()

@@ -10,7 +10,7 @@ public:
 	{
 		this->table_name = "dns";
 		this->primary_info["id"] = -1; 
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true;
 		this->field_list["created"] = false;
 		this->field_list["domain_name"] = true;
@@ -22,7 +22,7 @@ public:
 	{
 		this->table_name = "dns";
 		this->primary_info["id"] = id; 
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true;
 		this->field_list["created"] = false;
 		this->field_list["domain_name"] = true;
@@ -44,12 +44,13 @@ public:
 	domain get_domain();
 	bool get_active();
 
+	std::string _name;
+	bool _active;
+
 private:
 	int id;
-	std::string _name;
 	std::string _created;
 	std::shared_ptr<domain> _domain; /* auto_ptr deprecated */
-	bool _active;
 
 };
 

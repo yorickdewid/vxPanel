@@ -402,16 +402,48 @@ void master::create_domain(cppcms::json::value object)
 	}
 }
 
-void master::create_dns(std::string name, std::string domain_name)
+void master::create_dns(cppcms::json::value object)
 {
-	dns dns(get_database(),0);
+	std::map<std::string,any> primary_list;
 
-	dns.set_name(name);
-	dns.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Dns;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	dns.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		dns* tmp = dynamic_cast<dns*>(model_obj.get());
+		std::unique_ptr<dns> dns_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    dns_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!dns_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+		
+		dns_obj->_name = list["name"].string;
+		dns_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+
+		// optional
+    	if ( list.count("active") == 1 ) {
+    		dns_obj->_active = list.at("active").boolean;
+    	}
+
+		dns_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( dns_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_ftp_account(std::string ftp_username, std::string password, int uid)
