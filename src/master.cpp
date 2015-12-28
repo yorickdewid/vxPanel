@@ -26,7 +26,9 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("notify", cppcms::rpc::json_method(&master::notify, this), notification_role);
 	bind("both", cppcms::rpc::json_method(&master::both, this));
 #endif
+	bind("header", cppcms::rpc::json_method(&master::header, this), method_role);
 	bind("authenticate", cppcms::rpc::json_method(&master::authenticate, this), method_role);
+	// bind("logged_in", cppcms::rpc::json_method(&master::check_authenticated, this), method_role);
 	bind("uptime", cppcms::rpc::json_method(&master::system_uptime, this), method_role);
 	bind("version", cppcms::rpc::json_method(&master::version, this), method_role);
 	bind("db_version", cppcms::rpc::json_method(&master::db_version, this), method_role);
@@ -141,6 +143,18 @@ void master::both(std::string msg)
 	}
 }
 
+void master::header()
+{
+	std::map<std::string,std::string> env = cppcms::application::request().getenv();
+	std::string env2 = cppcms::application::request().getenv("HTTP_X_AUTH");
+	std::cout << env2 << std::endl;
+
+	for (auto p=env.begin(); p!=env.end(); ++p) {
+		std::cout << "Key " << p->first << " Value " << p->second << std::endl;
+	}
+	return_result("OK");
+}
+
 std::string master::format_uptime(std::string sec){
 	std::ostringstream os;
 
@@ -209,12 +223,16 @@ void master::authenticate(std::string username, std::string password)
 		r.fetch(0, uid);
 		std::cout << "UID == " << uid << std::endl;
 		if( uid != -1 ) {
-			std::string auth_token;
-			auth_token = this->create_auth_token(uid);
-			if ( !auth_token.empty() ){
+			std::string token;
+			token = this->create_auth_token(uid);
+			if ( !token.empty() ){
+				std::string remote_address = cppcms::application::request().remote_addr();
+				auth_token auth_token(get_database(),token,remote_address);
+				auth_token.load();
 				cppcms::json::value json;
-				std::cout << "Auth " << auth_token << std::endl;
-				json["auth"]["token"] = auth_token;
+				json["auth"]["token"] = auth_token.session_id;
+				json["auth"]["refresh_token"] = auth_token._refresh;
+				json["auth"]["valid"] = auth_token._valid;
 
 				return_result(json);
 			} else {
@@ -238,7 +256,7 @@ bool master::check_authenticated(std::string token)
 	std::string remote = cppcms::application::request().remote_addr();
 
 	stat = get_database().session() << 
-		"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?)" << token << remote;
+		"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
 	cppdb::result r = stat.query();
 
 	if(r.next()){

@@ -19,12 +19,12 @@ public:
 	void div(int x, int y);
 	void notify(std::string msg);
 	void both(std::string msg);
+	void header();
 	void system_uptime();
 	void version();
 	void db_version();
 
 	void authenticate(std::string username, std::string password);
-	bool check_authenticated(std::string token);
 
 	void create_user(std::string username);
 	void create_domain(std::string domain_name, int uid);
@@ -94,6 +94,7 @@ protected:
 
 private:
 	std::string create_auth_token(int uid);
+	bool check_authenticated(std::string token);
 	backend *db = NULL;
 	void init_backend();
 
