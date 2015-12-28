@@ -9,7 +9,7 @@ public:
 	user(backend& db) : model(db), _address_number(-1){ 
 		this->table_name = "user";
 		this->primary_info["uid"] = -1; 
-		this->field_list["uid"] = true;
+		this->field_list["uid"] = false;
 		this->field_list["username"] = true; 
 		this->field_list["password"] = true; 
 		this->field_list["email"] = true; 
@@ -22,7 +22,7 @@ public:
 		this->field_list["postal"] = false;
 		this->field_list["note"] = false;
 		this->field_list["remote"] = false;
-		this->field_list["user_type"] = true;
+		this->field_list["user_type"] = false;
 		this->field_list["active"] = false;
 		this->field_list["created"] = false;
 		this->field_list["last_login"] = false;
@@ -30,7 +30,7 @@ public:
 	user(backend& db, int uid) : model(db), uid(uid), _address_number(-1) { 
 		this->table_name = "user";
 		this->primary_info["uid"] = uid;
-		this->field_list["uid"] = true;
+		this->field_list["uid"] = false;
 		this->field_list["username"] = true; 
 		this->field_list["password"] = true; 
 		this->field_list["email"] = true; 
@@ -43,7 +43,7 @@ public:
 		this->field_list["postal"] = false;
 		this->field_list["note"] = false;
 		this->field_list["remote"] = false;
-		this->field_list["user_type"] = true;
+		this->field_list["user_type"] = false;
 		this->field_list["active"] = false;
 		this->field_list["created"] = false;
 		this->field_list["last_login"] = false;
@@ -88,14 +88,14 @@ public:
 	std::string _postal;
 	std::string _note;
 	std::string _remote; // ip_address on save
+	std::string _user_type;
+	bool _active;
 
 private:
 	int uid;
 	std::string username;
 	std::string _password;
 	std::string _email;
-	std::string _user_type;
-	bool _active;
 	std::string _created;
 	std::string _lastlogin;
 

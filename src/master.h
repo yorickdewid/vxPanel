@@ -27,7 +27,7 @@ public:
 	void authenticate(std::string username, std::string password);
 
 	void create_user(cppcms::json::value object);
-	void create_domain(std::string domain_name, int uid);
+	void create_domain(cppcms::json::value object);
 	void create_dns(std::string name, std::string domain_name);
 	void create_ftp_account(std::string ftp_account,std::string password, int uid);
 	void create_vhost(std::string domain_name, std::string custom_config, int uid);

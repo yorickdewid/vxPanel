@@ -11,7 +11,7 @@ void mailbox::save()
 
 		stat = db.session() << 
 			"INSERT INTO mailbox (email, password, maildir, quota, domain_name) "
-			"VALUES (?, ?, ?, ?, ?)" << _email << this->_password << this->_maildir << this->_quota << _domain->get_domain_name();
+			"VALUES (?, ?, ?, ?, ?)" << _email << this->_password << this->_maildir << this->_quota << _domain->name;
 		stat.exec();
 		stat.reset();
 

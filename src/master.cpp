@@ -283,16 +283,21 @@ void master::create_user(cppcms::json::value object)
 	std::map<std::string,any> primary_list;
 
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
+		ModelFactory::ModelType type = ModelFactory::ModelType::User;
 		std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list);
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
 		user* tmp = dynamic_cast<user*>(model_obj.get());
 		std::unique_ptr<user> user_obj;
 		if(tmp != nullptr)
 		{
 		    model_obj.release();
 		    user_obj.reset(tmp);
+		}
+
+		if(!user_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
 		}
 		
 		user_obj->set_username(list["username"].string);
@@ -327,9 +332,12 @@ void master::create_user(cppcms::json::value object)
     	if ( list.count("remote") == 1 ) {
     		user_obj->_remote = list.at("remote").string;
     	}
-
-    	user_obj->set_user_type(list["user_type"].string);
-		user_obj->set_active(list["active"].boolean);
+    	if ( list.count("user_type") == 1 ) {
+    		user_obj->_user_type = list.at("user_type").string;
+    	}
+    	if ( list.count("active") == 1 ) {
+    		user_obj->_active = list.at("active").boolean;
+    	}
 
 		user_obj->save();
 
@@ -338,24 +346,60 @@ void master::create_user(cppcms::json::value object)
 		if( user_obj->model::get_saved() ) {
 			return_result("OK");
 		} else {
-			return_error("Failed to save entity");
+			throw entity_save_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
 	}
 }
 
-void master::create_domain(std::string domain_name, int uid)
+void master::create_domain(cppcms::json::value object)
 {
-	domain domain(get_database(), domain_name);
+	std::map<std::string,any> primary_list;
 
-	domain.status("inactive");
-	domain.registrar("transip");
-	domain.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Domain;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	domain.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		domain* tmp = dynamic_cast<domain*>(model_obj.get());
+		std::unique_ptr<domain> domain_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    domain_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!domain_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+		
+		domain_obj->name = list["name"].string;
+		domain_obj->_status = list["status"].string;
+		domain_obj->_registrar = list["registrar"].string;
+		domain_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		// optional
+    	if ( list.count("vhost_id") == 1 ) {
+    		domain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
+    	}
+    	if ( list.count("active") == 1 ) {
+    		domain_obj->_active = list.at("active").boolean;
+    	}
+
+		domain_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( domain_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_dns(std::string name, std::string domain_name)
@@ -557,30 +601,25 @@ std::string master::create_auth_token(int uid)
 
 std::map<std::string, any> master::create_generic(cppcms::json::value object, ModelFactory::ModelType type)
 {
-	try{
-		cppcms::json::object ob_req;
-		cppcms::json::object ob_opt;
-		try {
-			ob_req = object.get<cppcms::json::object>("required_list");
-			ob_opt = object.get<cppcms::json::object>("optional_list");
-		}	catch(std::exception &e) {
-			throw missing_params_ex();
-		}
-		std::map<std::string, any> list;
-		std::map<std::string, any> primary_list_empty;
-
-		for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
-			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-		}
-
-		for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
-			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-		}
-		return list;
-	} catch(std::exception &e) {
-		return_error(e.what());
-		return std::map<std::string, any>();
+	cppcms::json::object ob_req;
+	cppcms::json::object ob_opt;
+	try {
+		ob_req = object.get<cppcms::json::object>("required_list");
+		ob_opt = object.get<cppcms::json::object>("optional_list");
+	}	catch(std::exception &e) {
+		throw missing_params_ex();
 	}
+	std::map<std::string, any> list;
+	std::map<std::string, any> primary_list_empty;
+
+	for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
+		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+	}
+
+	for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
+		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+	}
+	return list;
 }
 
 /* get */
@@ -610,9 +649,9 @@ void master::get_domain(std::string domain_name, int uid)
 
 	if (domain.get_user().get_uid() == uid ) {
 
-		json["domain"]["domainname"] = domain.get_domain_name();
-		json["domain"]["status"] = domain.get_status();
-		json["domain"]["registrar"] =  domain.get_registrar();
+		json["domain"]["domainname"] = domain.name;
+		json["domain"]["status"] = domain._status;
+		json["domain"]["registrar"] =  domain._registrar;
 
 		return_result(json);
 	} else {
@@ -684,15 +723,15 @@ void master::get_mailbox(std::string domain_name, int uid)
 	mailbox mailbox(get_database(),0);
 	mailbox.load(domain_name);
 
-	if ( mailbox.get_domain().get_domain_name().compare(domain_name) == 0) {
+	if ( mailbox.get_domain().name.compare(domain_name) == 0) {
 		json["mailbox"]["id"] = mailbox.get_id();
 		json["mailbox"]["email"] = mailbox.get_email();
 		json["mailbox"]["password"] = mailbox.get_password();
 		json["mailbox"]["maildir"] = mailbox.get_maildir();
 		json["mailbox"]["quota"] = mailbox.get_quota();
 		json["mailbox"]["created"] = mailbox.get_created();
-		if ( !mailbox.get_domain().get_domain_name().compare("") ) { /* good enough? */
-			json["mailbox"]["domain"] = mailbox.get_domain().get_domain_name();
+		if ( !mailbox.get_domain().name.compare("") ) { /* good enough? */
+			json["mailbox"]["domain"] = mailbox.get_domain().name;
 		}
 
 		return_result(json);
@@ -730,7 +769,7 @@ void master::get_subdomain(std::string subdomain_name, std::string domain_name, 
 	json["subdomain"]["name"] = subdomain.get_name();	
 	json["subdomain"]["created"] = subdomain.get_created();
 	if ( subdomain.get_domain_ptr() !=  NULL ) { /* good enough? */
-			json["subdomain"]["domain"] = subdomain.get_domain().get_domain_name();
+			json["subdomain"]["domain"] = subdomain.get_domain().name;
 	}
 
 	return_result(json);
@@ -864,6 +903,7 @@ void dump_map(const std::map<std::string,any>& map) {
 bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
 {
 	std::cout << "convert" << std::endl;
+	std::cout << "Field " << first.str() << std::endl;
 	if ( tmp->model::compare_field(first.str()) ) {
 		switch(second.type()) {
 			case cppcms::json::json_type::is_number: 

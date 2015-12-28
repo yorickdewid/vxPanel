@@ -113,22 +113,27 @@ bool model::check_required_fields(std::map<std::string,any> list)
 {
 	int countRequired = 0;
 	int countValuesOfRequired = 0;
+	std::cout << "list size " << list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
 		for(auto fields = this->field_list.begin(); fields != this->field_list.end(); ++fields) {
-	    	for(auto values = list.begin(); values != list.end(); ++values) {
-	    		if(fields->second) 
-	    		{
- 		    		countRequired++;
-	    		}
-		    	if( fields->first.compare(values->first) == 0)
-		    	{
-		    		countValuesOfRequired++;
-		    	}
-			}
+			if(fields->second) 
+	    	{
+	    		std::cout << "Found a required field" << std::endl;
+ 		    	countRequired++;
+ 		    	for(auto values = list.begin(); values != list.end(); ++values) {
+			    	if( fields->first.compare(values->first) == 0)
+			    	{
+			    		std::cout << "Matched required field" << std::endl;
+			    		countValuesOfRequired++;
+			    		break;
+			    	}
+				}
+	    	}
 		}
 	}
 	if(countValuesOfRequired == countRequired)
 	{
+		std::cout << "all required fields are there" << std::endl;
 		return true;
 	}
 	return false;

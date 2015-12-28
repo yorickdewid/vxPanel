@@ -95,16 +95,6 @@ bool domain::m_delete()
 	return false;
 }
 
-void domain::status(std::string status)
-{
-	this->_status = status;
-}
-
-void domain::registrar(std::string registrar)
-{
-	this->_registrar = registrar;
-}
-
 void domain::set_user(std::shared_ptr<user> user)
 {
 	this->_user.swap(user);
@@ -113,26 +103,6 @@ void domain::set_user(std::shared_ptr<user> user)
 void domain::set_vhost(std::shared_ptr<vhost> vhost)
 {
 	this->_vhost.swap(vhost);
-}
-
-void domain::set_active(bool active)
-{
-	this->_active = active;
-}
-
-std::string domain::get_domain_name()
-{
-	return this->name;
-}
-
-std::string domain::get_status()
-{
-	return this->_status;
-}
-
-std::string domain::get_registrar()
-{
-	return this->_registrar;
 }
 
 std::string domain::get_created()
@@ -148,10 +118,5 @@ user domain::get_user()
 vhost domain::get_vhost()
 {
 	return *this->_vhost;
-}
-
-bool domain::get_active()
-{
-	return this->_active;
 }
 

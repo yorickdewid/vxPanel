@@ -13,11 +13,11 @@ void subdomain::save()
 		if ( _vhost ) {
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name, vhost_id) "
-				"VALUES (?, ?, ?)" << name << _domain->get_domain_name() << _vhost->get_id();
+				"VALUES (?, ?, ?)" << name << _domain->name << _vhost->get_id();
 		} else {
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name) "
-				"VALUES (?, ?)" << name << _domain->get_domain_name();
+				"VALUES (?, ?)" << name << _domain->name;
 		}
 
 		stat.exec();
@@ -77,7 +77,7 @@ bool subdomain::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM subdomain WHERE name = ? and domain_name = ?" << name << _domain->get_domain_name();
+				"DELETE FROM subdomain WHERE name = ? and domain_name = ?" << name << _domain->name;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {

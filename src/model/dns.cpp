@@ -11,7 +11,7 @@ void dns::save()
 
 		stat = db.session() << 
 			"INSERT INTO dns (name, domain_name) "
-			"VALUES (?, ?)" << _name << _domain->get_domain_name();
+			"VALUES (?, ?)" << _name << _domain->name;
 
 		stat.exec();
 		stat.reset();
@@ -103,7 +103,7 @@ bool dns::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM dns WHERE domain_name = ?" << _domain->get_domain_name();
+				"DELETE FROM dns WHERE domain_name = ?" << _domain->name;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {

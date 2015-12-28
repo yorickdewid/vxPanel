@@ -27,11 +27,19 @@ class missing_params_ex: public std::exception
   }
 };
 
+class entity_save_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Entity not saved";
+  }
+};
+
 class missing_required_field_ex: public std::exception
 {
   virtual const char* what() const throw()
   {
-    return "Missing required field";
+    return "Missing required fields";
   }
 };
 

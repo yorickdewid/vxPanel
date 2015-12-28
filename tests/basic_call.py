@@ -35,7 +35,9 @@ def result_test(result, expected):
 	if not result:
 		return
 	try:
+		print result
 		rs = json.loads(result)
+		print rs;
 		if rs['error']:
 			print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 			return
@@ -71,12 +73,12 @@ def test_rpc_db_version():
 ### create ###
 def test_rpc_create_user():
 	print bcolors.OKBLUE + "Testcase: Create new user" + bcolors.ENDC
-	data = '{"id":0,"method":"create_user","params":[{"required_list":{"username":"kaasie"}, "optional_list":{}}]}'
+	data = '{"id":0,"method":"create_user","params":[{"required_list":{"username":"kaasie","email":"kaas@trol.com","password":"ABC@123"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None)
 
 def test_rpc_create_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
-	data = '{"id":0,"method":"create_domain","params":["trol.com",1000]}'
+	data = '{"id":0,"method":"create_domain","params":[{"required_list":{"name":"trol.com","uid":1001,"status":"waiting","registrar":"transip"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None)
 
 def test_rpc_create_dns():
@@ -333,43 +335,43 @@ test_rpc_db_version()
 
 test_rpc_create_user()
 test_rpc_create_domain()
-test_rpc_create_dns()
-test_rpc_create_ftp_account()
-test_rpc_create_vhost()
-test_rpc_create_mailbox()
-test_rpc_create_shell()
-test_rpc_create_subdomain()
-test_rpc_create_setting()
-test_rpc_create_db_user()
-test_rpc_create_database()
-test_rpc_create_queue()
+# test_rpc_create_dns()
+# test_rpc_create_ftp_account()
+# test_rpc_create_vhost()
+# test_rpc_create_mailbox()
+# test_rpc_create_shell()
+# test_rpc_create_subdomain()
+# test_rpc_create_setting()
+# test_rpc_create_db_user()
+# test_rpc_create_database()
+# test_rpc_create_queue()
 
-test_rpc_get_user()
-test_rpc_get_domain()
-test_rpc_get_dns()
-test_rpc_get_ftp_account()
-test_rpc_get_vhost()
-test_rpc_get_mailbox()
-test_rpc_get_shell()
-test_rpc_get_subdomain()
-test_rpc_get_setting()
-test_rpc_get_database_types()
-test_rpc_get_database_user()
-test_rpc_get_database()
-test_rpc_get_queue()
+# test_rpc_get_user()
+# test_rpc_get_domain()
+# test_rpc_get_dns()
+# test_rpc_get_ftp_account()
+# test_rpc_get_vhost()
+# test_rpc_get_mailbox()
+# test_rpc_get_shell()
+# test_rpc_get_subdomain()
+# test_rpc_get_setting()
+# test_rpc_get_database_types()
+# test_rpc_get_database_user()
+# test_rpc_get_database()
+# test_rpc_get_queue()
 
-test_rpc_update_user()
-test_rpc_update_domain()
-test_rpc_update_dns()
-test_rpc_update_ftp_account()
-test_rpc_update_vhost()
-test_rpc_update_mailbox()
-test_rpc_update_subdomain()
-test_rpc_update_setting()
-test_rpc_update_database_user()
-test_rpc_update_database()
+# test_rpc_update_user()
+# test_rpc_update_domain()
+# test_rpc_update_dns()
+# test_rpc_update_ftp_account()
+# test_rpc_update_vhost()
+# test_rpc_update_mailbox()
+# test_rpc_update_subdomain()
+# test_rpc_update_setting()
+# test_rpc_update_database_user()
+# test_rpc_update_database()
 
-test_rpc_authenticate()
+# test_rpc_authenticate()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()
