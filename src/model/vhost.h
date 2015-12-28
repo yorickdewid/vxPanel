@@ -21,11 +21,11 @@ public:
 	{
 		this->table_name = "vhost";
 		this->primary_info["id"] = id; 
-		this->field_list.push_back("id");
-		this->field_list.push_back("name"); 
-		this->field_list.push_back("custom_config"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("active");
+		this->field_list["id"] = true;
+		this->field_list["name"] = true; 
+		this->field_list["custom_config"] = true; 
+		this->field_list["created"] = false; 
+		this->field_list["active"] = false;
 	};
 	
 	void save();

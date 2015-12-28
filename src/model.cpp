@@ -81,7 +81,7 @@ bool model::compare_field(std::string field)
 	std::cout << "Size " << this->field_list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
 		for(auto it = this->field_list.begin(); it != this->field_list.end(); ++it) {
-	    	if((*it).compare(field) == 0)
+	    	if( it->first.compare(field) == 0)
 	    	{
 	    		return true;
 	    	}

@@ -32,7 +32,7 @@ public:
 	bool is_empty(std::string var);
 	bool get_saved(){ return this->saved; };
 	std::map<std::string,any> get_primary_info(){ return this->primary_info; };
-	std::vector<std::string> get_fields() { return this->field_list; };
+	std::map<std::string,bool> get_fields() { return this->field_list; };
 
 protected:
 	backend& db;
