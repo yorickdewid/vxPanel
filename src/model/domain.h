@@ -13,13 +13,13 @@ public:
 	{
 		this->table_name = "domain";
 		this->primary_info["name"] = "";
-		this->field_list.push_back("name");
-		this->field_list.push_back("status"); 
-		this->field_list.push_back("registrar"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("vhost_id");
-		this->field_list.push_back("active");
+		this->field_list["name"] = true;
+		this->field_list["status"] = true; 
+		this->field_list["registrar"] = true; 
+		this->field_list["created"] = false; 
+		this->field_list["uid"] = true; 
+		this->field_list["vhost_id"] = false;
+		this->field_list["active"] = false;
 	};
 	domain(backend& db, std::string domain_name) :
 		model(db),
@@ -28,13 +28,13 @@ public:
 	{
 		this->table_name = "domain";
 		this->primary_info["name"] = domain_name;
-		this->field_list.push_back("name");
-		this->field_list.push_back("status"); 
-		this->field_list.push_back("registrar"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("vhost_id");
-		this->field_list.push_back("active");
+		this->field_list["name"] = true;
+		this->field_list["status"] = true; 
+		this->field_list["registrar"] = true; 
+		this->field_list["created"] = false; 
+		this->field_list["uid"] = true; 
+		this->field_list["vhost_id"] = false;
+		this->field_list["active"] = false;
 		this->load();
 	};
 	

@@ -13,12 +13,12 @@ public:
 		this->table_name = "auth_token";
 		this->primary_info["session_id"] = "";
 		this->primary_info["remote"] = "";
-		this->field_list.push_back("session_id");
-		this->field_list.push_back("remote"); 
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("refresh");
-		this->field_list.push_back("created");
-		this->field_list.push_back("valid");
+		this->field_list["session_id"] = true;
+		this->field_list["remote"] = true; 
+		this->field_list["uid"] = true; 
+		this->field_list["refresh"] = true;
+		this->field_list["created"] = false;
+		this->field_list["valid"] = true;
 	};
 	auth_token(backend& db, std::string session_id, std::string remote) :
 		model(db),
@@ -28,12 +28,12 @@ public:
 		this->table_name = "auth_token";
 		this->primary_info["session_id"] = session_id;
 		this->primary_info["remote"] = remote;
-		this->field_list.push_back("session_id");
-		this->field_list.push_back("remote"); 
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("refresh");
-		this->field_list.push_back("created");
-		this->field_list.push_back("valid");
+		this->field_list["session_id"] = true;
+		this->field_list["remote"] = true; 
+		this->field_list["uid"] = true; 
+		this->field_list["refresh"] = true;
+		this->field_list["created"] = false;
+		this->field_list["valid"] = true;
 	};
 	
 	void save();

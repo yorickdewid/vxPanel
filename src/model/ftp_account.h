@@ -11,18 +11,18 @@ public:
 	{
 		this->table_name = "ftpuser";
 		this->primary_info["name"] = "";
-		this->field_list.push_back("id");
-		this->field_list.push_back("name"); 
-		this->field_list.push_back("password"); 
-		this->field_list.push_back("uid"); //linux
-		this->field_list.push_back("gid");
-		this->field_list.push_back("homedir");
-		this->field_list.push_back("shell");
-		this->field_list.push_back("count");
-		this->field_list.push_back("userid");
-		this->field_list.push_back("created");
-		this->field_list.push_back("accessed");
-		this->field_list.push_back("modified");
+		this->field_list["id"] = true;
+		this->field_list["name"] = true; 
+		this->field_list["password"] = true; 
+		this->field_list["uid"] = true; //linux
+		this->field_list["gid"] = true;
+		this->field_list["homedir"] = true;
+		this->field_list["shell"] = true;
+		this->field_list["count"] = true;
+		this->field_list["userid"] = true;
+		this->field_list["created"] = false;
+		this->field_list["accessed"] = true;
+		this->field_list["modified"] = true;
 	};
 	ftp_account(backend& db, std::string username) :
 		model(db),
@@ -31,18 +31,18 @@ public:
 	{
 		this->table_name = "ftpuser";
 		this->primary_info["name"] = username;
-		this->field_list.push_back("id");
-		this->field_list.push_back("name"); 
-		this->field_list.push_back("password"); 
-		this->field_list.push_back("uid"); //linux
-		this->field_list.push_back("gid");
-		this->field_list.push_back("homedir");
-		this->field_list.push_back("shell");
-		this->field_list.push_back("count");
-		this->field_list.push_back("userid");
-		this->field_list.push_back("created");
-		this->field_list.push_back("accessed");
-		this->field_list.push_back("modified");
+		this->field_list["id"] = true;
+		this->field_list["name"] = true; 
+		this->field_list["password"] = true; 
+		this->field_list["uid"] = true; //linux
+		this->field_list["gid"] = true;
+		this->field_list["homedir"] = true;
+		this->field_list["shell"] = true;
+		this->field_list["count"] = true;
+		this->field_list["userid"] = true;
+		this->field_list["created"] = false;
+		this->field_list["accessed"] = true;
+		this->field_list["modified"] = true;
 	};
 	
 	void save();

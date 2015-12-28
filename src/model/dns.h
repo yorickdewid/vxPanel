@@ -10,11 +10,11 @@ public:
 	{
 		this->table_name = "dns";
 		this->primary_info["id"] = -1; 
-		this->field_list.push_back("id");
-		this->field_list.push_back("name"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("domain_name"); 
-		this->field_list.push_back("active");
+		this->field_list["id"] = true;
+		this->field_list["name"] = true;
+		this->field_list["created"] = false;
+		this->field_list["domain_name"] = true;
+		this->field_list["active"] = false;
 	};
 	dns(backend& db, int id) :
 		model(db),
@@ -22,11 +22,11 @@ public:
 	{
 		this->table_name = "dns";
 		this->primary_info["id"] = id; 
-		this->field_list.push_back("id");
-		this->field_list.push_back("name"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("domain_name"); 
-		this->field_list.push_back("active");
+		this->field_list["id"] = true;
+		this->field_list["name"] = true;
+		this->field_list["created"] = false;
+		this->field_list["domain_name"] = true;
+		this->field_list["active"] = false;
 	};
 	
 	void save();

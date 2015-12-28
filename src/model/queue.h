@@ -16,15 +16,15 @@ public:
 	{
 		this->table_name = "queue";
 		this->primary_info["qid"] = -1; 
-		this->field_list.push_back("qid");
-		this->field_list.push_back("action"); 
-		this->field_list.push_back("params"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("started");
-		this->field_list.push_back("finished");
-		this->field_list.push_back("uid");
-		this->field_list.push_back("status");
-		this->field_list.push_back("result");
+		this->field_list["qid"] = true;
+		this->field_list["action"] = true; 
+		this->field_list["params"] = false; 
+		this->field_list["created"] = false; 
+		this->field_list["started"] = false;
+		this->field_list["finished"] = false;
+		this->field_list["uid"] = true;
+		this->field_list["status"] = false;
+		this->field_list["result"] = false;
 	};
 	queue(backend& db, int qid) :
 		model(db),
@@ -36,15 +36,15 @@ public:
 	{
 		this->table_name = "queue";
 		this->primary_info["qid"] = qid; 
-		this->field_list.push_back("qid");
-		this->field_list.push_back("action"); 
-		this->field_list.push_back("params"); 
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("started");
-		this->field_list.push_back("finished");
-		this->field_list.push_back("uid");
-		this->field_list.push_back("status");
-		this->field_list.push_back("result");
+		this->field_list["qid"] = true;
+		this->field_list["action"] = true; 
+		this->field_list["params"] = false; 
+		this->field_list["created"] = false; 
+		this->field_list["started"] = false;
+		this->field_list["finished"] = false;
+		this->field_list["uid"] = true;
+		this->field_list["status"] = false;
+		this->field_list["result"] = false;
 	};
 	
 	void save();

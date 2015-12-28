@@ -37,7 +37,7 @@ public:
 protected:
 	backend& db;
 	bool saved;
-	std::vector<std::string> field_list;
+	std::map<std::string,bool> field_list; // field name, required (true/false)
 	std::string table_name;
     std::map<std::string,any> primary_info;
 

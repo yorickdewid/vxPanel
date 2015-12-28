@@ -10,11 +10,11 @@ public:
 	{
 		this->table_name = "user_db_user";
 		this->primary_info["name"] = "";
-		this->field_list.push_back("name");
-		this->field_list.push_back("password");
-		this->field_list.push_back("permissions"); 
-		this->field_list.push_back("created");
-		this->field_list.push_back("uid");
+		this->field_list["name"] = true;
+		this->field_list["password"] = true;
+		this->field_list["permissions"] = true; 
+		this->field_list["created"] = false;
+		this->field_list["uid"] = true;
 	};
 	database_user(backend& db, std::string name) :
 		model(db),
@@ -22,11 +22,11 @@ public:
 	{
 		this->table_name = "user_db_user";
 		this->primary_info["name"] = name;
-		this->field_list.push_back("name");
-		this->field_list.push_back("password");
-		this->field_list.push_back("permissions"); 
-		this->field_list.push_back("created");
-		this->field_list.push_back("uid");
+		this->field_list["name"] = true;
+		this->field_list["password"] = true;
+		this->field_list["permissions"] = true; 
+		this->field_list["created"] = false;
+		this->field_list["uid"] = true;
 	};
 	
 	void save();

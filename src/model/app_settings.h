@@ -9,12 +9,12 @@ public:
 	{
 		this->table_name = "`settings`";
 		this->primary_info["key"] = "";
-		this->field_list.push_back("key");
-		this->field_list.push_back("value"); 
-		this->field_list.push_back("default"); 
-		this->field_list.push_back("description");
-		this->field_list.push_back("updated");
-		this->field_list.push_back("created");
+		this->field_list["key"] = true;
+		this->field_list["value"] = true; 
+		this->field_list["default"] = true; 
+		this->field_list["description"] = true;
+		this->field_list["updated"] = false;
+		this->field_list["created"] = false;
 	};
 	app_settings(backend& db, std::string key) :
 		model(db),
@@ -22,12 +22,12 @@ public:
 	{
 		this->table_name = "`settings`";
 		this->primary_info["key"] = key;
-		this->field_list.push_back("key");
-		this->field_list.push_back("value"); 
-		this->field_list.push_back("default"); 
-		this->field_list.push_back("description");
-		this->field_list.push_back("updated");
-		this->field_list.push_back("created");
+		this->field_list["key"] = true;
+		this->field_list["value"] = true; 
+		this->field_list["default"] = true; 
+		this->field_list["description"] = true;
+		this->field_list["updated"] = false;
+		this->field_list["created"] = false;
 	};
 	
 	void save();

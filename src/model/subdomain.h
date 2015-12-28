@@ -13,11 +13,11 @@ public:
 		this->table_name = "subdomain";
 		this->primary_info["name"] = "";
 		this->primary_info["domain_name"] = "";
-		this->field_list.push_back("name");
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("domain_name"); 
-		this->field_list.push_back("vhost_id");
-		this->field_list.push_back("active");
+		this->field_list["name"] = true;
+		this->field_list["created"] = false; 
+		this->field_list["domain_name"] = true; 
+		this->field_list["vhost_id"] = false;
+		this->field_list["active"] = false;
 	};
 	subdomain(backend& db, std::string name, std::string domain_name) :
 		model(db),
@@ -27,11 +27,11 @@ public:
 		this->table_name = "subdomain";
 		this->primary_info["name"] = name;
 		this->primary_info["domain_name"] = domain_name;
-		this->field_list.push_back("name");
-		this->field_list.push_back("created"); 
-		this->field_list.push_back("domain_name"); 
-		this->field_list.push_back("vhost_id");
-		this->field_list.push_back("active");
+		this->field_list["name"] = true;
+		this->field_list["created"] = false; 
+		this->field_list["domain_name"] = true; 
+		this->field_list["vhost_id"] = false;
+		this->field_list["active"] = false;
 	};
 	
 	void save();

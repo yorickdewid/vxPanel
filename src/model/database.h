@@ -11,10 +11,10 @@ public:
 	{
 		this->table_name = "user_db";
 		this->primary_info["name"] = "";
-		this->field_list.push_back("name");
-		this->field_list.push_back("created");
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("db_type");
+		this->field_list["name"] = true;
+		this->field_list["created"] = false;
+		this->field_list["uid"] = true; 
+		this->field_list["db_type"] = true;
 	};
 	database(backend& db, std::string name) :
 		model(db),
@@ -22,10 +22,10 @@ public:
 	{
 		this->table_name = "user_db";
 		this->primary_info["name"] = name;
-		this->field_list.push_back("name");
-		this->field_list.push_back("created");
-		this->field_list.push_back("uid"); 
-		this->field_list.push_back("db_type");
+		this->field_list["name"] = true;
+		this->field_list["created"] = false;
+		this->field_list["uid"] = true; 
+		this->field_list["db_type"] = true;
 	};
 	
 	void save();
