@@ -27,5 +27,29 @@ class missing_params_ex: public std::exception
   }
 };
 
+class missing_required_field_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Missing required field";
+  }
+};
+
+class invalid_value_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Received unexpected value";
+  }
+};
+
+class auth_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Invalid authorization";
+  }
+};
+
 #endif /* EXCEPTIONS_H */
 
