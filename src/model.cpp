@@ -109,6 +109,31 @@ bool model::compare_primary_field(std::string field)
 	return false;
 }
 
+bool model::check_required_fields(std::map<std::string,any> list)
+{
+	int countRequired = 0;
+	int countValuesOfRequired = 0;
+	if ( this->field_list.size() > 1 ) {
+		for(auto fields = this->field_list.begin(); fields != this->field_list.end(); ++fields) {
+	    	for(auto values = list.begin(); values != list.end(); ++values) {
+	    		if(fields->second) 
+	    		{
+ 		    		countRequired++;
+	    		}
+		    	if( fields->first.compare(values->first) == 0)
+		    	{
+		    		countValuesOfRequired++;
+		    	}
+			}
+		}
+	}
+	if(countValuesOfRequired == countRequired)
+	{
+		return true;
+	}
+	return false;
+}
+
 bool model::is_empty(std::string var)
 {
 	if ( !var.empty() ) {

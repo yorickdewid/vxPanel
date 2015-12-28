@@ -26,6 +26,7 @@ public:
 
 	bool compare_field(std::string field);
 	bool compare_primary_field(std::string field);
+	bool check_required_fields(std::map<std::string,any> list);
 
 	virtual bool m_delete() = 0;
 
