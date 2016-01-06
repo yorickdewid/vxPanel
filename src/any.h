@@ -4,11 +4,12 @@
 #include <string.h>
 
 struct any {
-    enum {CHAR, INT, LONG_INT, BOOL} tag;
+    enum {CHAR, INT, LONG_INT, LL_INT, BOOL} tag;
     union {
         char *string = NULL;
         int integer;
         long int long_integer;
+        long long int ll_integer;
         bool boolean;
     };
     any(){}
@@ -20,6 +21,7 @@ struct any {
     }
     any(int i) : integer(i), tag(INT) {}
     any(long int i) : long_integer(i), tag(LONG_INT) {}
+    any(long long int i) : ll_integer(i), tag(LL_INT) {}
     any(bool b) : boolean(b), tag(BOOL) {}
 };
 

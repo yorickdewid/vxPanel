@@ -9,7 +9,7 @@ public:
 	{
 		this->table_name = "vhost";
 		this->primary_info["id"] = -1; 
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true; 
 		this->field_list["custom_config"] = true; 
 		this->field_list["created"] = false; 
@@ -21,7 +21,7 @@ public:
 	{
 		this->table_name = "vhost";
 		this->primary_info["id"] = id; 
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true; 
 		this->field_list["custom_config"] = true; 
 		this->field_list["created"] = false; 
@@ -43,12 +43,13 @@ public:
 	std::string get_created();
 	bool get_active();
 
-private:
-	int id;
 	std::string _name;
 	std::string _custom_config;
-	std::string _created; 
 	bool _active;
+
+private:
+	int id;
+	std::string _created; 
 	
 };
 

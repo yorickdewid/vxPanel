@@ -499,34 +499,121 @@ void master::create_ftp_account(cppcms::json::value object)
 	}
 }
 
-void master::create_vhost(std::string name, std::string custom_config, int uid)
+void master::create_vhost(cppcms::json::value object)
 {
-	vhost vhost(get_database(),0);
+	std::map<std::string,any> primary_list;
 
-	vhost.set_name(name); /* either domain or subdomain */
-	vhost.set_custom_config(custom_config);
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Vhost;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	vhost.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		vhost* tmp = dynamic_cast<vhost*>(model_obj.get());
+		std::unique_ptr<vhost> vhost_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    vhost_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!vhost_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		vhost_obj->_name = list["name"].string; // validate?
+		vhost_obj->_custom_config = list["custom_config"].string;
+
+		// optional
+    	if ( list.count("active") == 1 ) {
+    		vhost_obj->_active = list["active"].integer;
+    	}
+
+		vhost_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( vhost_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		std::cout << "Exceotuib" << std::endl;
+		return_error(e.what());
+	}
 }
 
-void master::create_mailbox(std::vector<std::string> required_fields, std::string domain_name, int uid)
+void master::create_mailbox(cppcms::json::value object)
 {
-	mailbox mailbox(get_database(),0);
+	// mailbox mailbox(get_database(),0);
 
-	mailbox.set_email(required_fields[0]);
-	mailbox.set_password(required_fields[1]);
-	mailbox.set_maildir(required_fields[2]);
-	std::string tmp = required_fields[3];
-	char tmp_char[tmp.length()];
-	tmp.copy(tmp_char,tmp.length(),0);
-	mailbox.set_quota(atoll(tmp_char));
-	mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
+	// mailbox.set_email(required_fields[0]);
+	// mailbox.set_password(required_fields[1]);
+	// mailbox.set_maildir(required_fields[2]);
+	// std::string tmp = required_fields[3];
+	// char tmp_char[tmp.length()];
+	// tmp.copy(tmp_char,tmp.length(),0);
+	// mailbox.set_quota(atoll(tmp_char));
+	// mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
 
-	mailbox.save();
+	// mailbox.save();
 
-	return_result("OK");
+	// return_result("OK");
+
+
+	std::map<std::string,any> primary_list;
+
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Mailbox;
+		std::map<std::string, any> list = this->create_generic(object, type);
+
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		mailbox* tmp = dynamic_cast<mailbox*>(model_obj.get());
+		std::unique_ptr<mailbox> mailbox_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    mailbox_obj.reset(tmp);
+		}
+
+		if(!mailbox_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		mailbox_obj->_email = list["email"].string; // validate?
+		mailbox_obj->_password = list["password"].string;
+		mailbox_obj->_maildir = list["maildir"].string;
+		mailbox_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+
+		// optional
+    	if ( list.count("quota") == 1 ) {
+    		mailbox_obj->_quota = list["quota"].ll_integer;
+    	}
+    	if ( list.count("bytes") == 1 ) {
+    		mailbox_obj->_bytes = list["bytes"].ll_integer;
+    	}
+    	if ( list.count("messages") == 1 ) {
+    		mailbox_obj->_messages = list["messages"].string;
+    	}
+    	if ( list.count("active") == 1 ) {
+    		mailbox_obj->_active = list["active"].integer;
+    	}
+
+		mailbox_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( mailbox_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		std::cout << "Exceotuib" << std::endl;
+		return_error(e.what());
+	}
 }
 
 void master::create_shell(int uid)
@@ -960,6 +1047,9 @@ void dump_map(const std::map<std::string,any>& map) {
 				break;
 			case any::LONG_INT:
 				printf("%ld\n", it->second.long_integer);
+				break;
+			case any::LL_INT:
+				printf("%lld\n", it->second.ll_integer);
 				break;
 			case any::INT:
 				printf("%d\n", it->second.integer);

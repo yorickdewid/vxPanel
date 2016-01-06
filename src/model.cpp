@@ -12,6 +12,9 @@ void model::add_to_statement(cppdb::statement& stat, any value)
 		case any::LONG_INT:
 			stat << value.long_integer;
 			break;
+		case any::LL_INT:
+			stat << value.ll_integer;
+			break;
 		case any::BOOL:
 			stat << value.boolean;
 			break;
