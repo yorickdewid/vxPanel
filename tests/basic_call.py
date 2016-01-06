@@ -88,7 +88,7 @@ def test_rpc_create_dns():
 
 def test_rpc_create_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Create ftp account" + bcolors.ENDC
-	data = '{"id":0,"method":"create_ftp_account","params":["kaasje","hehjajejkhe",1000]}'
+	data = '{"id":0,"method":"create_ftp_account","params":[{"required_list":{"name":"kaasje","password":"hehjajejkhe","userid":1001,"homedir":"/kaasie"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_vhost():
@@ -336,7 +336,7 @@ test_rpc_db_version()
 test_rpc_create_user()
 test_rpc_create_domain()
 test_rpc_create_dns()
-# test_rpc_create_ftp_account()
+test_rpc_create_ftp_account()
 # test_rpc_create_vhost()
 # test_rpc_create_mailbox()
 # test_rpc_create_shell()

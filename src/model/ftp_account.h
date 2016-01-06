@@ -11,18 +11,18 @@ public:
 	{
 		this->table_name = "ftpuser";
 		this->primary_info["name"] = "";
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true; 
 		this->field_list["password"] = true; 
-		this->field_list["uid"] = true; //linux
-		this->field_list["gid"] = true;
+		this->field_list["uid"] = false; //linux
+		this->field_list["gid"] = false;
 		this->field_list["homedir"] = true;
-		this->field_list["shell"] = true;
-		this->field_list["count"] = true;
+		this->field_list["shell"] = false;
+		this->field_list["count"] = false;
 		this->field_list["userid"] = true;
 		this->field_list["created"] = false;
-		this->field_list["accessed"] = true;
-		this->field_list["modified"] = true;
+		this->field_list["accessed"] = false;
+		this->field_list["modified"] = false;
 	};
 	ftp_account(backend& db, std::string username) :
 		model(db),
@@ -31,18 +31,18 @@ public:
 	{
 		this->table_name = "ftpuser";
 		this->primary_info["name"] = username;
-		this->field_list["id"] = true;
+		this->field_list["id"] = false;
 		this->field_list["name"] = true; 
 		this->field_list["password"] = true; 
-		this->field_list["uid"] = true; //linux
-		this->field_list["gid"] = true;
+		this->field_list["uid"] = false; //linux
+		this->field_list["gid"] = false;
 		this->field_list["homedir"] = true;
-		this->field_list["shell"] = true;
-		this->field_list["count"] = true;
+		this->field_list["shell"] = false;
+		this->field_list["count"] = false;
 		this->field_list["userid"] = true;
 		this->field_list["created"] = false;
-		this->field_list["accessed"] = true;
-		this->field_list["modified"] = true;
+		this->field_list["accessed"] = false;
+		this->field_list["modified"] = false;
 	};
 	
 	void save();
@@ -73,19 +73,19 @@ public:
 	std::string get_accessed();
 	std::string get_modified();
 
-private:
-	int id; 
 	std::string _name; // required
 	std::string _password; // required
 	int _uid; // required
 	int _gid; // required
+	std::string _shell;
 	std::string _homedir; // required
-	std::string _shell; // required
-	int _count; // required
+private:
+	int id; 
+	int _count;
 	std::shared_ptr<user> _user; // required
-	std::string _created; // required
-	std::string _accessed; // required
-	std::string _modified; // required
+	std::string _created;
+	std::string _accessed;
+	std::string _modified;
 
 };
 

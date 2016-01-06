@@ -446,18 +446,57 @@ void master::create_dns(cppcms::json::value object)
 	}
 }
 
-void master::create_ftp_account(std::string ftp_username, std::string password, int uid)
+void master::create_ftp_account(cppcms::json::value object)
 {
-	ftp_account ftp_account(get_database(),ftp_username);
+	std::map<std::string,any> primary_list;
 
-	ftp_account.set_password(password);
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::FtpAccount;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	std::shared_ptr<user> point(new user(get_database(),uid));
-	ftp_account.set_user(point);
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		ftp_account* tmp = dynamic_cast<ftp_account*>(model_obj.get());
+		std::unique_ptr<ftp_account> ftp_account_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    ftp_account_obj.reset(tmp);
+		}
 
-	ftp_account.save();
+		if(!ftp_account_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
 
-	return_result("OK");
+		ftp_account_obj->_name = list["name"].string;
+		ftp_account_obj->_password = list["password"].string;
+		ftp_account_obj->_homedir= list["homedir"].string;
+		ftp_account_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["userid"].integer)));
+
+		// optional
+    	if ( list.count("shell") == 1 ) {
+    		ftp_account_obj->_shell = list.at("shell").string;
+    	}
+    	if ( list.count("uid") == 1 ) {
+    		ftp_account_obj->_uid = list["uid"].integer;
+    	}
+    	if ( list.count("gid") == 1 ) {
+    		ftp_account_obj->_gid = list["gid"].integer;
+    	}
+
+		ftp_account_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( ftp_account_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		std::cout << "Exceotuib" << std::endl;
+		return_error(e.what());
+	}
 }
 
 void master::create_vhost(std::string name, std::string custom_config, int uid)

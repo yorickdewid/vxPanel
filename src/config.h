@@ -6,6 +6,7 @@
 #define DB_POOLSZ	5
 #define TOKEN_VALID 30
 #define SALT "b23okd"
+#define FTP_SALT "b23okd"
 
 #endif /* CONFIG_H */
 

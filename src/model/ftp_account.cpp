@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "../model.h"
+#include "../config.h"
 #include "ftp_account.h"
 #include "domain.h"
 #include "user.h"
@@ -10,9 +11,12 @@ void ftp_account::save()
 	try{
 		cppdb::statement stat;
 
-		stat = db.session() << 
-		"INSERT INTO ftpuser (name, password, homedir, userid) "
-		"VALUES (?, encrypt(?), ?, ?)" << _name << _password << _homedir << _user->get_uid();
+		std::ostringstream query;
+		
+		query << "INSERT INTO ftpuser (name, password, homedir, userid) ";
+		query << "VALUES (?, encrypt(?,'"<< FTP_SALT <<"'), ?, ?)";
+
+		stat = db.session() << query.str() << _name << _password << _homedir << _user->get_uid(); 
 		stat.exec();
 		stat.reset();
 

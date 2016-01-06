@@ -13,12 +13,12 @@ void user::save()
 		std::ostringstream query;
 		if ( _note.empty() ) {
 			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) ";
-		 	query << "VALUES (?, encrypt(?,'"<< SALT <<"'), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
+		 	query << "VALUES (?, ENCRYPT(?, CONCAT('$6$', SUBSTRING(SHA(RAND()), -16))), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
 		 	stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
 		}
 		else{
 			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) ";
-			query << "VALUES (?, encrypt(?,'"<< SALT <<"'), ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
+			query << "VALUES (?, ENCRYPT(?, CONCAT('$6$', SUBSTRING(SHA(RAND()), -16))), ?, ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
 			stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _note << _remote << _user_type << _active << _lastlogin;
 		}
 
@@ -129,7 +129,7 @@ void user::set_lastlogin(std::string lastlogin)
 
 int user::get_uid()
 {
-	return uid;
+	return this->uid;
 }
 
 std::string user::get_username()
