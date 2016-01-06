@@ -103,7 +103,7 @@ def test_rpc_create_mailbox():
 
 def test_rpc_create_shell():
 	print bcolors.OKBLUE + "Testcase: Create shell" + bcolors.ENDC
-	data = '{"id":0,"method":"create_shell","params":[1000]}'
+	data = '{"id":0,"method":"create_shell","params":[{"required_list":{"uid":1001}, "optional_list":{"active":false}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_subdomain():
@@ -339,7 +339,7 @@ test_rpc_create_dns()
 test_rpc_create_ftp_account()
 test_rpc_create_vhost()
 test_rpc_create_mailbox()
-# test_rpc_create_shell()
+test_rpc_create_shell()
 # test_rpc_create_subdomain()
 # test_rpc_create_setting()
 # test_rpc_create_db_user()

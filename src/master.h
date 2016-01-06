@@ -32,7 +32,7 @@ public:
 	void create_ftp_account(cppcms::json::value object);
 	void create_vhost(cppcms::json::value object);
 	void create_mailbox(cppcms::json::value object);
-	void create_shell(int uid);
+	void create_shell(cppcms::json::value object);
 	void create_subdomain(std::string subdomain_name, std::string domain_name, int uid);
 	void create_setting(std::string key, std::string value, bool default_, std::string description);
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);

@@ -494,7 +494,6 @@ void master::create_ftp_account(cppcms::json::value object)
 			throw entity_save_ex();
 		}
 	} catch(std::exception &e) {
-		std::cout << "Exceotuib" << std::endl;
 		return_error(e.what());
 	}
 }
@@ -526,7 +525,7 @@ void master::create_vhost(cppcms::json::value object)
 
 		// optional
     	if ( list.count("active") == 1 ) {
-    		vhost_obj->_active = list["active"].integer;
+    		vhost_obj->_active = list["active"].boolean;
     	}
 
 		vhost_obj->save();
@@ -539,29 +538,12 @@ void master::create_vhost(cppcms::json::value object)
 			throw entity_save_ex();
 		}
 	} catch(std::exception &e) {
-		std::cout << "Exceotuib" << std::endl;
 		return_error(e.what());
 	}
 }
 
 void master::create_mailbox(cppcms::json::value object)
 {
-	// mailbox mailbox(get_database(),0);
-
-	// mailbox.set_email(required_fields[0]);
-	// mailbox.set_password(required_fields[1]);
-	// mailbox.set_maildir(required_fields[2]);
-	// std::string tmp = required_fields[3];
-	// char tmp_char[tmp.length()];
-	// tmp.copy(tmp_char,tmp.length(),0);
-	// mailbox.set_quota(atoll(tmp_char));
-	// mailbox.set_domain(std::shared_ptr<domain>(new domain(get_database(),domain_name)));
-
-	// mailbox.save();
-
-	// return_result("OK");
-
-
 	std::map<std::string,any> primary_list;
 
 	try{
@@ -598,7 +580,7 @@ void master::create_mailbox(cppcms::json::value object)
     		mailbox_obj->_messages = list["messages"].string;
     	}
     	if ( list.count("active") == 1 ) {
-    		mailbox_obj->_active = list["active"].integer;
+    		mailbox_obj->_active = list["active"].boolean;
     	}
 
 		mailbox_obj->save();
@@ -611,20 +593,50 @@ void master::create_mailbox(cppcms::json::value object)
 			throw entity_save_ex();
 		}
 	} catch(std::exception &e) {
-		std::cout << "Exceotuib" << std::endl;
 		return_error(e.what());
 	}
 }
 
-void master::create_shell(int uid)
+void master::create_shell(cppcms::json::value object)
 {
-	shell shell(get_database(),0);
+	std::map<std::string,any> primary_list;
 
-	shell.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Shell;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	shell.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		shell* tmp = dynamic_cast<shell*>(model_obj.get());
+		std::unique_ptr<shell> shell_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    shell_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!shell_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		shell_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		if ( list.count("active") == 1 ) {
+    		shell_obj->_active = list["active"].boolean;
+    	}
+
+		shell_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( shell_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_subdomain(std::string subdomain_name, std::string domain_name, int uid)

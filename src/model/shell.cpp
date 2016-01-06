@@ -10,8 +10,8 @@ void shell::save()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"INSERT INTO shell (uid) "
-			"VALUES (?)" << _user->get_uid();
+			"INSERT INTO shell (uid,active) "
+			"VALUES (?,?)" << _user->get_uid() << _active;
 
 		stat.exec();
 		stat.reset();
