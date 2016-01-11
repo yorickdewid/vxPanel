@@ -26,8 +26,12 @@ def open_config_file(configname):
 	config = json.loads(file.read());
 	return config["db"]
 
-def rpc_call(data):
-	req = urllib2.Request(url, data, headers)
+def rpc_call(data, extra_header = None):
+	if extra_header is None:
+		req = urllib2.Request(url, data, headers)
+	else:
+		headers_merge = headers + extra_header
+		req = urllib2.Request(url, data, headers_merge)
 	response = urllib2.urlopen(req)
 	return response.read()
 
@@ -69,6 +73,12 @@ def test_rpc_db_version():
 	data = '{"id":0,"method":"db_version","params":[]}'
 	result_test(rpc_call(data), None)
 
+def get_token():
+	data = '{"id":0,"method":"authenticate","params":["kaasie","ABC@123"]}'
+	req = urllib2.Request(url, data, headers)
+	response = urllib2.urlopen(req)
+	print response.read()
+
 
 ### create ###
 def test_rpc_create_user():
@@ -79,7 +89,7 @@ def test_rpc_create_user():
 def test_rpc_create_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
 	data = '{"id":0,"method":"create_domain","params":[{"required_list":{"name":"trol.com","uid":1001,"status":"waiting","registrar":"transip"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None)
+	result_test(rpc_call(data,{"X-AUTH_TOKEN": get_token()}), None)
 
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
@@ -325,22 +335,29 @@ os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DA
 if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme/create.sql') is not 0:
 	sys.exit(1)
 
-# Call the testcases
-test_rpc_sum()
-test_rpc_uptime()
-test_rpc_version()
-test_rpc_db_version()
 
-# ## all 'perfect' scenarios ##
+
+
+# Call the testcases
+# test_rpc_sum()
+# test_rpc_uptime()
+# test_rpc_version()
+# test_rpc_db_version()
+
+# # ## all 'perfect' scenarios ##
 
 test_rpc_create_user()
-test_rpc_create_domain()
-test_rpc_create_dns()
-test_rpc_create_ftp_account()
-test_rpc_create_vhost()
-test_rpc_create_mailbox()
-test_rpc_create_shell()
-# test_rpc_create_subdomain()
+
+#token
+get_token()
+
+# test_rpc_create_domain()
+# test_rpc_create_dns()
+# test_rpc_create_ftp_account()
+# test_rpc_create_vhost()
+# test_rpc_create_mailbox()
+# test_rpc_create_shell()
+# # test_rpc_create_subdomain()
 # test_rpc_create_setting()
 # test_rpc_create_db_user()
 # test_rpc_create_database()

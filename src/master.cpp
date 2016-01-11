@@ -212,7 +212,7 @@ void master::authenticate(std::string username, std::string password)
 	cppdb::statement stat;
 	std::ostringstream query;
 
-	query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,'"<< SALT << "')";
+	query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,password)";
 	stat = get_database().session() << query.str() << username << password;
 	cppdb::result r = stat.query();
 	bool error;

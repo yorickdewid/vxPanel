@@ -5,6 +5,8 @@
 #include <typeinfo>
 #include "user.h"
 
+
+// TODO make all optional fields optional for saving
 void user::save()
 {
 	try{
