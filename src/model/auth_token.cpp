@@ -24,7 +24,7 @@ void auth_token::save()
 		stat = db.session() << "SELECT * FROM token_gen";
 		cppdb::result r = stat.query();
 
-		while( r.next() ) {
+		if( r.next() ) {
 			r >> session_id;
 		}
 		stat.reset();
@@ -70,7 +70,7 @@ void auth_token::load()
 	}
 	catch(std::exception &e)
 	{
-		std::cout << "Exception occured domain load " << e.what() << std::endl;
+		std::cout << "Exception occured auth_token load " << e.what() << std::endl;
 	}
 }
 
@@ -81,7 +81,7 @@ bool auth_token::m_delete()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-				"DELETE FROM auth_token WHERE sessionid = ? AND remote = inet6_aton(?)" << session_id << remote;
+				"DELETE FROM auth_token WHERE sessionid = ? AND remote = inet6_aton(?)" << this->session_id << remote;
 		stat.exec();
 
 		if ( stat.affected() == 1 ) {

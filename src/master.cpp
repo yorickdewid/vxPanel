@@ -258,10 +258,14 @@ bool master::check_authenticated()
 	cppdb::statement stat;
 
 	std::string remote = cppcms::application::request().remote_addr();
-	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN");
+	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN"); // dont supply the http part in js or python
+
+	std::cout << remote << std::endl;
+	std::cout << token << std::endl;
 
 	if( token.empty() )
 	{
+		throw no_token_ex();
 		return false;
 	}
 
@@ -269,7 +273,7 @@ bool master::check_authenticated()
 		return_error("invalid token supplied");
 	} else {
 		stat = get_database().session() << 
-			"SELECT * FROM auth_token WHERE session_id = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
+			"SELECT * FROM auth_token WHERE sessionid = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
 		cppdb::result r = stat.query();
 
 		if(r.next()){
@@ -362,47 +366,51 @@ void master::create_user(cppcms::json::value object)
 
 void master::create_domain(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Domain;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		if ( this->check_authenticated() ) {
+			std::map<std::string,any> primary_list;
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		domain* tmp = dynamic_cast<domain*>(model_obj.get());
-		std::unique_ptr<domain> domain_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    domain_obj.reset(tmp);
-		}
+			ModelFactory::ModelType type = ModelFactory::ModelType::Domain;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		if(!domain_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
-		
-		domain_obj->name = list["name"].string;
-		domain_obj->_status = list["status"].string;
-		domain_obj->_registrar = list["registrar"].string;
-		domain_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			domain* tmp = dynamic_cast<domain*>(model_obj.get());
+			std::unique_ptr<domain> domain_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    domain_obj.reset(tmp);
+			}
 
-		// optional
-    	if ( list.count("vhost_id") == 1 ) {
-    		domain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
-    	}
-    	if ( list.count("active") == 1 ) {
-    		domain_obj->_active = list.at("active").boolean;
-    	}
+			if(!domain_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
+			
+			domain_obj->name = list["name"].string;
+			domain_obj->_status = list["status"].string;
+			domain_obj->_registrar = list["registrar"].string;
+			domain_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
 
-		domain_obj->save();
+			// optional
+	    	if ( list.count("vhost_id") == 1 ) {
+	    		domain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
+	    	}
+	    	if ( list.count("active") == 1 ) {
+	    		domain_obj->_active = list.at("active").boolean;
+	    	}
 
-		std::cout << "After saving called" << std::endl;
+			domain_obj->save();
 
-		if( domain_obj->model::get_saved() ) {
-			return_result("OK");
+			std::cout << "After saving called" << std::endl;
+
+			if( domain_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());

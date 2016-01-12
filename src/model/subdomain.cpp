@@ -5,13 +5,14 @@
 #include "subdomain.h"
 #include "vhost.h"
 
+
+//TODO add optional
 void subdomain::save()
 {
 	try{
 		cppdb::statement stat;
 
 		if ( _vhost ) {
-			std::cout << "vhost" << std::endl;
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name, vhost_id) "
 				"VALUES (?, ?, ?)" << name << _domain->name << _vhost->get_id();
@@ -21,7 +22,6 @@ void subdomain::save()
 				"VALUES (?, ?)" << name << _domain->name;
 		}
 
-		std::cout << "before executing statement" << std::endl;
 		stat.exec();
 		stat.reset();
 

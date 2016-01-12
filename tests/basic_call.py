@@ -20,6 +20,7 @@ class bcolors:
 # Default settings
 url = 'http://localhost:8080/rpc'
 headers = { 'Content-Type' : 'application/json; charset=UTF-8' }
+auth_header = 'X_AUTH_TOKEN'
 
 def open_config_file(configname):
 	file = open(configname,"r")
@@ -30,7 +31,8 @@ def rpc_call(data, extra_header = None):
 	if extra_header is None:
 		req = urllib2.Request(url, data, headers)
 	else:
-		headers_merge = headers + extra_header
+		headers_merge = headers.copy()
+		headers_merge.update(extra_header)
 		req = urllib2.Request(url, data, headers_merge)
 	response = urllib2.urlopen(req)
 	return response.read()
@@ -41,7 +43,6 @@ def result_test(result, expected):
 	try:
 		print result
 		rs = json.loads(result)
-		print rs;
 		if rs['error']:
 			print bcolors.FAIL + "Testcase: failed" + bcolors.ENDC
 			return
@@ -77,8 +78,12 @@ def get_token():
 	data = '{"id":0,"method":"authenticate","params":["kaasie","ABC@123"]}'
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
-	print response.read()
-
+	rs = json.loads(response.read())
+	result = rs['result']['auth']['token']
+	return result
+	# rs = json.loads(result)
+	# auth = rs['auth']
+	# print auth
 
 ### create ###
 def test_rpc_create_user():
@@ -86,11 +91,10 @@ def test_rpc_create_user():
 	data = '{"id":0,"method":"create_user","params":[{"required_list":{"username":"kaasie","email":"kaas@trol.com","password":"ABC@123"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None)
 
-def test_rpc_create_domain():
+def test_rpc_create_domain(token):
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
 	data = '{"id":0,"method":"create_domain","params":[{"required_list":{"name":"trol.com","uid":1001,"status":"waiting","registrar":"transip"}, "optional_list":{}}]}'
-	# result_test(rpc_call(data,{"X-AUTH_TOKEN": get_token()}), None)
-	result_test(rpc_call(data), None)
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
@@ -350,15 +354,15 @@ if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme
 test_rpc_create_user()
 
 #token
-get_token()
+token = get_token()
 
-test_rpc_create_domain()
-test_rpc_create_dns()
-test_rpc_create_ftp_account()
-test_rpc_create_vhost()
-test_rpc_create_mailbox()
-test_rpc_create_shell()
-test_rpc_create_subdomain()
+test_rpc_create_domain(token)
+# test_rpc_create_dns()
+# test_rpc_create_ftp_account()
+# test_rpc_create_vhost()
+# test_rpc_create_mailbox()
+# test_rpc_create_shell()
+# test_rpc_create_subdomain()
 # test_rpc_create_setting()
 # test_rpc_create_db_user()
 # test_rpc_create_database()

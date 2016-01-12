@@ -67,5 +67,14 @@ class auth_ex: public std::exception
   }
 };
 
+class no_token_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "No token supplied";
+  }
+};
+
+
 #endif /* EXCEPTIONS_H */
 
