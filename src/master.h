@@ -34,7 +34,7 @@ public:
 	void create_mailbox(cppcms::json::value object);
 	void create_shell(cppcms::json::value object);
 	void create_subdomain(cppcms::json::value object);
-	void create_setting(std::string key, std::string value, bool default_, std::string description);
+	void create_setting(cppcms::json::value object);
 	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
 	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
 	void create_queue(cppcms::json::value object);

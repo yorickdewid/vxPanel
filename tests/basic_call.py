@@ -128,7 +128,7 @@ def test_rpc_create_subdomain():
 
 def test_rpc_create_setting():
 	print bcolors.OKBLUE + "Testcase: Create setting" + bcolors.ENDC
-	data = '{"id":0,"method":"create_setting","params":["reboot","23:00:00",true,"reboot time"]}'
+	data = '{"id":0,"method":"create_setting","params":[{"required_list":{"key":"reboot","value":"23:00:00","default":"true","description":"reboot time"}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_db_user():
@@ -363,7 +363,7 @@ test_rpc_create_domain(token)
 # test_rpc_create_mailbox()
 # test_rpc_create_shell()
 # test_rpc_create_subdomain()
-# test_rpc_create_setting()
+test_rpc_create_setting()
 # test_rpc_create_db_user()
 # test_rpc_create_database()
 # test_rpc_create_queue()

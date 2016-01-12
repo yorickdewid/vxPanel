@@ -707,17 +707,45 @@ void master::create_subdomain(cppcms::json::value object)
 	}
 }
 
-void master::create_setting(std::string key, std::string value, bool default_, std::string description)
+void master::create_setting(cppcms::json::value object)
 {
-	app_settings app_settings(get_database(),key);
+	std::map<std::string,any> primary_list;
 
-	app_settings.set_value(value);
-    app_settings.set_default(default_);
-	app_settings.set_description(description);
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::AppSettings;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	app_settings.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		app_settings* tmp = dynamic_cast<app_settings*>(model_obj.get());
+		std::unique_ptr<app_settings> app_settings_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    app_settings_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!app_settings_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		app_settings_obj->set_key(list["key"].string); // validate?
+		app_settings_obj->set_value(list["value"].string);
+		app_settings_obj->set_default(list["default"].boolean);
+		app_settings_obj->set_description(list["description"].string);
+
+		app_settings_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( app_settings_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_database_user(std::string name, std::string password, std::string permissions, int uid)
