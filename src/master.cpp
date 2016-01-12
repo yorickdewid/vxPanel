@@ -748,17 +748,45 @@ void master::create_setting(cppcms::json::value object)
 	}
 }
 
-void master::create_database_user(std::string name, std::string password, std::string permissions, int uid)
+void master::create_database_user(cppcms::json::value object)
 {
-	database_user database_user(get_database(),name);
+	std::map<std::string,any> primary_list;
 
-	database_user.set_password(password);
-	database_user.set_permissions(permissions);
-	database_user.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::DatabaseUser;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-	database_user.save();
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		database_user* tmp = dynamic_cast<database_user*>(model_obj.get());
+		std::unique_ptr<database_user> database_user_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    database_user_obj.reset(tmp);
+		}
 
-	return_result("OK");
+		if(!database_user_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		database_user_obj->set_name(list["name"].string); // validate?
+		database_user_obj->set_password(list["password"].string);
+		database_user_obj->set_permissions(list["permissions"].string);
+		database_user_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		database_user_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( database_user_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_database(std::string db_name, std::string db_type, std::string db_username, int uid)

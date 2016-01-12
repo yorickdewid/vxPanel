@@ -133,7 +133,7 @@ def test_rpc_create_setting():
 
 def test_rpc_create_db_user():
 	print bcolors.OKBLUE + "Testcase: Create db user" + bcolors.ENDC
-	data = '{"id":0,"method":"create_database_user","params":["arie","ae4834ejs","RO",1000]}'
+	data = '{"id":0,"method":"create_database_user","params":[{"required_list":{"name":"arie","password":"ae4834ejs","permissions":"RO","uid":1001}, "optional_list":{}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_database():
@@ -357,14 +357,14 @@ test_rpc_create_user()
 token = get_token()
 
 test_rpc_create_domain(token)
-# test_rpc_create_dns()
-# test_rpc_create_ftp_account()
-# test_rpc_create_vhost()
-# test_rpc_create_mailbox()
-# test_rpc_create_shell()
-# test_rpc_create_subdomain()
+test_rpc_create_dns()
+test_rpc_create_ftp_account()
+test_rpc_create_vhost()
+test_rpc_create_mailbox()
+test_rpc_create_shell()
+test_rpc_create_subdomain()
 test_rpc_create_setting()
-# test_rpc_create_db_user()
+test_rpc_create_db_user()
 # test_rpc_create_database()
 # test_rpc_create_queue()
 

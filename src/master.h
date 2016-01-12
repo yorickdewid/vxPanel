@@ -35,7 +35,7 @@ public:
 	void create_shell(cppcms::json::value object);
 	void create_subdomain(cppcms::json::value object);
 	void create_setting(cppcms::json::value object);
-	void create_database_user(std::string name, std::string password, std::string permissions, int uid);
+	void create_database_user(cppcms::json::value object);
 	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
 	void create_queue(cppcms::json::value object);
 
