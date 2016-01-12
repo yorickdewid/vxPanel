@@ -95,6 +95,22 @@ bool domain::m_delete()
 	return false;
 }
 
+bool domain::compare_owner(int uid)
+{
+	if ( !this->saved ) {
+		if ( !name.empty() ) {
+			this->load();
+		} else {
+			throw primary_key_ex();
+			return false;
+		}
+	}
+	if( this->get_user().get_uid() ==  uid ) {
+		return true;
+	}
+	return false;
+}
+
 void domain::set_user(std::shared_ptr<user> user)
 {
 	this->_user.swap(user);

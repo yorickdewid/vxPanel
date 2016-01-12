@@ -41,6 +41,7 @@ public:
 	void save();
 	void load();
 	bool m_delete();
+	bool compare_owner(int uid);
 
 	/* Setters */
 	void set_user(std::shared_ptr<user> user);

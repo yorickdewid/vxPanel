@@ -639,13 +639,54 @@ void master::create_shell(cppcms::json::value object)
 	}
 }
 
-void master::create_subdomain(std::string subdomain_name, std::string domain_name, int uid)
+void master::create_subdomain(cppcms::json::value object)
 {
-	subdomain subdomain(get_database(),subdomain_name, domain_name);
+	// subdomain subdomain(get_database(),subdomain_name, domain_name);
 
-	subdomain.save();
+	// subdomain.save();
 
-	return_result("OK");
+	// return_result("OK");
+	std::map<std::string,any> primary_list;
+
+	try{
+		ModelFactory::ModelType type = ModelFactory::ModelType::Subdomain;
+		std::map<std::string, any> list = this->create_generic(object, type);
+
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		subdomain* tmp = dynamic_cast<subdomain*>(model_obj.get());
+		std::unique_ptr<subdomain> subdomain_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    subdomain_obj.reset(tmp);
+		}
+
+		if(!subdomain_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
+
+		subdomain_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		if ( list.count("active") == 1 ) {
+    		subdomain_obj->_active = list["active"].boolean;
+    	}
+    	if ( list.count("vhost_id") == 1 ) {
+    		subdomain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
+    	}
+
+		subdomain_obj->save();
+
+		std::cout << "After saving called" << std::endl;
+
+		if( subdomain_obj->model::get_saved() ) {
+			return_result("OK");
+		} else {
+			throw entity_save_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::create_setting(std::string key, std::string value, bool default_, std::string description)

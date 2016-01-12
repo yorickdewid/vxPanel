@@ -35,6 +35,14 @@ class entity_save_ex: public std::exception
   }
 };
 
+class primary_key_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Empty primary key";
+  }
+};
+
 class missing_required_field_ex: public std::exception
 {
   virtual const char* what() const throw()

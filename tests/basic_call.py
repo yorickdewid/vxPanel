@@ -118,7 +118,7 @@ def test_rpc_create_shell():
 
 def test_rpc_create_subdomain():
 	print bcolors.OKBLUE + "Testcase: Create subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"create_subdomain","params":["kaas.","trol.com",1000]}'
+	data = '{"id":0,"method":"create_subdomain","params":[{"required_list":{"name":"kaas.", "domain_name":"trol.com"}, "optional_list":{"active":false}}]}'
 	result_test(rpc_call(data), None); 
 
 def test_rpc_create_setting():
@@ -351,13 +351,13 @@ test_rpc_create_user()
 #token
 get_token()
 
-# test_rpc_create_domain()
-# test_rpc_create_dns()
-# test_rpc_create_ftp_account()
-# test_rpc_create_vhost()
-# test_rpc_create_mailbox()
-# test_rpc_create_shell()
-# # test_rpc_create_subdomain()
+test_rpc_create_domain()
+test_rpc_create_dns()
+test_rpc_create_ftp_account()
+test_rpc_create_vhost()
+test_rpc_create_mailbox()
+test_rpc_create_shell()
+test_rpc_create_subdomain()
 # test_rpc_create_setting()
 # test_rpc_create_db_user()
 # test_rpc_create_database()
