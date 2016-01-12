@@ -207,67 +207,73 @@ void master::db_version()
 
 void master::authenticate(std::string username, std::string password)
 {
-	cppdb::statement stat;
-	std::ostringstream query;
+	try{
+		cppdb::statement stat;
+		std::ostringstream query;
 
-	// check if already authenticated
+		// check if already authenticated
 
-	query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,password)";
-	stat = get_database().session() << query.str() << username << password;
-	cppdb::result r = stat.query();
-	bool error;
+		query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,password)";
+		stat = get_database().session() << query.str() << username << password;
+		cppdb::result r = stat.query();
+		bool error;
 
-	if(r.next())
-	{
-		int uid = -1;
-		r.fetch(0, uid);
-		std::cout << "UID == " << uid << std::endl;
-		if( uid != -1 ) {
-			std::string remote_address = cppcms::application::request().remote_addr();
-			/*  check if already authenticated */
-			stat.reset();
-			stat = get_database().session() << 
-			"SELECT * FROM auth_token WHERE uid = ? and remote = inet6_aton(?) and valid > now()" << uid << remote_address;
-			cppdb::result r = stat.query();
-			if ( r.next() ) {
-				cppcms::json::value json;
-				std::string token,refresh,valid;
-
-				r.fetch(0,token);
-				r.fetch(3,refresh);
-				r.fetch(5,valid);
-
-				json["auth"]["token"] = token;
-				json["auth"]["refresh_token"] = refresh;
-				json["auth"]["valid"] = valid;
-
-				return_result(json);
-			} else {
-				std::string token;
-				token = this->create_auth_token(uid);
-				if ( !token.empty() ){
+		if(r.next())
+		{
+			int uid = -1;
+			r.fetch(0, uid);
+			std::cout << "UID == " << uid << std::endl;
+			if( uid != -1 ) {
+				std::string remote_address = cppcms::application::request().remote_addr();
+				/*  check if already authenticated */
+				stat.reset();
+				stat = get_database().session() << 
+				"SELECT * FROM auth_token WHERE uid = ? and remote = inet6_aton(?) and valid > now()" << uid << remote_address;
+				cppdb::result r = stat.query();
+				if ( r.next() ) {
 					cppcms::json::value json;
-					
-					auth_token auth_token(get_database(),token,remote_address);
-					auth_token.load();
+					std::string token,refresh,valid;
 
-					json["auth"]["token"] = auth_token.session_id;
-					json["auth"]["refresh_token"] = auth_token._refresh;
-					json["auth"]["valid"] = auth_token._valid;
+					r.fetch(0,token);
+					r.fetch(3,refresh);
+					r.fetch(5,valid);
+
+					json["auth"]["token"] = token;
+					json["auth"]["refresh_token"] = refresh;
+					json["auth"]["valid"] = valid;
 
 					return_result(json);
 				} else {
-					error = true;
+					std::string token;
+					token = this->create_auth_token(uid);
+					if ( !token.empty() ){
+						cppcms::json::value json;
+						
+						auth_token auth_token(get_database(),token,remote_address);
+						auth_token.load();
+
+						json["auth"]["token"] = auth_token.session_id;
+						json["auth"]["refresh_token"] = auth_token._refresh;
+						json["auth"]["valid"] = auth_token._valid;
+
+						return_result(json);
+					} else {
+						error = true;
+					}
 				}
+			} else {
+				error = true;
+			}
+			if( error ) {
+				return_error("Failed to create token");
 			}
 		} else {
-			error = true;
+			return_error("Incorrect credentials");
 		}
-		if( error ) {
-			return_error("Failed to create token");
-		}
-	} else {
-		return_error("Incorrect credentials");
+	}
+	catch (std::exception &e)
+	{
+
 	}
 }
 
@@ -836,7 +842,7 @@ void master::create_database(cppcms::json::value object)
 		database_obj->save();
 
 		std::string username = object.get<std::string>("username");
-		user_dbuser_db connect(get_database(), database_obj->get_name(), username); // TODO verify db_type
+		user_dbuser_db connect(get_database(), username, database_obj->get_name()); // TODO verify db_type
 		connect.save();
 
 		std::cout << "After saving called" << std::endl;

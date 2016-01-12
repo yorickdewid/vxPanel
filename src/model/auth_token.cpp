@@ -9,6 +9,8 @@ void auth_token::save()
 	try{
 		cppdb::statement stat;
 
+		this->check_if_token_exists();
+
 		stat = db.session() << "DROP TEMPORARY TABLE IF EXISTS `token_gen`";
 		stat.exec();
 		stat.reset();
@@ -109,3 +111,23 @@ user auth_token::get_user()
 	return *this->_user;
 }
 
+void auth_token::check_if_token_exists()
+{
+	cppdb::statement stat;
+
+	stat = db.session() << 
+	"SELECT * FROM auth_token WHERE uid = ? and valid <= now()" << get_user().get_uid();
+	cppdb::result r = stat.query();
+
+	std::string token;
+
+	if( r.next() ) {
+		r >> token;
+	}
+
+	stat.reset();
+
+	stat = db.session() << 
+	"DELETE FROM auth_token WHERE uid = ? and sessionid = ? and remote = inet6_aton(?)" << get_user().get_uid() << token << remote;
+	stat.exec();
+}

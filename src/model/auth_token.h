@@ -52,8 +52,9 @@ public:
     std::string _valid;
 
 private:
-	std::shared_ptr<user> _user;
+	void check_if_token_exists();
 
+	std::shared_ptr<user> _user;
 };
 
 #endif /* AUTH_TOKEN_H */
