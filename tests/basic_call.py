@@ -89,7 +89,8 @@ def test_rpc_create_user():
 def test_rpc_create_domain():
 	print bcolors.OKBLUE + "Testcase: Create new domain" + bcolors.ENDC
 	data = '{"id":0,"method":"create_domain","params":[{"required_list":{"name":"trol.com","uid":1001,"status":"waiting","registrar":"transip"}, "optional_list":{}}]}'
-	result_test(rpc_call(data,{"X-AUTH_TOKEN": get_token()}), None)
+	# result_test(rpc_call(data,{"X-AUTH_TOKEN": get_token()}), None)
+	result_test(rpc_call(data), None)
 
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC

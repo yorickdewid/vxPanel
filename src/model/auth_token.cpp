@@ -9,7 +9,11 @@ void auth_token::save()
 	try{
 		cppdb::statement stat;
 
-		stat = db.session() << "CREATE TEMPORARY TABLE IF NOT EXISTS `token_gen`(`token` char(40) NOT NULL)";
+		stat = db.session() << "DROP TEMPORARY TABLE IF EXISTS `token_gen`";
+		stat.exec();
+		stat.reset();
+
+		stat = db.session() << "CREATE TEMPORARY TABLE `token_gen`(`token` char(40) NOT NULL)";
 		stat.exec();
 		stat.reset();
 
@@ -20,7 +24,7 @@ void auth_token::save()
 		stat = db.session() << "SELECT * FROM token_gen";
 		cppdb::result r = stat.query();
 
-		if( r.next() ) {
+		while( r.next() ) {
 			r >> session_id;
 		}
 		stat.reset();

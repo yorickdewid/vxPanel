@@ -11,6 +11,7 @@ void subdomain::save()
 		cppdb::statement stat;
 
 		if ( _vhost ) {
+			std::cout << "vhost" << std::endl;
 			stat = db.session() << 
 				"INSERT INTO subdomain (name, domain_name, vhost_id) "
 				"VALUES (?, ?, ?)" << name << _domain->name << _vhost->get_id();
@@ -20,6 +21,7 @@ void subdomain::save()
 				"VALUES (?, ?)" << name << _domain->name;
 		}
 
+		std::cout << "before executing statement" << std::endl;
 		stat.exec();
 		stat.reset();
 
@@ -37,25 +39,27 @@ void subdomain::load()
 {
 	try{
 		cppdb::statement stat;
-		std::string domain_name;
-		int vhost_id;
 
 		stat = db.session() << 
 				"SELECT * FROM subdomain WHERE name = ?" << name;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			r >> this->name >> this->_created;
-	  		if( r.fetch(2,domain_name) != false){
-				if ( !domain_name.empty() ) {
-	  				set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
-	  			}
+			int tmp_active;
+			std::string domain_name;
+			int vhost_id;
+			r >> this->name >> this->_created >> domain_name;
+			if ( !domain_name.empty() ) {
+	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
 	  		}
-	  		else{
-	  			std::cout << "Failed to load domain " << std::endl;
-	  		}
-	  		if(r.fetch(3,vhost_id) != false){ 
+			if(r.fetch(3,vhost_id) != false){ 
 	  			set_vhost(std::shared_ptr<vhost>(new vhost(db,vhost_id)));
+	  		}
+	  		r.fetch(4,tmp_active);
+	  		if ( tmp_active == 1 ) {
+	  			this->_active = true;
+	  		} else {
+	  			this->_active = false;
 	  		}
 	    }
 

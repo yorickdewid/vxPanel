@@ -48,6 +48,8 @@ public:
 	std::shared_ptr<domain> get_domain_ptr();
 	vhost get_vhost();
 
+	bool _active;
+
 private:
 	std::string name;
 	std::string _created; 

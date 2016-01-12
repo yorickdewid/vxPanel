@@ -212,6 +212,8 @@ void master::authenticate(std::string username, std::string password)
 	cppdb::statement stat;
 	std::ostringstream query;
 
+	// check if already authenticated
+
 	query << "SELECT uid FROM user WHERE username = ? AND password = encrypt(?,password)";
 	stat = get_database().session() << query.str() << username << password;
 	cppdb::result r = stat.query();
@@ -257,6 +259,11 @@ bool master::check_authenticated()
 
 	std::string remote = cppcms::application::request().remote_addr();
 	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN");
+
+	if( token.empty() )
+	{
+		return false;
+	}
 
 	if(token.size() != 40) {
 		return_error("invalid token supplied");
@@ -666,7 +673,8 @@ void master::create_subdomain(cppcms::json::value object)
 			throw missing_required_field_ex();
 		}
 
-		subdomain_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+		subdomain_obj->set_name(list["name"].string);
+		subdomain_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
 
 		if ( list.count("active") == 1 ) {
     		subdomain_obj->_active = list["active"].boolean;
@@ -674,6 +682,8 @@ void master::create_subdomain(cppcms::json::value object)
     	if ( list.count("vhost_id") == 1 ) {
     		subdomain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
     	}
+
+    	std::cout << "Before saving called" << std::endl;
 
 		subdomain_obj->save();
 
