@@ -36,10 +36,8 @@ public:
 	void create_subdomain(cppcms::json::value object);
 	void create_setting(cppcms::json::value object);
 	void create_database_user(cppcms::json::value object);
-	void create_database(std::string db_name, std::string db_type, std::string db_username, int uid);
+	void create_database(cppcms::json::value object);
 	void create_queue(cppcms::json::value object);
-
-	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 
 	void get_user(int uid);
 	void get_domain(std::string domain_name, int uid);
@@ -55,13 +53,6 @@ public:
 	void get_database(std::string db_name, int uid);
 	void get_queue(int qid);
 	void get_ip();
-
-	bool check_default(any value);
-	bool check_default(std::map<std::string,any> primary_list);
-	bool check_primary_field(std::vector<any> primary_list, std::string field);
-	void update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
-	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
-	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 
 	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 	void update_domain(cppcms::json::value object); /* status, registrar, vhost_id */
@@ -87,7 +78,13 @@ public:
 	void delete_database_user(std::string username, int uid);
 	void delete_database(std::string db_name, std::string username, int uid);
 
-	void write_ip_to_db(); /* both ivp4 and ipv6 */
+	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
+	bool check_default(any value);
+	bool check_default(std::map<std::string,any> primary_list);
+	bool check_primary_field(std::vector<any> primary_list, std::string field);
+	void update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type);
+	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
+	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 
 protected:
 	std::string format_uptime(std::string sec);

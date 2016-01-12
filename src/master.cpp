@@ -87,8 +87,6 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("delete_database_type", cppcms::rpc::json_method(&master::delete_database_type, this), method_role);
 	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
 	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
-
-	bind("write_ip_to_db", cppcms::rpc::json_method(&master::write_ip_to_db, this), method_role);
 }
 
 master::~master()
@@ -789,27 +787,47 @@ void master::create_database_user(cppcms::json::value object)
 	}
 }
 
-void master::create_database(std::string db_name, std::string db_type, std::string db_username, int uid)
+void master::create_database(cppcms::json::value object)
 {
+	std::map<std::string,any> primary_list;
+
 	try{
-		database database(get_database(),db_name);
+		ModelFactory::ModelType type = ModelFactory::ModelType::Database;
+		std::map<std::string, any> list = this->create_generic(object, type);
 
-		database.set_database_type(std::shared_ptr<database_type>(new database_type(get_database(),db_type)));
-		database.set_user(std::shared_ptr<user>(new user(get_database(),uid)));
+		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+		database* tmp = dynamic_cast<database*>(model_obj.get());
+		std::unique_ptr<database> database_obj;
+		if(tmp != nullptr)
+		{
+		    model_obj.release();
+		    database_obj.reset(tmp);
+		}
 
-		database.save();
+		if(!database_obj->model::check_required_fields(list))
+		{
+			throw missing_required_field_ex();
+		}
 
-		/* now connect the db_username and db_name */
-		user_dbuser_db connect(get_database(),db_username,db_name);
+		database_obj->set_name(list["name"].string); // validate?
+		database_obj->set_database_type(std::shared_ptr<database_type>(new database_type(get_database(),list["db_type"].string)));
+		database_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+
+		database_obj->save();
+
+		std::string username = object.get<std::string>("username");
+		user_dbuser_db connect(get_database(), database_obj->get_name(), username); // TODO verify db_type
 		connect.save();
 
-		if ( connect.get_saved() ) {
+		std::cout << "After saving called" << std::endl;
+
+		if( database_obj->model::get_saved() ) {
 			return_result("OK");
+		} else {
+			throw entity_save_ex();
 		}
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+	} catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
@@ -882,29 +900,6 @@ std::string master::create_auth_token(int uid)
 	} catch(std::exception &e) {
 		return "";
 	}
-}
-
-std::map<std::string, any> master::create_generic(cppcms::json::value object, ModelFactory::ModelType type)
-{
-	cppcms::json::object ob_req;
-	cppcms::json::object ob_opt;
-	try {
-		ob_req = object.get<cppcms::json::object>("required_list");
-		ob_opt = object.get<cppcms::json::object>("optional_list");
-	}	catch(std::exception &e) {
-		throw missing_params_ex();
-	}
-	std::map<std::string, any> list;
-	std::map<std::string, any> primary_list_empty;
-
-	for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-	}
-
-	for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-	}
-	return list;
 }
 
 /* get */
@@ -1163,207 +1158,6 @@ void master::get_ip()
 
 /* Update */
 
-/* Dump map contents */
-void dump_map(const std::map<std::string,any>& map) {
-	for (std::map<std::string, any>::const_iterator it = map.begin(); it != map.end(); it++) {
-		std::cout << "Key: " << it->first << std::endl;
-		std::cout << "Value: " << std::endl;
-		switch (it->second.tag) {
-			case any::CHAR:
-				puts(it->second.string);
-				break;
-			case any::LONG_INT:
-				printf("%ld\n", it->second.long_integer);
-				break;
-			case any::LL_INT:
-				printf("%lld\n", it->second.ll_integer);
-				break;
-			case any::INT:
-				printf("%d\n", it->second.integer);
-				break;
-			case any::BOOL:
-				printf("%d\n", it->second.boolean);
-				break;
-		}
-	}
-}
-
-bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
-{
-	std::cout << "convert" << std::endl;
-	std::cout << "Field " << first.str() << std::endl;
-	if ( tmp->model::compare_field(first.str()) ) {
-		switch(second.type()) {
-			case cppcms::json::json_type::is_number: 
-			{
-				update_list[first.str()] = any((int)second.number());
-				break;
-			}
-			case cppcms::json::json_type::is_string: 
-			{
-				std::string val = (std::string)second.str();
-				update_list[first.str()] = any(val);
-				break;
-			}
-			case cppcms::json::json_type::is_boolean:
-			{
-				update_list[first.str()] = any((bool)second.boolean());
-				break;
-			}
-			default:
-				break;
-		}
-		dump_map(update_list);
-		return true;
-	}
-	throw unrecognized_field_ex();
-	return false;
-}
-
-any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
-{
-	std::cout << "Called get get_identifier" << std::endl;
-	std::cout << first.str() << primary_field << std::endl;
-	if( primary_field.compare(first.str()) == 0){
-		switch(second.type())
-		{
-			case cppcms::json::json_type::is_number: 
-			{
-				return (int)second.number();
-				break;
-			}
-			case cppcms::json::json_type::is_string: 
-			{
-				std::string val = (std::string)second.str();
-				return val;
-				break;
-			}
-			case cppcms::json::json_type::is_boolean:
-			{
-				return (bool)second.boolean();
-				break;
-			}
-			case cppcms::json::json_type::is_undefined:
-			{
-				std::cout << "Undefined type detected, trying to convert to string" << std::endl;
-				std::string val = (std::string)second.str();
-				return val;
-				break;
-			}
-			default:
-			{
-				return -1;
-				break;
-			}
-		}
-	}
-	std::cout << " Primary field doesnt match " << std::endl;
-	return -1;
-}
-
-bool master::check_default(any value)
-{
-	switch (value.tag) {
-		case any::CHAR:
-			std::cout << " String " << std::endl;
-			if( ((std::string)value.string).empty() )
-			{
-				return true;
-			}
-			return false;
-			break;
-		case any::INT:
-			std::cout << " Integer " << std::endl;
-			if( value.integer == -1 )
-			{
-				return true;
-			}
-			return false;
-			break;
-		default: 
-			std::cout << "Default case" << std::endl;
-			return true;
-	}
-}
-
-bool master::check_default(std::map<std::string,any> primary_list)
-{
-	int count_defaults = 0;
-	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
-		switch ((*it).second.tag) {
-			case any::CHAR:
-				if( ((std::string)(*it).second.string).empty() )
-				{
-					count_defaults++;
-				}
-				break;
-			case any::INT:
-				if( (*it).second.integer == -1 )
-				{
-					count_defaults++;
-				}
-				break;
-			default: 
-				count_defaults++;
-				break;
-		}
-	}
-	if(count_defaults == 0 )
-	{
-		return false;
-	} else {
-		return true;
-	}
-}
-
-bool master::check_primary_field(std::vector<any> primary_list, std::string field)
-{
-	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
-		if(field.compare((*it).string) == 0)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-void master::update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
-{
-	try{
-		std::map<std::string, any> update_list;
-		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
-		std::map<std::string, any> primary_list;
-		std::map<std::string, any> primary_list_empty;
-		std::map<std::string, any> primary_info = tmp->get_primary_info();
-
-		for (cppcms::json::object::const_iterator p=ob.begin(); p!=ob.end(); ++p) {
-			bool primary = false;
-			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
-				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) && (it->first.compare(p->first) == 0) ) {
-					primary_list[it->first] = this->get_identifier( (*it).first, p->first.str(), p->second);
-					primary = true;
-				} 
-			}
-			if ( primary ) {
-				continue; // skip primary value
-			}
-			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, update_list);
-		}
-		dump_map(primary_list);
-		if ( !this->check_default(primary_list) ) {
-			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
-			if (model_obj->model::update(update_list)) {
-				return_result("OK");
-			} else { 
-				return_error("Failed to update user");
-			}
-		}
-	} catch(std::exception &e) {
-		std::cout << "User update Exception : " << e.what() << std::endl;
-		return_error("Unrecognized field");
-	}
-}
-
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(cppcms::json::value object)
 {
@@ -1617,21 +1411,230 @@ void master::delete_database(std::string db_name, std::string db_username, int u
 	}
 }
 
-void master::write_ip_to_db()
+
+/* Helper methods */
+
+std::map<std::string, any> master::create_generic(cppcms::json::value object, ModelFactory::ModelType type)
 {
-	std::string remote_address = cppcms::application::request().remote_addr();
+	cppcms::json::object ob_req;
+	cppcms::json::object ob_opt;
+	try {
+		ob_req = object.get<cppcms::json::object>("required_list");
+		ob_opt = object.get<cppcms::json::object>("optional_list");
+	}	catch(std::exception &e) {
+		throw missing_params_ex();
+	}
+	std::map<std::string, any> list;
+	std::map<std::string, any> primary_list_empty;
 
-	cppdb::statement stat;
+	for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
+		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+	}
 
-	stat = get_database().session() << 
-		"UPDATE user set remote = inet6_aton(?)" << remote_address;
+	for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
+		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+	}
+	return list;
+}
 
-	stat.exec();
-	stat.reset();
+/* Dump map contents */
+void dump_map(const std::map<std::string,any>& map) {
+	for (std::map<std::string, any>::const_iterator it = map.begin(); it != map.end(); it++) {
+		std::cout << "Key: " << it->first << std::endl;
+		std::cout << "Value: " << std::endl;
+		switch (it->second.tag) {
+			case any::CHAR:
+				puts(it->second.string);
+				break;
+			case any::LONG_INT:
+				printf("%ld\n", it->second.long_integer);
+				break;
+			case any::LL_INT:
+				printf("%lld\n", it->second.ll_integer);
+				break;
+			case any::INT:
+				printf("%d\n", it->second.integer);
+				break;
+			case any::BOOL:
+				printf("%d\n", it->second.boolean);
+				break;
+		}
+	}
+}
 
-	std::ostringstream stream;
-	stream << "Saved ip to db, " << remote_address;
+bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
+{
+	std::cout << "convert" << std::endl;
+	std::cout << "Field " << first.str() << std::endl;
+	if ( tmp->model::compare_field(first.str()) ) {
+		switch(second.type()) {
+			case cppcms::json::json_type::is_number: 
+			{
+				update_list[first.str()] = any((int)second.number());
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				std::string val = (std::string)second.str();
+				update_list[first.str()] = any(val);
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				update_list[first.str()] = any((bool)second.boolean());
+				break;
+			}
+			default:
+				break;
+		}
+		dump_map(update_list);
+		return true;
+	}
+	throw unrecognized_field_ex();
+	return false;
+}
 
-	return_result(stream.str());
+any master::get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second)
+{
+	std::cout << "Called get get_identifier" << std::endl;
+	std::cout << first.str() << primary_field << std::endl;
+	if( primary_field.compare(first.str()) == 0){
+		switch(second.type())
+		{
+			case cppcms::json::json_type::is_number: 
+			{
+				return (int)second.number();
+				break;
+			}
+			case cppcms::json::json_type::is_string: 
+			{
+				std::string val = (std::string)second.str();
+				return val;
+				break;
+			}
+			case cppcms::json::json_type::is_boolean:
+			{
+				return (bool)second.boolean();
+				break;
+			}
+			case cppcms::json::json_type::is_undefined:
+			{
+				std::cout << "Undefined type detected, trying to convert to string" << std::endl;
+				std::string val = (std::string)second.str();
+				return val;
+				break;
+			}
+			default:
+			{
+				return -1;
+				break;
+			}
+		}
+	}
+	std::cout << " Primary field doesnt match " << std::endl;
+	return -1;
+}
+
+bool master::check_default(any value)
+{
+	switch (value.tag) {
+		case any::CHAR:
+			std::cout << " String " << std::endl;
+			if( ((std::string)value.string).empty() )
+			{
+				return true;
+			}
+			return false;
+			break;
+		case any::INT:
+			std::cout << " Integer " << std::endl;
+			if( value.integer == -1 )
+			{
+				return true;
+			}
+			return false;
+			break;
+		default: 
+			std::cout << "Default case" << std::endl;
+			return true;
+	}
+}
+
+bool master::check_default(std::map<std::string,any> primary_list)
+{
+	int count_defaults = 0;
+	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
+		switch ((*it).second.tag) {
+			case any::CHAR:
+				if( ((std::string)(*it).second.string).empty() )
+				{
+					count_defaults++;
+				}
+				break;
+			case any::INT:
+				if( (*it).second.integer == -1 )
+				{
+					count_defaults++;
+				}
+				break;
+			default: 
+				count_defaults++;
+				break;
+		}
+	}
+	if(count_defaults == 0 )
+	{
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool master::check_primary_field(std::vector<any> primary_list, std::string field)
+{
+	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
+		if(field.compare((*it).string) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void master::update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
+{
+	try{
+		std::map<std::string, any> update_list;
+		cppcms::json::object ob = object.get<cppcms::json::object>("update_list");
+		std::map<std::string, any> primary_list;
+		std::map<std::string, any> primary_list_empty;
+		std::map<std::string, any> primary_info = tmp->get_primary_info();
+
+		for (cppcms::json::object::const_iterator p=ob.begin(); p!=ob.end(); ++p) {
+			bool primary = false;
+			for ( auto it = primary_info.begin(); it != primary_info.end(); ++it ) {
+				if( this->check_default( (*it).second) && tmp->model::compare_primary_field(p->first) && (it->first.compare(p->first) == 0) ) {
+					primary_list[it->first] = this->get_identifier( (*it).first, p->first.str(), p->second);
+					primary = true;
+				} 
+			}
+			if ( primary ) {
+				continue; // skip primary value
+			}
+			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, update_list);
+		}
+		dump_map(primary_list);
+		if ( !this->check_default(primary_list) ) {
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
+			if (model_obj->model::update(update_list)) {
+				return_result("OK");
+			} else { 
+				return_error("Failed to update user");
+			}
+		}
+	} catch(std::exception &e) {
+		std::cout << "User update Exception : " << e.what() << std::endl;
+		return_error("Unrecognized field");
+	}
 }
 
