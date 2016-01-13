@@ -39,18 +39,18 @@ public:
 	void create_database(cppcms::json::value object);
 	void create_queue(cppcms::json::value object);
 
-	void get_user(int uid);
-	void get_domain(std::string domain_name, int uid);
-	void get_dns(std::string domain_name, int uid);
-	void get_ftp_account(std::string ftp_account, int uid);
-	void get_vhost(std::string domain_name, int uid);
-	void get_mailbox(std::string domain_name, int uid);
-	void get_shell(int id, int uid);
-	void get_subdomain(std::string subdomain_name, std::string domain_name, int uid);
+	void get_user();
+	void get_domain(std::string domain_name);
+	void get_dns(std::string domain_name);
+	void get_ftp_account(std::string ftp_account);
+	void get_vhost(std::string domain_name, int vhost_id);
+	void get_mailbox(std::string domain_name);
+	void get_shell(int id);
+	void get_subdomain(std::string subdomain_name, std::string domain_name);
 	void get_setting(std::string key);
 	void get_database_types();
-	void get_database_user(std::string username, int uid);
-	void get_database(std::string db_name, int uid);
+	void get_database_user(std::string username);
+	void get_database(std::string db_name);
 	void get_queue(int qid);
 	void get_ip();
 
@@ -93,6 +93,7 @@ private:
 	std::string create_auth_token(int uid);
 	bool check_authenticated(std::vector<std::string> role_types);
 	bool is_role_allowed(std::vector<std::string> role_types, int uid);
+	int get_uid_from_token();
 	void init_backend();
 
 	backend *db = NULL;

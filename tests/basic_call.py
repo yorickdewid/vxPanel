@@ -150,68 +150,68 @@ def test_rpc_create_queue():
 ### get ###
 def test_rpc_get_user():
 	print bcolors.OKBLUE + "Testcase: Get user" + bcolors.ENDC
-	data = '{"id":0,"method":"get_user","params":[1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_user","params":[]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_domain():
 	print bcolors.OKBLUE + "Testcase: Get domain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_domain","params":["trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_domain","params":["trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_dns():
 	print bcolors.OKBLUE + "Testcase: Get dns" + bcolors.ENDC
-	data = '{"id":0,"method":"get_dns","params":["trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_dns","params":["trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Get ftp account" + bcolors.ENDC
-	data = '{"id":0,"method":"get_ftp_account","params":["kaasje",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_ftp_account","params":["kaasje"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_vhost():
 	print bcolors.OKBLUE + "Testcase: Get vhost" + bcolors.ENDC
-	data = '{"id":0,"method":"get_vhost","params":["trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_vhost","params":["trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_mailbox():
 	print bcolors.OKBLUE + "Testcase: Get mailbox" + bcolors.ENDC
-	data = '{"id":0,"method":"get_mailbox","params":["trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_mailbox","params":["trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_shell():
 	print bcolors.OKBLUE + "Testcase: Get shell" + bcolors.ENDC
-	data = '{"id":0,"method":"get_shell","params":[1,1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_shell","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_subdomain():
 	print bcolors.OKBLUE + "Testcase: Get subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"get_subdomain","params":["kaas.","trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_subdomain","params":["kaas.","trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_setting():
 	print bcolors.OKBLUE + "Testcase: Get setting" + bcolors.ENDC
 	data = '{"id":0,"method":"get_setting","params":["reboot"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_database_types():
 	print bcolors.OKBLUE + "Testcase: Get database options" + bcolors.ENDC
 	data = '{"id":0,"method":"get_database_types","params":[]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_database_user():
 	print bcolors.OKBLUE + "Testcase: Get database user" + bcolors.ENDC
-	data = '{"id":0,"method":"get_database_user","params":["arie",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_database_user","params":["arie"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_database():
 	print bcolors.OKBLUE + "Testcase: Get database" + bcolors.ENDC
-	data = '{"id":0,"method":"get_database","params":["kaas",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"get_database","params":["kaas"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_queue():
 	print bcolors.OKBLUE + "Testcase: Get queue" + bcolors.ENDC
 	data = '{"id":0,"method":"get_queue","params":[1]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 
 ### update ###
@@ -368,19 +368,19 @@ test_rpc_create_db_user()
 test_rpc_create_database()
 test_rpc_create_queue()
 
-# test_rpc_get_user()
-# test_rpc_get_domain()
-# test_rpc_get_dns()
-# test_rpc_get_ftp_account()
-# test_rpc_get_vhost()
-# test_rpc_get_mailbox()
-# test_rpc_get_shell()
-# test_rpc_get_subdomain()
-# test_rpc_get_setting()
-# test_rpc_get_database_types()
-# test_rpc_get_database_user()
-# test_rpc_get_database()
-# test_rpc_get_queue()
+test_rpc_get_user()
+test_rpc_get_domain()
+test_rpc_get_dns()
+test_rpc_get_ftp_account()
+test_rpc_get_vhost()
+test_rpc_get_mailbox()
+test_rpc_get_shell()
+test_rpc_get_subdomain()
+test_rpc_get_setting()
+test_rpc_get_database_types()
+test_rpc_get_database_user()
+test_rpc_get_database()
+test_rpc_get_queue()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()

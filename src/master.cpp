@@ -335,6 +335,24 @@ bool master::is_role_allowed(std::vector<std::string> role_types, int uid)
 	return false;
 }
 
+int master::get_uid_from_token()
+{
+	cppdb::statement stat;
+
+	std::string remote = cppcms::application::request().remote_addr();
+	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN"); // dont supply the http part in js or python
+
+	stat = get_database().session() << 
+			"SELECT * FROM auth_token WHERE sessionid = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
+		cppdb::result r = stat.query();
+
+	if(r.next()){
+		int uid = -1;
+		r.fetch(2, uid);
+		return uid;
+	}
+	return -1;
+}
 /*
 	Create
 */
@@ -1004,172 +1022,269 @@ std::string master::create_auth_token(int uid)
 
 /* get */
 
-void master::get_user(int uid)
+void master::get_user()
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	user user(get_database(), uid);
+			user user(get_database(), this->get_uid_from_token());
 
-	user.load();
+			user.load();
 
-	json["user"]["username"] = user.get_username();
-	json["user"]["password"] = user.get_password();
-	json["user"]["email"] =  user.get_email();
+			json["user"]["username"] = user.get_username();
+			json["user"]["password"] = user.get_password();
+			json["user"]["email"] =  user.get_email();
 
-	return_result(json);
+			return_result(json);
+		} else {
+			return_error("Not authenticated");
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
-void master::get_domain(std::string domain_name, int uid)
+void master::get_domain(std::string domain_name)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	domain domain(get_database(), domain_name);
+			domain domain(get_database(), domain_name);
 
-	domain.load();
+			domain.load();
 
-	if (domain.get_user().get_uid() == uid ) {
+			if (domain.get_user().get_uid() == this->get_uid_from_token() ) {
 
-		json["domain"]["domainname"] = domain.name;
-		json["domain"]["status"] = domain._status;
-		json["domain"]["registrar"] =  domain._registrar;
+				json["domain"]["domainname"] = domain.name;
+				json["domain"]["status"] = domain._status;
+				json["domain"]["registrar"] =  domain._registrar;
 
-		return_result(json);
-	} else {
-		return_error("Unauthorized");
+				return_result(json);
+			} else {
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
 
-void master::get_dns(std::string domain_name, int uid)
+void master::get_dns(std::string domain_name)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	dns dns(get_database(), 0);
-	dns.load(domain_name);
+			dns dns(get_database(), 0);
+			dns.load(domain_name);
 
-	if (dns.get_domain().get_user().get_uid() == uid ) {
+			if (dns.get_domain().get_user().get_uid() == this->get_uid_from_token() ) {
 
-		json["dns"]["address"] = dns.get_name();
-		json["dns"]["created"] = dns.get_created();
-		json["dns"]["domain_name"] = domain_name;
+				json["dns"]["address"] = dns.get_name();
+				json["dns"]["created"] = dns.get_created();
+				json["dns"]["domain_name"] = domain_name;
 
-		return_result(json);
-	} else {
-		return_error("Unauthorized");
+				return_result(json);
+			} else {
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
 // TODO add missing fields
-void master::get_ftp_account(std::string ftp_username, int uid)
+void master::get_ftp_account(std::string ftp_username)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	ftp_account ftp_account(get_database(), ftp_username);
-	ftp_account.load();
+			ftp_account ftp_account(get_database(), ftp_username);
+			ftp_account.load();
 
-	if (ftp_account.get_user().get_uid() == uid){
+			if (ftp_account.get_user().get_uid() == this->get_uid_from_token() ){
 
-		json["ftp_account"]["username"] = ftp_account.get_username();
-		json["ftp_account"]["password"] = ftp_account.get_password();
-		json["ftp_account"]["created"] = ftp_account.get_created();
+				json["ftp_account"]["username"] = ftp_account.get_username();
+				json["ftp_account"]["password"] = ftp_account.get_password();
+				json["ftp_account"]["created"] = ftp_account.get_created();
 
-		return_result(json);
-	}
-	else{
-		return_error("Unauthorized");
-	}
-}
-
-void master::get_vhost(std::string domain_name, int uid)
-{
-	cppcms::json::value json;
-
-	vhost vhost(get_database(),0);
-	vhost.load(domain_name);
-
-	json["vhost"]["id"] = vhost.get_id();
-	json["vhost"]["name"] = vhost.get_name();
-	json["vhost"]["custom_config"] = vhost.get_custom_config();
-	json["vhost"]["created"] = vhost.get_created();
-	json["vhost"]["active"] = vhost.get_active();
-
-	return_result(json);
-}
-
-void master::get_mailbox(std::string domain_name, int uid)
-{
-	cppcms::json::value json;
-
-	mailbox mailbox(get_database(),0);
-	mailbox.load(domain_name);
-
-	if ( mailbox.get_domain().name.compare(domain_name) == 0) {
-		json["mailbox"]["id"] = mailbox.get_id();
-		json["mailbox"]["email"] = mailbox.get_email();
-		json["mailbox"]["password"] = mailbox.get_password();
-		json["mailbox"]["maildir"] = mailbox.get_maildir();
-		json["mailbox"]["quota"] = mailbox.get_quota();
-		json["mailbox"]["created"] = mailbox.get_created();
-		if ( !mailbox.get_domain().name.compare("") ) { /* good enough? */
-			json["mailbox"]["domain"] = mailbox.get_domain().name;
+				return_result(json);
+			}
+			else{
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
 		}
-
-		return_result(json);
-	}
-	else{
-		return_error("Unauthorized");
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::get_shell(int id,int uid)
+void master::get_vhost(std::string domain_name, int vhost_id)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	shell shell(get_database(),id);
-	shell.load();
+			vhost vhost(get_database(),vhost_id);
+			vhost.load(domain_name);
 
-	if ( shell.get_user().get_uid() == uid) {
-		json["shell"]["created"] = shell.get_created();
+			json["vhost"]["id"] = vhost.get_id();
+			json["vhost"]["name"] = vhost.get_name();
+			json["vhost"]["custom_config"] = vhost.get_custom_config();
+			json["vhost"]["created"] = vhost.get_created();
+			json["vhost"]["active"] = vhost.get_active();
 
-		return_result(json);
+			return_result(json);
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
-	else{
-		return_error("Unauthorized");
+}
+
+void master::get_mailbox(std::string domain_name)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
+
+			mailbox mailbox(get_database(),0);
+			mailbox.load(domain_name);
+
+			if ( mailbox.get_domain().name.compare(domain_name) == 0) {
+				json["mailbox"]["id"] = mailbox.get_id();
+				json["mailbox"]["email"] = mailbox.get_email();
+				json["mailbox"]["password"] = mailbox.get_password();
+				json["mailbox"]["maildir"] = mailbox.get_maildir();
+				json["mailbox"]["quota"] = mailbox.get_quota();
+				json["mailbox"]["created"] = mailbox.get_created();
+				if ( !mailbox.get_domain().name.compare("") ) { /* good enough? */
+					json["mailbox"]["domain"] = mailbox.get_domain().name;
+				}
+
+				return_result(json);
+			} else{
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_shell(int id)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
+
+			shell shell(get_database(),id);
+			shell.load();
+
+			if ( shell.get_user().get_uid() == this->get_uid_from_token() ) {
+				json["shell"]["created"] = shell.get_created();
+
+				return_result(json);
+			}
+			else{
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
 /* todo check if domain belongs to logged in user */
-void master::get_subdomain(std::string subdomain_name, std::string domain_name, int uid)
+void master::get_subdomain(std::string subdomain_name, std::string domain_name)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	subdomain subdomain(get_database(),subdomain_name, domain_name);
-	subdomain.load();
+			subdomain subdomain(get_database(),subdomain_name, domain_name);
+			subdomain.load();
 
-	json["subdomain"]["name"] = subdomain.get_name();	
-	json["subdomain"]["created"] = subdomain.get_created();
-	if ( subdomain.get_domain_ptr() !=  NULL ) { /* good enough? */
-			json["subdomain"]["domain"] = subdomain.get_domain().name;
+			json["subdomain"]["name"] = subdomain.get_name();	
+			json["subdomain"]["created"] = subdomain.get_created();
+			if ( subdomain.get_domain_ptr() !=  NULL ) { /* good enough? */
+					json["subdomain"]["domain"] = subdomain.get_domain().name;
+			}
+
+			return_result(json);
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
-
-	return_result(json);
 }
 
 void master::get_setting(std::string key)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	app_settings app_settings(get_database(),key);
-	app_settings.load();
+			app_settings app_settings(get_database(),key);
+			app_settings.load();
 
-	json["app_settings"]["key"] = app_settings.get_key();
-	json["app_settings"]["value"] = app_settings.get_value();
-	json["app_settings"]["default"] = app_settings.get_default();
-	json["app_settings"]["description"] = app_settings.get_description();
-	json["app_settings"]["updated"] = app_settings.get_updated();	
-	json["app_settings"]["created"] = app_settings.get_created();
+			json["app_settings"]["key"] = app_settings.get_key();
+			json["app_settings"]["value"] = app_settings.get_value();
+			json["app_settings"]["default"] = app_settings.get_default();
+			json["app_settings"]["description"] = app_settings.get_description();
+			json["app_settings"]["updated"] = app_settings.get_updated();	
+			json["app_settings"]["created"] = app_settings.get_created();
 
-	return_result(json);
+			return_result(json);
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* TODO Inspect for memory leakage */
@@ -1190,64 +1305,95 @@ void master::get_database_types()
 	return_result(json);
 }
 
-void master::get_database_user(std::string username, int uid)
+void master::get_database_user(std::string username)
 {
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	cppcms::json::value json;
+			database_user database_user(get_database(),username);
+			database_user.load();
 
-	database_user database_user(get_database(),username);
-	database_user.load();
+			if ( database_user.get_user().get_uid() == this->get_uid_from_token() ) {
+				json["db_user"]["username"] = database_user.get_name();
+				json["db_user"]["password"] = database_user.get_password();
+				json["db_user"]["permissions"] = database_user.get_permissions();
+				json["db_user"]["created"] = database_user.get_created();
 
-	if ( database_user.get_user().get_uid() == uid ) {
-		json["db_user"]["username"] = database_user.get_name();
-		json["db_user"]["password"] = database_user.get_password();
-		json["db_user"]["permissions"] = database_user.get_permissions();
-		json["db_user"]["created"] = database_user.get_created();
-
-		return_result(json);
-	}
-	else {
-		return_error("Unauthorized");
+				return_result(json);
+			}
+			else {
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::get_database(std::string db_name, int uid)
+void master::get_database(std::string db_name)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	database database(get_database(),db_name);
-	database.load();
+			database database(get_database(),db_name);
+			database.load();
 
-	if ( database.get_user().get_uid() == uid ) {
-		json["db"]["name"] = database.get_name();
-		json["db"]["created"] = database.get_created();
-		json["db"]["db_type"] = database.get_database_type().get_name();
+			if ( database.get_user().get_uid() == this->get_uid_from_token()) {
+				json["db"]["name"] = database.get_name();
+				json["db"]["created"] = database.get_created();
+				json["db"]["db_type"] = database.get_database_type().get_name();
 
-		return_result(json);
-	}
-	else {
-		return_error("Unauthorized");
+				return_result(json);
+			}
+			else {
+				return_error("Unauthorized");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
 void master::get_queue(int qid)
 {
-	cppcms::json::value json;
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
 
-	queue queue(get_database(),qid);
-	queue.load();
+			queue queue(get_database(),qid);
+			queue.load();
 
-	json["queue"]["id"] = queue.qid;
-	json["queue"]["action"] = queue._action;
-	json["queue"]["params"] = queue._params;
-	json["queue"]["created"] = queue.get_created();
-	json["queue"]["started"] = queue._started;
-	json["queue"]["finished"] = queue._finished;
-	json["queue"]["uid"] = queue.get_user().get_uid();
-	json["queue"]["status"] = queue._status;
-	json["queue"]["result"] = queue.get_result();
+			json["queue"]["id"] = queue.qid;
+			json["queue"]["action"] = queue._action;
+			json["queue"]["params"] = queue._params;
+			json["queue"]["created"] = queue.get_created();
+			json["queue"]["started"] = queue._started;
+			json["queue"]["finished"] = queue._finished;
+			json["queue"]["uid"] = queue.get_user().get_uid();
+			json["queue"]["status"] = queue._status;
+			json["queue"]["result"] = queue.get_result();
 
-	return_result(json);
+			return_result(json);
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 void master::get_ip()
