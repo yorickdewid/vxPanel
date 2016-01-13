@@ -99,52 +99,52 @@ def test_rpc_create_domain(token):
 def test_rpc_create_dns():
 	print bcolors.OKBLUE + "Testcase: Create dns" + bcolors.ENDC
 	data = '{"id":0,"method":"create_dns","params":[{"required_list":{"name":"A www trol.com","domain_name":"trol.com"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Create ftp account" + bcolors.ENDC
 	data = '{"id":0,"method":"create_ftp_account","params":[{"required_list":{"name":"kaasje","password":"hehjajejkhe","userid":1001,"homedir":"/kaasie"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_vhost():
 	print bcolors.OKBLUE + "Testcase: Create vhost" + bcolors.ENDC
 	data = '{"id":0,"method":"create_vhost","params":[{"required_list":{"name":"trol.com","custom_config":"kaas"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_mailbox():
 	print bcolors.OKBLUE + "Testcase: Create mailbox" + bcolors.ENDC
 	data = '{"id":0,"method":"create_mailbox","params":[{"required_list":{"email":"arie@trol.com","password":"kaas","maildir":"/usr/kaas","domain_name":"trol.com"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_shell():
 	print bcolors.OKBLUE + "Testcase: Create shell" + bcolors.ENDC
 	data = '{"id":0,"method":"create_shell","params":[{"required_list":{"uid":1001}, "optional_list":{"active":false}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_subdomain():
 	print bcolors.OKBLUE + "Testcase: Create subdomain" + bcolors.ENDC
 	data = '{"id":0,"method":"create_subdomain","params":[{"required_list":{"name":"kaas.", "domain_name":"trol.com"}, "optional_list":{"active":false}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_setting():
 	print bcolors.OKBLUE + "Testcase: Create setting" + bcolors.ENDC
 	data = '{"id":0,"method":"create_setting","params":[{"required_list":{"key":"reboot","value":"23:00:00","default":"true","description":"reboot time"}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_db_user():
 	print bcolors.OKBLUE + "Testcase: Create db user" + bcolors.ENDC
 	data = '{"id":0,"method":"create_database_user","params":[{"required_list":{"name":"arie","password":"ae4834ejs","permissions":"RO","uid":1001}, "optional_list":{}}]}'
-	result_test(rpc_call(data), None); 
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_database():
 	print bcolors.OKBLUE + "Testcase: Create database" + bcolors.ENDC
 	data = '{"id":0,"method":"create_database","params":[{"required_list":{"name":"kaas","uid":1001,"db_type":"mysql"}, "optional_list":{}, "username":"arie"}]}'
-	result_test(rpc_call(data), None);
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_create_queue():
 	print bcolors.OKBLUE + "Testcase: Create queue" + bcolors.ENDC
 	data = '{"id":0,"method":"create_queue","params":[{"required_list":{"action":"USERADD","uid":1000}, "optional_list":{"params":"kaas"}}]}'
-	result_test(rpc_call(data), None);
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 
 ### get ###

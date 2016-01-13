@@ -116,7 +116,6 @@ bool model::check_required_fields(std::map<std::string,any> list)
 {
 	int countRequired = 0;
 	int countValuesOfRequired = 0;
-	std::cout << "list size " << list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
 		for(auto fields = this->field_list.begin(); fields != this->field_list.end(); ++fields) {
 			if(fields->second) 

@@ -472,42 +472,48 @@ void master::create_domain(cppcms::json::value object)
 
 void master::create_dns(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Dns;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Dns;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		dns* tmp = dynamic_cast<dns*>(model_obj.get());
-		std::unique_ptr<dns> dns_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    dns_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			dns* tmp = dynamic_cast<dns*>(model_obj.get());
+			std::unique_ptr<dns> dns_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    dns_obj.reset(tmp);
+			}
 
-		if(!dns_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
-		
-		dns_obj->_name = list["name"].string;
-		dns_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+			if(!dns_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
+			
+			dns_obj->_name = list["name"].string;
+			dns_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
 
-		// optional
-    	if ( list.count("active") == 1 ) {
-    		dns_obj->_active = list.at("active").boolean;
-    	}
+			// optional
+	    	if ( list.count("active") == 1 ) {
+	    		dns_obj->_active = list.at("active").boolean;
+	    	}
 
-		dns_obj->save();
+			dns_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( dns_obj->model::get_saved() ) {
-			return_result("OK");
+			if( dns_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -516,50 +522,56 @@ void master::create_dns(cppcms::json::value object)
 
 void master::create_ftp_account(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::FtpAccount;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::FtpAccount;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		ftp_account* tmp = dynamic_cast<ftp_account*>(model_obj.get());
-		std::unique_ptr<ftp_account> ftp_account_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    ftp_account_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			ftp_account* tmp = dynamic_cast<ftp_account*>(model_obj.get());
+			std::unique_ptr<ftp_account> ftp_account_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    ftp_account_obj.reset(tmp);
+			}
 
-		if(!ftp_account_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!ftp_account_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		ftp_account_obj->_name = list["name"].string;
-		ftp_account_obj->_password = list["password"].string;
-		ftp_account_obj->_homedir= list["homedir"].string;
-		ftp_account_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["userid"].integer)));
+			ftp_account_obj->_name = list["name"].string;
+			ftp_account_obj->_password = list["password"].string;
+			ftp_account_obj->_homedir= list["homedir"].string;
+			ftp_account_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["userid"].integer)));
 
-		// optional
-    	if ( list.count("shell") == 1 ) {
-    		ftp_account_obj->_shell = list.at("shell").string;
-    	}
-    	if ( list.count("uid") == 1 ) {
-    		ftp_account_obj->_uid = list["uid"].integer;
-    	}
-    	if ( list.count("gid") == 1 ) {
-    		ftp_account_obj->_gid = list["gid"].integer;
-    	}
+			// optional
+	    	if ( list.count("shell") == 1 ) {
+	    		ftp_account_obj->_shell = list.at("shell").string;
+	    	}
+	    	if ( list.count("uid") == 1 ) {
+	    		ftp_account_obj->_uid = list["uid"].integer;
+	    	}
+	    	if ( list.count("gid") == 1 ) {
+	    		ftp_account_obj->_gid = list["gid"].integer;
+	    	}
 
-		ftp_account_obj->save();
+			ftp_account_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( ftp_account_obj->model::get_saved() ) {
-			return_result("OK");
+			if( ftp_account_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -568,42 +580,48 @@ void master::create_ftp_account(cppcms::json::value object)
 
 void master::create_vhost(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Vhost;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Vhost;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		vhost* tmp = dynamic_cast<vhost*>(model_obj.get());
-		std::unique_ptr<vhost> vhost_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    vhost_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			vhost* tmp = dynamic_cast<vhost*>(model_obj.get());
+			std::unique_ptr<vhost> vhost_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    vhost_obj.reset(tmp);
+			}
 
-		if(!vhost_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!vhost_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		vhost_obj->_name = list["name"].string; // validate?
-		vhost_obj->_custom_config = list["custom_config"].string;
+			vhost_obj->_name = list["name"].string; // validate?
+			vhost_obj->_custom_config = list["custom_config"].string;
 
-		// optional
-    	if ( list.count("active") == 1 ) {
-    		vhost_obj->_active = list["active"].boolean;
-    	}
+			// optional
+	    	if ( list.count("active") == 1 ) {
+	    		vhost_obj->_active = list["active"].boolean;
+	    	}
 
-		vhost_obj->save();
+			vhost_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( vhost_obj->model::get_saved() ) {
-			return_result("OK");
+			if( vhost_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -612,53 +630,59 @@ void master::create_vhost(cppcms::json::value object)
 
 void master::create_mailbox(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Mailbox;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Mailbox;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		mailbox* tmp = dynamic_cast<mailbox*>(model_obj.get());
-		std::unique_ptr<mailbox> mailbox_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    mailbox_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			mailbox* tmp = dynamic_cast<mailbox*>(model_obj.get());
+			std::unique_ptr<mailbox> mailbox_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    mailbox_obj.reset(tmp);
+			}
 
-		if(!mailbox_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!mailbox_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		mailbox_obj->_email = list["email"].string; // validate?
-		mailbox_obj->_password = list["password"].string;
-		mailbox_obj->_maildir = list["maildir"].string;
-		mailbox_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+			mailbox_obj->_email = list["email"].string; // validate?
+			mailbox_obj->_password = list["password"].string;
+			mailbox_obj->_maildir = list["maildir"].string;
+			mailbox_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
 
-		// optional
-    	if ( list.count("quota") == 1 ) {
-    		mailbox_obj->_quota = list["quota"].ll_integer;
-    	}
-    	if ( list.count("bytes") == 1 ) {
-    		mailbox_obj->_bytes = list["bytes"].ll_integer;
-    	}
-    	if ( list.count("messages") == 1 ) {
-    		mailbox_obj->_messages = list["messages"].string;
-    	}
-    	if ( list.count("active") == 1 ) {
-    		mailbox_obj->_active = list["active"].boolean;
-    	}
+			// optional
+	    	if ( list.count("quota") == 1 ) {
+	    		mailbox_obj->_quota = list["quota"].ll_integer;
+	    	}
+	    	if ( list.count("bytes") == 1 ) {
+	    		mailbox_obj->_bytes = list["bytes"].ll_integer;
+	    	}
+	    	if ( list.count("messages") == 1 ) {
+	    		mailbox_obj->_messages = list["messages"].string;
+	    	}
+	    	if ( list.count("active") == 1 ) {
+	    		mailbox_obj->_active = list["active"].boolean;
+	    	}
 
-		mailbox_obj->save();
+			mailbox_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( mailbox_obj->model::get_saved() ) {
-			return_result("OK");
+			if( mailbox_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -667,40 +691,46 @@ void master::create_mailbox(cppcms::json::value object)
 
 void master::create_shell(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Shell;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+				std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Shell;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		shell* tmp = dynamic_cast<shell*>(model_obj.get());
-		std::unique_ptr<shell> shell_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    shell_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			shell* tmp = dynamic_cast<shell*>(model_obj.get());
+			std::unique_ptr<shell> shell_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    shell_obj.reset(tmp);
+			}
 
-		if(!shell_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!shell_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		shell_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+			shell_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
 
-		if ( list.count("active") == 1 ) {
-    		shell_obj->_active = list["active"].boolean;
-    	}
+			if ( list.count("active") == 1 ) {
+	    		shell_obj->_active = list["active"].boolean;
+	    	}
 
-		shell_obj->save();
+			shell_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( shell_obj->model::get_saved() ) {
-			return_result("OK");
+			if( shell_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -709,51 +739,52 @@ void master::create_shell(cppcms::json::value object)
 
 void master::create_subdomain(cppcms::json::value object)
 {
-	// subdomain subdomain(get_database(),subdomain_name, domain_name);
-
-	// subdomain.save();
-
-	// return_result("OK");
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Subdomain;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Subdomain;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		subdomain* tmp = dynamic_cast<subdomain*>(model_obj.get());
-		std::unique_ptr<subdomain> subdomain_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    subdomain_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			subdomain* tmp = dynamic_cast<subdomain*>(model_obj.get());
+			std::unique_ptr<subdomain> subdomain_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    subdomain_obj.reset(tmp);
+			}
 
-		if(!subdomain_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!subdomain_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		subdomain_obj->set_name(list["name"].string);
-		subdomain_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+			subdomain_obj->set_name(list["name"].string);
+			subdomain_obj->set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
 
-		if ( list.count("active") == 1 ) {
-    		subdomain_obj->_active = list["active"].boolean;
-    	}
-    	if ( list.count("vhost_id") == 1 ) {
-    		subdomain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
-    	}
+			if ( list.count("active") == 1 ) {
+	    		subdomain_obj->_active = list["active"].boolean;
+	    	}
+	    	if ( list.count("vhost_id") == 1 ) {
+	    		subdomain_obj->set_vhost(std::shared_ptr<vhost>(new vhost(get_database(),list.at("vhost_id").integer)));
+	    	}
 
-    	std::cout << "Before saving called" << std::endl;
+	    	std::cout << "Before saving called" << std::endl;
 
-		subdomain_obj->save();
+			subdomain_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( subdomain_obj->model::get_saved() ) {
-			return_result("OK");
+			if( subdomain_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -762,39 +793,44 @@ void master::create_subdomain(cppcms::json::value object)
 
 void master::create_setting(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::AppSettings;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::AppSettings;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		app_settings* tmp = dynamic_cast<app_settings*>(model_obj.get());
-		std::unique_ptr<app_settings> app_settings_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    app_settings_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			app_settings* tmp = dynamic_cast<app_settings*>(model_obj.get());
+			std::unique_ptr<app_settings> app_settings_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    app_settings_obj.reset(tmp);
+			}
 
-		if(!app_settings_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!app_settings_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		app_settings_obj->set_key(list["key"].string); // validate?
-		app_settings_obj->set_value(list["value"].string);
-		app_settings_obj->set_default(list["default"].boolean);
-		app_settings_obj->set_description(list["description"].string);
+			app_settings_obj->set_key(list["key"].string); // validate?
+			app_settings_obj->set_value(list["value"].string);
+			app_settings_obj->set_default(list["default"].boolean);
+			app_settings_obj->set_description(list["description"].string);
 
-		app_settings_obj->save();
+			app_settings_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( app_settings_obj->model::get_saved() ) {
-			return_result("OK");
+			if( app_settings_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -803,39 +839,45 @@ void master::create_setting(cppcms::json::value object)
 
 void master::create_database_user(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::DatabaseUser;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::DatabaseUser;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		database_user* tmp = dynamic_cast<database_user*>(model_obj.get());
-		std::unique_ptr<database_user> database_user_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    database_user_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			database_user* tmp = dynamic_cast<database_user*>(model_obj.get());
+			std::unique_ptr<database_user> database_user_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    database_user_obj.reset(tmp);
+			}
 
-		if(!database_user_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!database_user_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		database_user_obj->set_name(list["name"].string); // validate?
-		database_user_obj->set_password(list["password"].string);
-		database_user_obj->set_permissions(list["permissions"].string);
-		database_user_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+			database_user_obj->set_name(list["name"].string); // validate?
+			database_user_obj->set_password(list["password"].string);
+			database_user_obj->set_permissions(list["permissions"].string);
+			database_user_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
 
-		database_user_obj->save();
+			database_user_obj->save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( database_user_obj->model::get_saved() ) {
-			return_result("OK");
+			if( database_user_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -844,42 +886,48 @@ void master::create_database_user(cppcms::json::value object)
 
 void master::create_database(cppcms::json::value object)
 {
-	std::map<std::string,any> primary_list;
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Database;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Database;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
-		database* tmp = dynamic_cast<database*>(model_obj.get());
-		std::unique_ptr<database> database_obj;
-		if(tmp != nullptr)
-		{
-		    model_obj.release();
-		    database_obj.reset(tmp);
-		}
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			database* tmp = dynamic_cast<database*>(model_obj.get());
+			std::unique_ptr<database> database_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    database_obj.reset(tmp);
+			}
 
-		if(!database_obj->model::check_required_fields(list))
-		{
-			throw missing_required_field_ex();
-		}
+			if(!database_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
 
-		database_obj->set_name(list["name"].string); // validate?
-		database_obj->set_database_type(std::shared_ptr<database_type>(new database_type(get_database(),list["db_type"].string)));
-		database_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+			database_obj->set_name(list["name"].string); // validate?
+			database_obj->set_database_type(std::shared_ptr<database_type>(new database_type(get_database(),list["db_type"].string)));
+			database_obj->set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
 
-		database_obj->save();
+			database_obj->save();
 
-		std::string username = object.get<std::string>("username");
-		user_dbuser_db connect(get_database(), username, database_obj->get_name()); // TODO verify db_type
-		connect.save();
+			std::string username = object.get<std::string>("username");
+			user_dbuser_db connect(get_database(), username, database_obj->get_name()); // TODO verify db_type
+			connect.save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( database_obj->model::get_saved() ) {
-			return_result("OK");
+			if( database_obj->model::get_saved() ) {
+				return_result("OK");
+			} else {
+				throw entity_save_ex();
+			}
 		} else {
-			throw entity_save_ex();
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -888,47 +936,44 @@ void master::create_database(cppcms::json::value object)
 
 void master::create_queue(cppcms::json::value object)
 {
-	//required_fields qid,action,created,uid
-	//optional_fields params,started,finished,status,result
-	/*
-	std::string _action;
-	std::string _params;
-	std::string _started;
-	std::string _finished;
-	std::string _status;
-	*/
-
 	try{
-		ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
-		std::map<std::string, any> list = this->create_generic(object, type);
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::Queue;
+			std::map<std::string, any> list = this->create_generic(object, type);
 
-		queue queue(get_database());
+			queue queue(get_database());
 
-		queue._action = list["action"].string;
-		queue.set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
+			queue._action = list["action"].string;
+			queue.set_user(std::shared_ptr<user>(new user(get_database(),list["uid"].integer)));
 
-		// optional
-		if ( list.count("params") == 1 ) {
-			queue._params = list.at("params").string;
-		}
-		if ( list.count("started") == 1 ) {
-	    	queue._started = list.at("started").string;
-	    }
-	    if ( list.count("finished") == 1 ) {
-	    	queue._finished = list.at("finished").string;
-		}
-		if ( list.count("status") == 1 ) {
-    		queue._status = list.at("status").string;
-    	}
+			// optional
+			if ( list.count("params") == 1 ) {
+				queue._params = list.at("params").string;
+			}
+			if ( list.count("started") == 1 ) {
+		    	queue._started = list.at("started").string;
+		    }
+		    if ( list.count("finished") == 1 ) {
+		    	queue._finished = list.at("finished").string;
+			}
+			if ( list.count("status") == 1 ) {
+	    		queue._status = list.at("status").string;
+	    	}
 
-		queue.save();
+			queue.save();
 
-		std::cout << "After saving called" << std::endl;
+			std::cout << "After saving called" << std::endl;
 
-		if( queue.model::get_saved() ) {
-			return_result("OK");
+			if( queue.model::get_saved() ) {
+				return_result("OK");
+			} else {
+				return_error("Failed to save entity");
+			}
 		} else {
-			return_error("Failed to save entity");
+			return_error("Not authenticated");
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -1519,8 +1564,8 @@ void dump_map(const std::map<std::string,any>& map) {
 
 bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
 {
-	std::cout << "convert" << std::endl;
-	std::cout << "Field " << first.str() << std::endl;
+	// std::cout << "convert" << std::endl;
+	// std::cout << "Field " << first.str() << std::endl;
 	if ( tmp->model::compare_field(first.str()) ) {
 		switch(second.type()) {
 			case cppcms::json::json_type::is_number: 
@@ -1542,7 +1587,7 @@ bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 			default:
 				break;
 		}
-		dump_map(update_list);
+		// dump_map(update_list);
 		return true;
 	}
 	throw unrecognized_field_ex();
