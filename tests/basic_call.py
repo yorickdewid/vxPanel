@@ -170,7 +170,7 @@ def test_rpc_get_ftp_account():
 
 def test_rpc_get_vhost():
 	print bcolors.OKBLUE + "Testcase: Get vhost" + bcolors.ENDC
-	data = '{"id":0,"method":"get_vhost","params":["trol.com"]}'
+	data = '{"id":0,"method":"get_vhost","params":["trol.com",1]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_get_mailbox():
@@ -271,63 +271,63 @@ def test_rpc_update_database():
 
 def test_rpc_delete_user():
 	print bcolors.OKBLUE + "Testcase: Delete user" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_user","params":["kaasie",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_user","params":["kaasie"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_domain():
 	print bcolors.OKBLUE + "Testcase: Delete domain" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_domain","params":["trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_domain","params":["trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_dns():
 	print bcolors.OKBLUE + "Testcase: Delete dns" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_dns","params":[1,1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_dns","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Delete ftp account" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_ftp_account","params":["kaasje",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_ftp_account","params":["kaasje"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_vhost():
 	print bcolors.OKBLUE + "Testcase: Delete vhost" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_vhost","params":[1,1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_vhost","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_mailbox():
 	print bcolors.OKBLUE + "Testcase: Delete mailbox" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_mailbox","params":[1,1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_mailbox","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_shell():
 	print bcolors.OKBLUE + "Testcase: Delete shell" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_shell","params":[1,1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_shell","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_subdomain():
 	print bcolors.OKBLUE + "Testcase: Delete subdomain" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_subdomain","params":["kaas.","trol.com",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_subdomain","params":["kaas.","trol.com"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_setting():
 	print bcolors.OKBLUE + "Testcase: Delete setting" + bcolors.ENDC
 	data = '{"id":0,"method":"delete_setting","params":["reboot"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_database_type():
 	print bcolors.OKBLUE + "Testcase: Delete database options" + bcolors.ENDC
 	data = '{"id":0,"method":"delete_database_type","params":["mysql"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_database_user():
 	print bcolors.OKBLUE + "Testcase: Delete database user" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_database_user","params":["arie",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_database_user","params":["arie"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_delete_database():
 	print bcolors.OKBLUE + "Testcase: Delete database" + bcolors.ENDC
-	data = '{"id":0,"method":"delete_database","params":["kaas","arie",1000]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	data = '{"id":0,"method":"delete_database","params":["kaas","arie"]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 
 config = open_config_file(sys.argv[1])
@@ -349,7 +349,7 @@ if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme
 test_rpc_create_user()
 
 #token
-token = get_token()
+token = get_token() # user type user
 
 test_rpc_create_domain(token)
 test_rpc_create_dns()
@@ -388,16 +388,16 @@ test_rpc_update_setting()
 test_rpc_update_database_user()
 test_rpc_update_database()
 
-# test_rpc_delete_dns()
-# test_rpc_delete_ftp_account()
-# test_rpc_delete_vhost()
-# test_rpc_delete_mailbox()
-# test_rpc_delete_shell()
-# test_rpc_delete_subdomain()
-# test_rpc_delete_setting()
-# test_rpc_delete_database()
-# test_rpc_delete_database_user() ## DELETE LAST (foreign key)
-# test_rpc_delete_database_type() ## DELETE LAST (foreign key)
-# test_rpc_delete_domain() ## DELETE LAST (foreign key)
-# test_rpc_delete_user() ## DELETE LAST (foreign key)
+test_rpc_delete_dns()
+test_rpc_delete_ftp_account()
+test_rpc_delete_vhost()
+test_rpc_delete_mailbox()
+test_rpc_delete_shell()
+test_rpc_delete_subdomain()
+test_rpc_delete_setting()
+test_rpc_delete_database()
+test_rpc_delete_database_user() ## DELETE LAST (foreign key)
+test_rpc_delete_database_type() ## DELETE LAST (foreign key)
+test_rpc_delete_domain() ## DELETE LAST (foreign key)
+test_rpc_delete_user() ## DELETE LAST (foreign key)
 ## all 'perfect' scenarios ##

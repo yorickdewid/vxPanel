@@ -1609,6 +1609,7 @@ void master::update_database(cppcms::json::value object)
 	try{
 		std::vector<std::string> role_types;
 		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
 		if ( this->check_authenticated(role_types) ) {
 
 			std::string name = "";
@@ -1626,107 +1627,195 @@ void master::update_database(cppcms::json::value object)
 
 /* delete */
 
-void master::delete_user(std::string username, int uid)
+void master::delete_user(std::string username)
 {
-	user user(get_database(),uid);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			user user(get_database(), this->get_uid_from_token());
 
-	user.load();
+			user.load();
 
-	if ( user.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( user.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_domain(std::string domain_name, int uid)
+void master::delete_domain(std::string domain_name)
 {
-	domain domain(get_database(),domain_name);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			domain domain(get_database(),domain_name);
 
-	domain.load();
+			domain.load();
 
-	if ( domain.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( domain.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_dns(int dns_id, int uid)
+void master::delete_dns(int dns_id)
 {
-	dns dns(get_database(),dns_id);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			dns dns(get_database(),dns_id);
 
-	dns.load();
+			dns.load();
 
-	if ( dns.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( dns.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_ftp_account(std::string ftp_username, int uid)
+void master::delete_ftp_account(std::string ftp_username)
 {
-	ftp_account ftp_account(get_database(),ftp_username);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			ftp_account ftp_account(get_database(),ftp_username);
 
-	ftp_account.load();
+			ftp_account.load();
 
-	if ( ftp_account.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( ftp_account.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_vhost(int vhost_id, int uid)
+void master::delete_vhost(int vhost_id)
 {
-	vhost vhost(get_database(),vhost_id);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			vhost vhost(get_database(),vhost_id);
 
-	vhost.load();
+			vhost.load();
 
-	if ( vhost.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( vhost.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_mailbox(int mailbox_id, int uid)
+void master::delete_mailbox(int mailbox_id)
 {
-	mailbox mailbox(get_database(),mailbox_id);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			mailbox mailbox(get_database(),mailbox_id);
 
-	mailbox.load();
+			mailbox.load();
 
-	if ( mailbox.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( mailbox.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_shell(int id, int uid)
+void master::delete_shell(int id)
 {
-	shell shell(get_database(),id);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			shell shell(get_database(),id);
 
-	shell.load();
+			shell.load();
 
-	if ( shell.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( shell.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_subdomain(std::string subdomain_name, std::string domain_name, int uid)
+void master::delete_subdomain(std::string subdomain_name, std::string domain_name)
 {
-	subdomain subdomain(get_database(),subdomain_name,domain_name);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			subdomain subdomain(get_database(),subdomain_name,domain_name);
 
-	subdomain.load();
+			subdomain.load();
 
-	if ( subdomain.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			if ( subdomain.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
@@ -1755,33 +1844,55 @@ void master::delete_database_type(std::string name)
 	}
 }
 
-void master::delete_database_user(std::string username, int uid)
+void master::delete_database_user(std::string username)
 {
-	database_user database_user(get_database(),username);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			database_user database_user(get_database(),username);
 
-	database_user.load();
-	if ( database_user.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
+			database_user.load();
+			if ( database_user.m_delete() ) {
+				return_result("OK");
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 
-void master::delete_database(std::string db_name, std::string db_username, int uid)
+void master::delete_database(std::string db_name, std::string db_username)
 {
-	database database(get_database(),db_name);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			database database(get_database(),db_name);
 
-	database.load();
-	user_dbuser_db connect(get_database(),db_username,db_name);
-	if ( connect.m_delete() ) {
-		if ( database.m_delete() ) {
-			return_result("OK");
+			database.load();
+			user_dbuser_db connect(get_database(),db_username,db_name);
+			if ( connect.m_delete() ) {
+				if ( database.m_delete() ) {
+					return_result("OK");
+				}
+				else {
+					return_error("Failed to delete database, and remove connection with username");
+				}
+			} else {
+				return_error("Delete failed");
+			}
+		} else {
+			return_error("Not authenticated");
 		}
-		else {
-			return_error("Failed to delete database, and remove connection with username");
-		}
-	} else {
-		return_error("Delete failed");
+    } catch(std::exception &e) {
+		return_error(e.what());
 	}
 }
 

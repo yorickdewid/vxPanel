@@ -54,29 +54,29 @@ public:
 	void get_queue(int qid);
 	void get_ip();
 
-	void update_user(cppcms::json::value object); /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
-	void update_domain(cppcms::json::value object); /* status, registrar, vhost_id */
-	void update_dns( cppcms::json::value object); /* address */
-	void update_ftp_account(cppcms::json::value object); /* password, permissions */
-	void update_vhost(cppcms::json::value object); /* name ?, custom_config */ 
-	void update_mailbox(cppcms::json::value object); /* address */
-	void update_subdomain(cppcms::json::value object); /* subdomain name , vhost_id */
-	void update_setting(cppcms::json::value object); /* value, default, description */
-	void update_database_user(cppcms::json::value object); /* password, permissions */
-	void update_database(cppcms::json::value object); /* database_type */
+	void update_user(cppcms::json::value object);
+	void update_domain(cppcms::json::value object);
+	void update_dns( cppcms::json::value object);
+	void update_ftp_account(cppcms::json::value object);
+	void update_vhost(cppcms::json::value object);
+	void update_mailbox(cppcms::json::value object);
+	void update_subdomain(cppcms::json::value object);
+	void update_setting(cppcms::json::value object);
+	void update_database_user(cppcms::json::value object);
+	void update_database(cppcms::json::value object);
 
-	void delete_user(std::string username, int uid);
-	void delete_domain(std::string domain_name, int uid);
-	void delete_dns(int dns_id, int uid);
-	void delete_ftp_account(std::string ftp_username, int uid);
-	void delete_vhost(int vhost_id, int uid);
-	void delete_mailbox(int mailbox_id, int uid);
-	void delete_shell(int id, int uid);
-	void delete_subdomain(std::string subdomain_name, std::string domain_name, int uid);
+	void delete_user(std::string username);
+	void delete_domain(std::string domain_name);
+	void delete_dns(int dns_id);
+	void delete_ftp_account(std::string ftp_username);
+	void delete_vhost(int vhost_id);
+	void delete_mailbox(int mailbox_id);
+	void delete_shell(int id);
+	void delete_subdomain(std::string subdomain_name, std::string domain_name);
 	void delete_setting(std::string key);
 	void delete_database_type(std::string name);
-	void delete_database_user(std::string username, int uid);
-	void delete_database(std::string db_name, std::string username, int uid);
+	void delete_database_user(std::string username);
+	void delete_database(std::string db_name, std::string username);
 
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 	bool check_default(any value);
