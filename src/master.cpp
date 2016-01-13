@@ -313,6 +313,7 @@ bool master::check_authenticated(std::vector<std::string> role_types)
 			}
 			return false;
 		} else {
+			throw token_not_valid_ex();
 			return false;
 		}
 	}

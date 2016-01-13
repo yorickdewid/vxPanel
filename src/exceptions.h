@@ -75,6 +75,14 @@ class no_token_ex: public std::exception
   }
 };
 
+class token_not_valid_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Token not valid";
+  }
+};
+
 
 #endif /* EXCEPTIONS_H */
 
