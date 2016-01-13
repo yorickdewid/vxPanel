@@ -16,7 +16,7 @@ void user::save()
 		if ( _note.empty() ) {
 			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, remote, user_type, active, lastlogin) ";
 		 	query << "VALUES (?, ENCRYPT(?, CONCAT('$6$', SUBSTRING(SHA(RAND()), -16))), ?, ?, ?, ?, ?, ?, ?, ?, inet6_aton(?), ?, ?, ?)";
-		 	stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _active << _lastlogin;
+		 	stat = db.session() << query.str() << username << _password << _email << _firstname << _lastname << _country << _city << _address << _address_number << _postal << _remote << _user_type << _active << _lastlogin;
 		}
 		else{
 			query << "INSERT INTO user (username, password, email, firstname, lastname, country, city, address, address_number, postal, note, remote, user_type, active, lastlogin) ";

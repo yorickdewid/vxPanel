@@ -2,6 +2,7 @@
 #define USER_H
 
 #include <iostream>
+#include "../constants.h"
 
 class user : public model {
 
@@ -88,7 +89,7 @@ public:
 	std::string _postal;
 	std::string _note;
 	std::string _remote; // ip_address on save
-	std::string _user_type;
+	std::string _user_type = USER_TYPE_USER; // SAME DEFAULT AS DB
 	bool _active;
 
 private:

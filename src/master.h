@@ -91,9 +91,11 @@ protected:
 
 private:
 	std::string create_auth_token(int uid);
-	bool check_authenticated();
-	backend *db = NULL;
+	bool check_authenticated(std::vector<std::string> role_types);
+	bool is_role_allowed(std::vector<std::string> role_types, int uid);
 	void init_backend();
+
+	backend *db = NULL;
 
 };
 

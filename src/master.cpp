@@ -12,6 +12,7 @@
 #include "model.h"
 #include "any.h"
 #include "model/models.h"
+#include "constants.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -277,7 +278,7 @@ void master::authenticate(std::string username, std::string password)
 	}
 }
 
-bool master::check_authenticated()
+bool master::check_authenticated(std::vector<std::string> role_types)
 {
 	cppdb::statement stat;
 
@@ -301,9 +302,34 @@ bool master::check_authenticated()
 		cppdb::result r = stat.query();
 
 		if(r.next()){
-			return true;
+			int uid = -1;
+			r.fetch(2, uid);
+			if ( uid != -1 ) {
+				if ( this->is_role_allowed(role_types, uid) ) {
+					return true;
+				} else {
+					throw auth_ex();
+				}
+			}
+			return false;
 		} else {
 			return false;
+		}
+	}
+	return false;
+}
+
+bool master::is_role_allowed(std::vector<std::string> role_types, int uid)
+{
+	user user(get_database(),uid);
+	user.load();
+
+	if ( user.model::get_saved() ) {
+		for ( auto it = role_types.begin(); it != role_types.end(); ++it ) {
+			if ( (*it).compare(user._user_type) == 0 )
+			{
+				return true;
+			}
 		}
 	}
 	return false;
@@ -391,7 +417,10 @@ void master::create_user(cppcms::json::value object)
 void master::create_domain(cppcms::json::value object)
 {
 	try{
-		if ( this->check_authenticated() ) {
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
 			std::map<std::string,any> primary_list;
 
 			ModelFactory::ModelType type = ModelFactory::ModelType::Domain;
