@@ -1407,93 +1407,221 @@ void master::get_ip()
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void master::update_user(cppcms::json::value object)
 {
-	int uid = -1;
-	std::map<std::string,any> primary_list;
-	primary_list["uid"] = uid;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			int uid = -1;
+			std::map<std::string,any> primary_list;
+			primary_list["uid"] = uid;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* status, registrar, vhost_id */
 void master::update_domain(cppcms::json::value object)
 {
-	std::string domain_name = "";
-	std::map<std::string,any> primary_list;
-	primary_list["name"] = domain_name;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			
+			std::string domain_name = "";
+			std::map<std::string,any> primary_list;
+			primary_list["name"] = domain_name;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* address */
 void master::update_dns(cppcms::json::value object)
 {
-	int dns_id = -1;
-	std::map<std::string,any> primary_list;
-	primary_list["id"] = dns_id;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			
+			int dns_id = -1;
+			std::map<std::string,any> primary_list;
+			primary_list["id"] = dns_id;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* password, permissions */
 void master::update_ftp_account(cppcms::json::value object)
 {
-	std::string ftp_account = "";
-	std::map<std::string,any> primary_list;
-	primary_list["name"] = ftp_account;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			
+			std::string ftp_account = "";
+			std::map<std::string,any> primary_list;
+			primary_list["name"] = ftp_account;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* name ?, custom_config */ 
 void master::update_vhost(cppcms::json::value object)
 {
-	int vhost_id = -1;
-	std::map<std::string,any> primary_list;
-	primary_list["id"] = vhost_id;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			int vhost_id = -1;
+			std::map<std::string,any> primary_list;
+			primary_list["id"] = vhost_id;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* address */
 void master::update_mailbox(cppcms::json::value object)
 {
-	int mailbox_id = -1;
-	std::map<std::string,any> primary_list;
-	primary_list["id"] = mailbox_id;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			int mailbox_id = -1;
+			std::map<std::string,any> primary_list;
+			primary_list["id"] = mailbox_id;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* subdomain name , vhost_id */
 void master::update_subdomain(cppcms::json::value object)
 {
-	std::string domain_name = "";
-	std::string subdomain_name = "";
-	std::map<std::string,any> primary_list;
-	primary_list["name"] = subdomain_name;
-	primary_list["domain_name"] = domain_name;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			std::string domain_name = "";
+			std::string subdomain_name = "";
+			std::map<std::string,any> primary_list;
+			primary_list["name"] = subdomain_name;
+			primary_list["domain_name"] = domain_name;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* value, default, description */
 void master::update_setting(cppcms::json::value object)
 {
-	std::string key = "";
-	std::map<std::string,any> primary_list;
-	primary_list["key"] = key;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+
+			std::string key = "";
+			std::map<std::string,any> primary_list;
+			primary_list["key"] = key;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* password, permissions */
 void master::update_database_user(cppcms::json::value object)
 {
-	std::string username = "";
-	std::map<std::string,any> primary_list;
-	primary_list["name"] = username;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			std::string username = "";
+			std::map<std::string,any> primary_list;
+			primary_list["name"] = username;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* database_type */
 void master::update_database(cppcms::json::value object)
 {
-	std::string name = "";
-	std::map<std::string,any> primary_list;
-	primary_list["name"] = name;
-	this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+
+			std::string name = "";
+			std::map<std::string,any> primary_list;
+			primary_list["name"] = name;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
+
+		} else {
+			return_error("Not authenticated");
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
 }
 
 /* delete */

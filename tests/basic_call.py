@@ -219,52 +219,52 @@ def test_rpc_get_queue():
 def test_rpc_update_user():
 	print bcolors.OKBLUE + "Testcase: Update user" + bcolors.ENDC
 	data = '{"id":0,"method":"update_user","params":[{"update_list":{"uid":1000,"address_number":255,"address":"kaassstraat"}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_domain():
 	print bcolors.OKBLUE + "Testcase: Update domain" + bcolors.ENDC
 	data = '{"id":0,"method":"update_domain","params":[{"update_list":{"name":"trol.com","status":"kaas","active":0}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_dns():
 	print bcolors.OKBLUE + "Testcase: Update dns" + bcolors.ENDC
 	data = '{"id":0,"method":"update_dns","params":[{"update_list":{"id":1,"name":"A www2.trol.com","active":0}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_ftp_account():
 	print bcolors.OKBLUE + "Testcase: Update ftp_account" + bcolors.ENDC
 	data = '{"id":0,"method":"update_ftp_account","params":[{"update_list":{"name":"kaasje","homedir":"/usr/kaasie","count":1}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_vhost():
 	print bcolors.OKBLUE + "Testcase: Update vhost" + bcolors.ENDC
 	data = '{"id":0,"method":"update_vhost","params":[{"update_list":{"id":1,"name":"trol.com","custom_config":"enable_write:true"}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_mailbox():
 	print bcolors.OKBLUE + "Testcase: Update mailbox" + bcolors.ENDC
 	data = '{"id":0,"method":"update_mailbox","params":[{"update_list":{"id":1,"maildir":"/usr/kaasie","messages":10}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_subdomain():
 	print bcolors.OKBLUE + "Testcase: Update subdomain" + bcolors.ENDC
 	data = '{"id":0,"method":"update_subdomain","params":[{"update_list":{"name":"kaas.","domain_name":"trol.com","active":0}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_setting():
 	print bcolors.OKBLUE + "Testcase: Update setting" + bcolors.ENDC
 	data = '{"id":0,"method":"update_setting","params":[{"update_list":{"key":"reboot","value":"off"}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_database_user():
 	print bcolors.OKBLUE + "Testcase: Update database_user" + bcolors.ENDC
 	data = '{"id":0,"method":"update_database_user","params":[{"update_list":{"name":"arie","permissions":"RWXR"}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 def test_rpc_update_database():
 	print bcolors.OKBLUE + "Testcase: Update database" + bcolors.ENDC
 	data = '{"id":0,"method":"update_database","params":[{"update_list":{"name":"kaas","db_type":"postgresql"}}]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 
 ### delete ###
@@ -330,11 +330,6 @@ def test_rpc_delete_database():
 	result_test(rpc_call(data), None); #TODO json object comparison
 
 
-def test_rpc_authenticate():
-	print bcolors.OKBLUE + "Testcase: Authenticate" + bcolors.ENDC
-	data = '{"id":0,"method":"authenticate","params":["kaasie","kaas"]}'
-	result_test(rpc_call(data), None); #TODO json object comparison
-
 config = open_config_file(sys.argv[1])
 os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DATABASE IF EXISTS ' + config['database'] +'"')
 if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme/create.sql') is not 0:
@@ -382,18 +377,16 @@ test_rpc_get_database_user()
 test_rpc_get_database()
 test_rpc_get_queue()
 
-# test_rpc_update_user()
-# test_rpc_update_domain()
-# test_rpc_update_dns()
-# test_rpc_update_ftp_account()
-# test_rpc_update_vhost()
-# test_rpc_update_mailbox()
-# test_rpc_update_subdomain()
-# test_rpc_update_setting()
-# test_rpc_update_database_user()
-# test_rpc_update_database()
-
-# test_rpc_authenticate()
+test_rpc_update_user()
+test_rpc_update_domain()
+test_rpc_update_dns()
+test_rpc_update_ftp_account()
+test_rpc_update_vhost()
+test_rpc_update_mailbox()
+test_rpc_update_subdomain()
+test_rpc_update_setting()
+test_rpc_update_database_user()
+test_rpc_update_database()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()
