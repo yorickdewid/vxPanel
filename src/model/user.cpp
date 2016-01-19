@@ -43,7 +43,7 @@ void user::load()
 		cppdb::statement stat;
 
 		stat = db.session() << 
-			"SELECT * FROM user WHERE uid = ?" << uid;
+			"SELECT uid, username, password, email, firstname, lastname, country, city, address, address_number, postal, note, inet6_ntoa(remote), user_type, active, lastlogin FROM user WHERE uid = ?" << uid;
 		cppdb::result r = stat.query();
 
 		while(r.next()) {

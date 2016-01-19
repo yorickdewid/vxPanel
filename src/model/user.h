@@ -49,6 +49,7 @@ public:
 		this->field_list["created"] = false;
 		this->field_list["last_login"] = false;
 		this->load(); 
+		std::cout << "user id " << uid << std::endl;
 	};
 
 	

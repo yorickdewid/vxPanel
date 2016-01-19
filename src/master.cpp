@@ -63,6 +63,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
+	bind("get_users", cppcms::rpc::json_method(&master::get_users, this), method_role);
+
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
 	bind("update_dns", cppcms::rpc::json_method(&master::update_dns, this), method_role);
@@ -1402,6 +1404,77 @@ void master::get_ip()
 	std::string remote_address = cppcms::application::request().remote_addr();
 	return_result(remote_address);
 }
+
+/* Get all */
+
+//helper
+
+cppdb::result master::get_result(std::ostringstream query)
+{
+	cppdb::statement stat;
+
+	stat = get_database().session() << query.str();
+	std::cout << query.str() << std::endl;
+	cppdb::result r = stat.query();
+
+	// dont reset the statement here clears the result..
+	return r;
+}
+
+void master::get_users(cppcms::json::value object)
+{
+	try{
+		std::ostringstream query;
+		cppcms::json::value json;
+		int count = 0;
+
+		query << "SELECT * FROM user LIMIT " << DEFAULT_LIMIT;
+		cppdb::result r = this->get_result(std::move(query));
+		//stat.reset();
+
+		while ( r.next() ) {
+			std::cout << "kaas" << std::endl;
+			int uid;
+			r >> uid;
+  			std::map<std::string,any> primary_list;
+			primary_list["uid"] = uid;
+			std::cout << uid << std::endl;
+  			
+  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list);		
+  			user* tmp = dynamic_cast<user*>(model_obj.get());
+			std::unique_ptr<user> user_obj;
+			if(tmp != nullptr)
+			{
+				model_obj.release();
+			    user_obj.reset(tmp);
+			}
+			
+			json["users"][count]["uid"] = user_obj->get_uid();
+			json["users"][count]["username"] = user_obj->get_username();
+			json["users"][count]["password"] = user_obj->get_password();
+			json["users"][count]["email"] = user_obj->get_email();
+			json["users"][count]["firstname"] = user_obj->_firstname;
+			json["users"][count]["lastname"] = user_obj->_lastname;
+			json["users"][count]["country"] = user_obj->_country;
+			json["users"][count]["city"] = user_obj->_city;
+			json["users"][count]["address"] = user_obj->_address;
+			json["users"][count]["address_number"] = user_obj->_address_number;
+			json["users"][count]["postal"] = user_obj->_postal;
+			json["users"][count]["note"] = user_obj->_note;
+			json["users"][count]["remote"] = user_obj->_remote;
+			json["users"][count]["user_type"] = user_obj->_user_type;
+			json["users"][count]["active"] = user_obj->_active;
+			json["users"][count]["created"] = user_obj->get_created();
+			json["users"][count]["last_login"] = user_obj->get_lastlogin();
+
+			count++;
+		}
+		return_result(json);
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
 
 /* Update */
 

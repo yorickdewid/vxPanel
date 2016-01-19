@@ -48,11 +48,25 @@ public:
 	void get_shell(int id);
 	void get_subdomain(std::string subdomain_name, std::string domain_name);
 	void get_setting(std::string key);
-	void get_database_types();
 	void get_database_user(std::string username);
 	void get_database(std::string db_name);
 	void get_queue(int qid);
 	void get_ip();
+
+	/* LISTS */
+	void get_users(cppcms::json::value object); // admin only for now
+	void get_domains(); // get domains for 1 user
+	void get_dns_records(std::string domain_name); // get all dns records for 1 domain
+	void get_ftp_accounts(std::string ftp_account); // get all ftp accounts for 1 user
+	void get_vhosts(std::string domain_name); // get all vhosts for 1 domain
+	void get_mailboxes(std::string domain_name); // get all mailboxes for 1 domain
+	void get_shells(); // get all shells for 1 domain 
+	void get_subdomains(); // get all subdomains for 1 user
+	void get_settings(std::string key); // get all settings (admin only)
+	void get_database_types(); // get all subdomains for 1 user
+	void get_database_users(); // get all database users for 1 user
+	void get_databases(); // get all databases for 1 user
+	void get_queues(); // get all queues for 1 user
 
 	void update_user(cppcms::json::value object);
 	void update_domain(cppcms::json::value object);
@@ -78,6 +92,7 @@ public:
 	void delete_database_user(std::string username);
 	void delete_database(std::string db_name, std::string username);
 
+	cppdb::result get_result(std::ostringstream query);
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 	bool check_default(any value);
 	bool check_default(std::map<std::string,any> primary_list);
