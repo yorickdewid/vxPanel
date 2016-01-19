@@ -213,6 +213,12 @@ def test_rpc_get_queue():
 	data = '{"id":0,"method":"get_queue","params":[1]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+## get multiple
+def test_rpc_get_users():
+	print bcolors.OKBLUE + "Testcase: Get users" + bcolors.ENDC
+	data = '{"id":0,"method":"get_users","params":[{"options":{"start_point":10,"size":50}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 
 ### update ###
 
@@ -349,7 +355,8 @@ if os.system('mysql -u' + config['user'] +' -p' + config['password'] +' < scheme
 test_rpc_create_user()
 
 #token
-token = get_token() # user type user
+token = get_token("kaasie","ABC@123") # user_type user
+admin_token = get_token("admin","ABC@123") # user_type admin
 
 test_rpc_create_domain(token)
 test_rpc_create_dns()
@@ -376,6 +383,8 @@ test_rpc_get_database_types()
 test_rpc_get_database_user()
 test_rpc_get_database()
 test_rpc_get_queue()
+
+test_rpc_get_users()
 
 test_rpc_update_user()
 test_rpc_update_domain()

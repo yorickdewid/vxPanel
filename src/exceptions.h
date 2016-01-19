@@ -67,6 +67,14 @@ class auth_ex: public std::exception
   }
 };
 
+class not_auth_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Not authenticated";
+  }
+};
+
 class no_token_ex: public std::exception
 {
   virtual const char* what() const throw()

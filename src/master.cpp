@@ -484,7 +484,7 @@ void master::create_domain(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -534,7 +534,7 @@ void master::create_dns(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -592,7 +592,7 @@ void master::create_ftp_account(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -642,7 +642,7 @@ void master::create_vhost(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -703,7 +703,7 @@ void master::create_mailbox(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -751,7 +751,7 @@ void master::create_shell(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -805,7 +805,7 @@ void master::create_subdomain(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -851,7 +851,7 @@ void master::create_setting(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -898,7 +898,7 @@ void master::create_database_user(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -948,7 +948,7 @@ void master::create_database(cppcms::json::value object)
 				throw entity_save_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -994,7 +994,7 @@ void master::create_queue(cppcms::json::value object)
 				return_error("Failed to save entity");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -1044,7 +1044,7 @@ void master::get_user()
 
 			return_result(json);
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
 	} catch(std::exception &e) {
 		return_error(e.what());
@@ -1072,10 +1072,10 @@ void master::get_domain(std::string domain_name)
 
 				return_result(json);
 			} else {
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1103,10 +1103,10 @@ void master::get_dns(std::string domain_name)
 
 				return_result(json);
 			} else {
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1135,10 +1135,10 @@ void master::get_ftp_account(std::string ftp_username)
 				return_result(json);
 			}
 			else{
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1165,7 +1165,7 @@ void master::get_vhost(std::string domain_name, int vhost_id)
 
 			return_result(json);
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1197,10 +1197,10 @@ void master::get_mailbox(std::string domain_name)
 
 				return_result(json);
 			} else{
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1225,10 +1225,10 @@ void master::get_shell(int id)
 				return_result(json);
 			}
 			else{
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1251,12 +1251,12 @@ void master::get_subdomain(std::string subdomain_name, std::string domain_name)
 			json["subdomain"]["name"] = subdomain.get_name();	
 			json["subdomain"]["created"] = subdomain.get_created();
 			if ( subdomain.get_domain_ptr() !=  NULL ) { /* good enough? */
-					json["subdomain"]["domain"] = subdomain.get_domain().name;
+				json["subdomain"]["domain"] = subdomain.get_domain().name;
 			}
 
 			return_result(json);
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1283,7 +1283,7 @@ void master::get_setting(std::string key)
 
 			return_result(json);
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1329,10 +1329,10 @@ void master::get_database_user(std::string username)
 				return_result(json);
 			}
 			else {
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1359,10 +1359,10 @@ void master::get_database(std::string db_name)
 				return_result(json);
 			}
 			else {
-				return_error("Unauthorized");
+				throw auth_ex();
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1392,7 +1392,7 @@ void master::get_queue(int qid)
 
 			return_result(json);
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1409,67 +1409,100 @@ void master::get_ip()
 
 //helper
 
-cppdb::result master::get_result(std::ostringstream query)
+cppdb::result master::get_result(std::ostringstream& query)
 {
 	cppdb::statement stat;
 
 	stat = get_database().session() << query.str();
 	std::cout << query.str() << std::endl;
-	cppdb::result r = stat.query();
 
 	// dont reset the statement here clears the result..
-	return r;
+	return stat.query();
+}
+
+void master::create_get_all_query(cppcms::json::value& object, std::ostringstream& query)
+{
+	cppcms::json::value options;
+	cppcms::json::value json;
+
+	try {
+		options = object.get<cppcms::json::object>("options");
+	}	catch(std::exception &e) {
+		throw missing_params_ex();
+	}
+
+	cppcms::json::value start_point = options.find("start_point");
+	if( !start_point.is_undefined() ) {
+		query << start_point.number();
+	} else {
+		query << DEFAULT_START_POINT;
+	}
+
+	query << ",";
+
+	cppcms::json::value size = options.find("size");
+	if( !size.is_undefined() ) {
+		query << options.number();
+	} else {
+		query << DEFAULT_LIMIT;
+	}
 }
 
 void master::get_users(cppcms::json::value object)
 {
 	try{
-		std::ostringstream query;
-		cppcms::json::value json;
-		int count = 0;
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
+			std::ostringstream query;
+			int count = 0;
 
-		query << "SELECT * FROM user LIMIT " << DEFAULT_LIMIT;
-		cppdb::result r = this->get_result(std::move(query));
-		//stat.reset();
+			query << "SELECT * FROM user LIMIT ";
 
-		while ( r.next() ) {
-			std::cout << "kaas" << std::endl;
-			int uid;
-			r >> uid;
-  			std::map<std::string,any> primary_list;
-			primary_list["uid"] = uid;
-			std::cout << uid << std::endl;
-  			
-  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list);		
-  			user* tmp = dynamic_cast<user*>(model_obj.get());
-			std::unique_ptr<user> user_obj;
-			if(tmp != nullptr)
-			{
-				model_obj.release();
-			    user_obj.reset(tmp);
+			this->create_get_all_query(object,query);
+
+			cppdb::result r = this->get_result(query);
+
+			while ( r.next() ) {
+				int uid;
+				r >> uid;
+	  			std::map<std::string,any> primary_list;
+				primary_list["uid"] = uid;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list);		
+	  			user* tmp = dynamic_cast<user*>(model_obj.get());
+				std::unique_ptr<user> user_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    user_obj.reset(tmp);
+				}
+
+				json["users"][count]["uid"] = user_obj->get_uid();
+				json["users"][count]["username"] = user_obj->get_username();
+				json["users"][count]["email"] = user_obj->get_email();
+				json["users"][count]["firstname"] = user_obj->_firstname;
+				json["users"][count]["lastname"] = user_obj->_lastname;
+				json["users"][count]["country"] = user_obj->_country;
+				json["users"][count]["city"] = user_obj->_city;
+				json["users"][count]["address"] = user_obj->_address;
+				json["users"][count]["address_number"] = user_obj->_address_number;
+				json["users"][count]["postal"] = user_obj->_postal;
+				json["users"][count]["note"] = user_obj->_note;
+				json["users"][count]["remote"] = user_obj->_remote;
+				json["users"][count]["user_type"] = user_obj->_user_type;
+				json["users"][count]["active"] = user_obj->_active;
+				json["users"][count]["created"] = user_obj->get_created();
+				json["users"][count]["last_login"] = user_obj->get_lastlogin();
+
+				count++;
 			}
-			
-			json["users"][count]["uid"] = user_obj->get_uid();
-			json["users"][count]["username"] = user_obj->get_username();
-			json["users"][count]["password"] = user_obj->get_password();
-			json["users"][count]["email"] = user_obj->get_email();
-			json["users"][count]["firstname"] = user_obj->_firstname;
-			json["users"][count]["lastname"] = user_obj->_lastname;
-			json["users"][count]["country"] = user_obj->_country;
-			json["users"][count]["city"] = user_obj->_city;
-			json["users"][count]["address"] = user_obj->_address;
-			json["users"][count]["address_number"] = user_obj->_address_number;
-			json["users"][count]["postal"] = user_obj->_postal;
-			json["users"][count]["note"] = user_obj->_note;
-			json["users"][count]["remote"] = user_obj->_remote;
-			json["users"][count]["user_type"] = user_obj->_user_type;
-			json["users"][count]["active"] = user_obj->_active;
-			json["users"][count]["created"] = user_obj->get_created();
-			json["users"][count]["last_login"] = user_obj->get_lastlogin();
-
-			count++;
+			return_result(json);
+		} else {
+			throw not_auth_ex();
 		}
-		return_result(json);
     } catch(std::exception &e) {
 		return_error(e.what());
 	}
@@ -1493,7 +1526,7 @@ void master::update_user(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::User, get_database(), primary_list), ModelFactory::ModelType::User);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1515,7 +1548,7 @@ void master::update_domain(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list), ModelFactory::ModelType::Domain);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1537,7 +1570,7 @@ void master::update_dns(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list), ModelFactory::ModelType::Dns);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1559,7 +1592,7 @@ void master::update_ftp_account(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list), ModelFactory::ModelType::FtpAccount);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1581,7 +1614,7 @@ void master::update_vhost(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list), ModelFactory::ModelType::Vhost);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1603,7 +1636,7 @@ void master::update_mailbox(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list), ModelFactory::ModelType::Mailbox);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1627,7 +1660,7 @@ void master::update_subdomain(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list), ModelFactory::ModelType::Subdomain);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1648,7 +1681,7 @@ void master::update_setting(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list), ModelFactory::ModelType::AppSettings);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1670,7 +1703,7 @@ void master::update_database_user(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list), ModelFactory::ModelType::DatabaseUser);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1692,7 +1725,7 @@ void master::update_database(cppcms::json::value object)
 			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list), ModelFactory::ModelType::Database);
 
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1718,7 +1751,7 @@ void master::delete_user(std::string username)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1742,7 +1775,7 @@ void master::delete_domain(std::string domain_name)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1766,7 +1799,7 @@ void master::delete_dns(int dns_id)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1790,7 +1823,7 @@ void master::delete_ftp_account(std::string ftp_username)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1814,7 +1847,7 @@ void master::delete_vhost(int vhost_id)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1838,7 +1871,7 @@ void master::delete_mailbox(int mailbox_id)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1862,7 +1895,7 @@ void master::delete_shell(int id)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1886,7 +1919,7 @@ void master::delete_subdomain(std::string subdomain_name, std::string domain_nam
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1934,7 +1967,7 @@ void master::delete_database_user(std::string username)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());
@@ -1963,7 +1996,7 @@ void master::delete_database(std::string db_name, std::string db_username)
 				return_error("Delete failed");
 			}
 		} else {
-			return_error("Not authenticated");
+			throw not_auth_ex();
 		}
     } catch(std::exception &e) {
 		return_error(e.what());

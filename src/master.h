@@ -92,7 +92,11 @@ public:
 	void delete_database_user(std::string username);
 	void delete_database(std::string db_name, std::string username);
 
-	cppdb::result get_result(std::ostringstream query);
+	/* used for get_all functions */
+	cppdb::result get_result(std::ostringstream& query);
+	void create_get_all_query(cppcms::json::value& object, std::ostringstream& query);
+
+	/* used mainly in update (create) functions */
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 	bool check_default(any value);
 	bool check_default(std::map<std::string,any> primary_list);
