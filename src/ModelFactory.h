@@ -34,7 +34,7 @@ public:
 				case DatabaseUser : return std::make_unique<database_user>(db, primary["name"].string);
 				case Dns : return std::make_unique<dns>(db, primary["id"].integer);
 				case Domain : return std::make_unique<domain>(db, primary["name"].string);
-				case FtpAccount : return std::make_unique<ftp_account>(db, primary["name"].string);
+				case FtpAccount : return std::make_unique<ftp_account>(db, primary["id"].integer);
 				case Mailbox : return std::make_unique<mailbox>(db, primary["id"].integer);
 				case Shell : return std::make_unique<shell>(db, primary["id"].integer);
 				case Subdomain : return std::make_unique<subdomain>(db, primary["name"].string, primary["domain_name"].string);

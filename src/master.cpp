@@ -68,6 +68,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_users", cppcms::rpc::json_method(&master::get_users, this), method_role);
 	bind("get_domains", cppcms::rpc::json_method(&master::get_domains, this), method_role);
 	bind("get_dns_records", cppcms::rpc::json_method(&master::get_dns_records, this), method_role);
+	bind("get_ftp_accounts", cppcms::rpc::json_method(&master::get_ftp_accounts, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1731,6 +1732,81 @@ void master::get_dns_records(cppcms::json::value object)
 				json["dns_records"][count]["created"] = dns_obj->get_created();
 				json["dns_records"][count]["domain_name"] = dns_obj->get_domain().name;
 				json["dns_records"][count]["active"] = dns_obj->_active;
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_ftp_accounts(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppdb::statement stat;
+			cppcms::json::value json;
+			std::ostringstream query;
+			int count = 0;
+
+			query << "SELECT id FROM ftpuser WHERE userid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			stat << this->get_uid_from_token();
+			std::cout << query.str() << std::endl;
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				int id;
+				r >> id;
+	  			std::map<std::string,any> primary_list;
+				primary_list["id"] = id;
+
+				std::cout << "the test 1 " << std::endl;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list);
+	  			std::cout << "the test 2 " << std::endl;
+	  			ftp_account* tmp = dynamic_cast<ftp_account*>(model_obj.get());
+				std::unique_ptr<ftp_account> ftp_account_obj;
+
+				std::cout << "the test 3 " << std::endl;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    ftp_account_obj.reset(tmp);
+				}
+
+				ftp_account_obj->load_id(); //sigsev
+
+				std::cout << "the test" << std::endl;
+
+				json["ftp_accounts"][count]["id"] = ftp_account_obj->get_id();
+				json["ftp_accounts"][count]["name"] = ftp_account_obj->_name;
+				json["ftp_accounts"][count]["uid"] = ftp_account_obj->_uid;
+				json["ftp_accounts"][count]["gid"] = ftp_account_obj->_gid;
+				json["ftp_accounts"][count]["homedir"] = ftp_account_obj->_homedir;
+				json["ftp_accounts"][count]["shell"] = ftp_account_obj->_shell;
+				json["ftp_accounts"][count]["count"] = ftp_account_obj->get_count();
+				json["ftp_accounts"][count]["userid"] = ftp_account_obj->get_user().get_uid();
+				json["ftp_accounts"][count]["created"] = ftp_account_obj->get_created();
+				json["ftp_accounts"][count]["accessed"] = ftp_account_obj->get_accessed();
+				json["ftp_accounts"][count]["modified"] = ftp_account_obj->get_modified();
 
 				count++;
 			}

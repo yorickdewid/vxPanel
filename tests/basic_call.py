@@ -240,6 +240,11 @@ def test_rpc_get_dns_records():
 	data = '{"id":0,"method":"get_dns_records","params":[{"options":{"domain_name":"trol.com"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_ftp_accounts():
+	print bcolors.OKBLUE + "Testcase: Get ftp accounts" + bcolors.ENDC
+	data = '{"id":0,"method":"get_ftp_accounts","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 
 ### update ###
 
@@ -421,6 +426,7 @@ test_rpc_get_domain_alias()
 test_rpc_get_users()
 test_rpc_get_domains()
 test_rpc_get_dns_records()
+test_rpc_get_ftp_accounts()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()

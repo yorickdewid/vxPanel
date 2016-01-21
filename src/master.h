@@ -59,16 +59,16 @@ public:
 	void get_users(cppcms::json::value object); // admin only for now
 	void get_domains(cppcms::json::value object); // get domains for 1 user
 	void get_dns_records(cppcms::json::value object); // get all dns records for 1 domain
-	void get_ftp_accounts(std::string ftp_account); // get all ftp accounts for 1 user
-	void get_vhosts(std::string domain_name); // get all vhosts for 1 domain
-	void get_mailboxes(std::string domain_name); // get all mailboxes for 1 domain
-	void get_shells(); // get all shells for 1 domain 
-	void get_subdomains(); // get all subdomains for 1 user
-	void get_settings(std::string key); // get all settings (admin only)
+	void get_ftp_accounts(cppcms::json::value object); // get all ftp accounts for 1 user
+	void get_vhosts(cppcms::json::value object); // get all vhosts for 1 domain
+	void get_mailboxes(cppcms::json::value object); // get all mailboxes for 1 domain
+	void get_shells(cppcms::json::value object); // get all shells for 1 domain 
+	void get_subdomains(cppcms::json::value object); // get all subdomains for 1 user
+	void get_settings(cppcms::json::value object); // get all settings (admin only)
 	void get_database_types(); // get all subdomains for 1 user
-	void get_database_users(); // get all database users for 1 user
-	void get_databases(); // get all databases for 1 user
-	void get_queues(); // get all queues for 1 user
+	void get_database_users(cppcms::json::value object); // get all database users for 1 user
+	void get_databases(cppcms::json::value object); // get all databases for 1 user
+	void get_queues(cppcms::json::value object); // get all queues for 1 user
 
 	void update_user(cppcms::json::value object);
 	void update_domain(cppcms::json::value object);

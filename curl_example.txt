@@ -2,3 +2,4 @@ curl -d '{"id":0,"method":"update_user","params":[{"update_list":{"uid":1000,"ad
 
 curl -d '{"id":0,"method":"get_users","params":[{"kaas":{}}]}' -H 'content-type: application/json;' http://localhost:8080/rpc
 
+curl -d '{"id":0,"method":"get_dns_records","params":[{"options":{"domain_name":"trol.com"}}]}' -H 'content-type: application/json;' -H '' http://localhost:8080/rpc

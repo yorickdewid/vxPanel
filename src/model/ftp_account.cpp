@@ -41,7 +41,38 @@ void ftp_account::load()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
+			std::cout << "before " << std::endl;
 			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
+	  		std::cout << "before " << std::endl;
+	  		set_user(std::shared_ptr<user>(new user(db,userid)));
+	    }
+
+	    stat.reset();
+
+    	this->saved = true;
+
+		std::cout << "Entity loaded " << std::endl;
+	}
+	catch(std::exception &e)
+	{
+		std::cout << "Exception occured " << e.what() << std::endl;
+	}
+}
+
+void ftp_account::load_id()
+{
+	try{
+		cppdb::statement stat;
+		int userid;
+
+		stat = db.session() << 
+				"SELECT * FROM ftpuser WHERE id = ?" << id;
+		cppdb::result r = stat.query();
+
+		while(r.next()) {
+			std::cout << "before " << std::endl;
+			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
+	  		std::cout << "before " << std::endl;
 	  		set_user(std::shared_ptr<user>(new user(db,userid)));
 	    }
 

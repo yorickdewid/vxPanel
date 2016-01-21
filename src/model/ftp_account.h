@@ -24,6 +24,26 @@ public:
 		this->field_list["accessed"] = false;
 		this->field_list["modified"] = false;
 	};
+	ftp_account(backend& db, int id) :
+		model(db),
+		id(id),
+		_user(NULL)
+	{
+		this->table_name = "ftpuser";
+		this->primary_info["id"] = id;
+		this->field_list["id"] = false;
+		this->field_list["name"] = true; 
+		this->field_list["password"] = true; 
+		this->field_list["uid"] = false; //linux
+		this->field_list["gid"] = false;
+		this->field_list["homedir"] = true;
+		this->field_list["shell"] = false;
+		this->field_list["count"] = false;
+		this->field_list["userid"] = true;
+		this->field_list["created"] = false;
+		this->field_list["accessed"] = false;
+		this->field_list["modified"] = false;
+	};
 	ftp_account(backend& db, std::string username) :
 		model(db),
 		_name(username),
@@ -47,6 +67,7 @@ public:
 	
 	void save();
 	void load();
+	void load_id();
 	bool m_delete();
 	
 	void set_username(std::string username);
