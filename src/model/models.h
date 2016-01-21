@@ -15,6 +15,7 @@
 #include "database_type.h"
 #include "user_dbuser_db.h"
 #include "queue.h"
+#include "domain_alias.h"
 #include "auth_token.h"
 
 #endif /* MODEL_H */

@@ -74,8 +74,8 @@ def test_rpc_db_version():
 	data = '{"id":0,"method":"db_version","params":[]}'
 	result_test(rpc_call(data), None)
 
-def get_token():
-	data = '{"id":0,"method":"authenticate","params":["kaasie","ABC@123"]}'
+def get_token(username, password):
+	data = '{"id":0,"method":"authenticate","params":["'+username+'","'+password+'"]}'
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
 	rs = json.loads(response.read())
@@ -146,6 +146,11 @@ def test_rpc_create_queue():
 	data = '{"id":0,"method":"create_queue","params":[{"required_list":{"action":"USERADD","uid":1000}, "optional_list":{"params":"kaas"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_create_domain_alias():
+	print bcolors.OKBLUE + "Testcase: Create domain alias" + bcolors.ENDC
+	data = '{"id":0,"method":"create_domain_alias","params":[{"required_list":{"source":"","destination":"","domain_name":"trol.com"}, "optional_list":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 
 ### get ###
 def test_rpc_get_user():
@@ -211,6 +216,11 @@ def test_rpc_get_database():
 def test_rpc_get_queue():
 	print bcolors.OKBLUE + "Testcase: Get queue" + bcolors.ENDC
 	data = '{"id":0,"method":"get_queue","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
+def test_rpc_get_domain_alias():
+	print bcolors.OKBLUE + "Testcase: Get domain_alias" + bcolors.ENDC
+	data = '{"id":0,"method":"get_domain_alias","params":[1]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
 ## get multiple
@@ -356,7 +366,7 @@ test_rpc_create_user()
 
 #token
 token = get_token("kaasie","ABC@123") # user_type user
-admin_token = get_token("admin","ABC@123") # user_type admin
+# admin_token = get_token("admin","ABC@123") # user_type admin
 
 test_rpc_create_domain(token)
 test_rpc_create_dns()
@@ -369,44 +379,45 @@ test_rpc_create_setting()
 test_rpc_create_db_user()
 test_rpc_create_database()
 test_rpc_create_queue()
+test_rpc_create_domain_alias()
 
-test_rpc_get_user()
-test_rpc_get_domain()
-test_rpc_get_dns()
-test_rpc_get_ftp_account()
-test_rpc_get_vhost()
-test_rpc_get_mailbox()
-test_rpc_get_shell()
-test_rpc_get_subdomain()
-test_rpc_get_setting()
-test_rpc_get_database_types()
-test_rpc_get_database_user()
-test_rpc_get_database()
-test_rpc_get_queue()
+# test_rpc_get_user()
+# test_rpc_get_domain()
+# test_rpc_get_dns()
+# test_rpc_get_ftp_account()
+# test_rpc_get_vhost()
+# test_rpc_get_mailbox()
+# test_rpc_get_shell()
+# test_rpc_get_subdomain()
+# test_rpc_get_setting()
+# test_rpc_get_database_types()
+# test_rpc_get_database_user()
+# test_rpc_get_database()
+# test_rpc_get_queue()
 
-test_rpc_get_users()
+# test_rpc_get_users()
 
-test_rpc_update_user()
-test_rpc_update_domain()
-test_rpc_update_dns()
-test_rpc_update_ftp_account()
-test_rpc_update_vhost()
-test_rpc_update_mailbox()
-test_rpc_update_subdomain()
-test_rpc_update_setting()
-test_rpc_update_database_user()
-test_rpc_update_database()
+# test_rpc_update_user()
+# test_rpc_update_domain()
+# test_rpc_update_dns()
+# test_rpc_update_ftp_account()
+# test_rpc_update_vhost()
+# test_rpc_update_mailbox()
+# test_rpc_update_subdomain()
+# test_rpc_update_setting()
+# test_rpc_update_database_user()
+# test_rpc_update_database()
 
-test_rpc_delete_dns()
-test_rpc_delete_ftp_account()
-test_rpc_delete_vhost()
-test_rpc_delete_mailbox()
-test_rpc_delete_shell()
-test_rpc_delete_subdomain()
-test_rpc_delete_setting()
-test_rpc_delete_database()
-test_rpc_delete_database_user() ## DELETE LAST (foreign key)
-test_rpc_delete_database_type() ## DELETE LAST (foreign key)
-test_rpc_delete_domain() ## DELETE LAST (foreign key)
-test_rpc_delete_user() ## DELETE LAST (foreign key)
+# test_rpc_delete_dns()
+# test_rpc_delete_ftp_account()
+# test_rpc_delete_vhost()
+# test_rpc_delete_mailbox()
+# test_rpc_delete_shell()
+# test_rpc_delete_subdomain()
+# test_rpc_delete_setting()
+# test_rpc_delete_database()
+# test_rpc_delete_database_user() ## DELETE LAST (foreign key)
+# test_rpc_delete_database_type() ## DELETE LAST (foreign key)
+# test_rpc_delete_domain() ## DELETE LAST (foreign key)
+# test_rpc_delete_user() ## DELETE LAST (foreign key)
 ## all 'perfect' scenarios ##

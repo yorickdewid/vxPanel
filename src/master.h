@@ -38,6 +38,7 @@ public:
 	void create_database_user(cppcms::json::value object);
 	void create_database(cppcms::json::value object);
 	void create_queue(cppcms::json::value object);
+	void create_domain_alias(cppcms::json::value object);
 
 	void get_user();
 	void get_domain(std::string domain_name);
@@ -51,6 +52,7 @@ public:
 	void get_database_user(std::string username);
 	void get_database(std::string db_name);
 	void get_queue(int qid);
+	void get_domain_alias(int id);
 	void get_ip();
 
 	/* LISTS */

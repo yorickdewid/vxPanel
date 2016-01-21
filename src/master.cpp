@@ -46,6 +46,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("create_database_user", cppcms::rpc::json_method(&master::create_database_user, this), method_role);
 	bind("create_database", cppcms::rpc::json_method(&master::create_database, this), method_role);
 	bind("create_queue", cppcms::rpc::json_method(&master::create_queue, this), method_role);
+	bind("create_domain_alias", cppcms::rpc::json_method(&master::create_domain_alias, this), method_role);
 
 	bind("get_user", cppcms::rpc::json_method(&master::get_user, this), method_role);
 	bind("get_domain", cppcms::rpc::json_method(&master::get_domain, this), method_role);
@@ -989,6 +990,58 @@ void master::create_queue(cppcms::json::value object)
 			std::cout << "After saving called" << std::endl;
 
 			if( queue.model::get_saved() ) {
+				return_result("OK");
+			} else {
+				return_error("Failed to save entity");
+			}
+		} else {
+			throw not_auth_ex();
+		}
+	} catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::create_domain_alias(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			std::map<std::string,any> primary_list;
+			ModelFactory::ModelType type = ModelFactory::ModelType::DomainAlias;
+			std::map<std::string, any> list = this->create_generic(object, type);
+
+			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);		
+			domain_alias* tmp = dynamic_cast<domain_alias*>(model_obj.get());
+			std::unique_ptr<domain_alias> domain_alias_obj;
+			if(tmp != nullptr)
+			{
+			    model_obj.release();
+			    domain_alias_obj.reset(tmp);
+			}
+
+			if(!domain_alias_obj->model::check_required_fields(list))
+			{
+				throw missing_required_field_ex();
+			}
+
+
+			domain_alias domain_alias(get_database());
+
+			domain_alias.set_domain(std::shared_ptr<domain>(new domain(get_database(),list["domain_name"].string)));
+			domain_alias._source = list["source"].string;
+			domain_alias._destination = list["destination"].string;
+
+			// optional
+			if ( list.count("active") == 1 ) {
+				domain_alias._active = list.at("active").boolean;
+			}
+
+			domain_alias.save();
+
+			if( domain_alias.model::get_saved() ) {
 				return_result("OK");
 			} else {
 				return_error("Failed to save entity");
