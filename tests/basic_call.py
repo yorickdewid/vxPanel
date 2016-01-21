@@ -282,6 +282,12 @@ def test_rpc_update_database():
 	data = '{"id":0,"method":"update_database","params":[{"update_list":{"name":"kaas","db_type":"postgresql"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_update_domain_alias():
+	print bcolors.OKBLUE + "Testcase: Update domain_alias" + bcolors.ENDC
+	data = '{"id":0,"method":"update_domain_alias","params":[{"update_list":{"source":"trol.com","id":1}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
+
 
 ### delete ###
 
@@ -396,18 +402,19 @@ test_rpc_get_database()
 test_rpc_get_queue()
 test_rpc_get_domain_alias()
 
-# test_rpc_get_users()
+test_rpc_get_users()
 
-# test_rpc_update_user()
-# test_rpc_update_domain()
-# test_rpc_update_dns()
-# test_rpc_update_ftp_account()
-# test_rpc_update_vhost()
-# test_rpc_update_mailbox()
-# test_rpc_update_subdomain()
-# test_rpc_update_setting()
-# test_rpc_update_database_user()
-# test_rpc_update_database()
+test_rpc_update_user()
+test_rpc_update_domain()
+test_rpc_update_dns()
+test_rpc_update_ftp_account()
+test_rpc_update_vhost()
+test_rpc_update_mailbox()
+test_rpc_update_subdomain()
+test_rpc_update_setting()
+test_rpc_update_database_user()
+test_rpc_update_database()
+test_rpc_update_domain_alias()
 
 # test_rpc_delete_dns()
 # test_rpc_delete_ftp_account()

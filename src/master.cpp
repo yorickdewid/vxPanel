@@ -77,6 +77,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("update_setting", cppcms::rpc::json_method(&master::update_setting, this), method_role);
 	bind("update_database_user", cppcms::rpc::json_method(&master::update_database_user, this), method_role);
 	bind("update_database", cppcms::rpc::json_method(&master::update_database, this), method_role);
+	bind("update_domain_alias", cppcms::rpc::json_method(&master::update_domain_alias, this), method_role);
 
 	/* TODO update */
 
@@ -1827,6 +1828,28 @@ void master::update_database(cppcms::json::value object)
 	}
 }
 
+
+void master::update_domain_alias(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+
+			int id = -1;
+			std::map<std::string,any> primary_list;
+			primary_list["id"] = id;
+			this->update_generic(object, ModelFactory::createModel(ModelFactory::ModelType::DomainAlias, get_database(), primary_list), ModelFactory::ModelType::DomainAlias);
+
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
 /* delete */
 
 void master::delete_user(std::string username)
@@ -2177,6 +2200,7 @@ bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcm
 		// dump_map(update_list);
 		return true;
 	}
+	std::cout << "field " << first.str() << std::endl;
 	throw unrecognized_field_ex();
 	return false;
 }
@@ -2288,6 +2312,7 @@ bool master::check_primary_field(std::vector<any> primary_list, std::string fiel
 	return false;
 }
 
+// TODO check if primary fields are supplied
 void master::update_generic(cppcms::json::value object, std::unique_ptr<model> tmp, ModelFactory::ModelType type)
 {
 	try{
@@ -2316,12 +2341,12 @@ void master::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 			if (model_obj->model::update(update_list)) {
 				return_result("OK");
 			} else { 
-				return_error("Failed to update user");
+				return_error("Failed to update model");
 			}
 		}
 	} catch(std::exception &e) {
 		std::cout << "User update Exception : " << e.what() << std::endl;
-		return_error("Unrecognized field");
+		return_error(e.what());
 	}
 }
 

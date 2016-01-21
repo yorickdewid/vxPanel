@@ -80,6 +80,7 @@ public:
 	void update_setting(cppcms::json::value object);
 	void update_database_user(cppcms::json::value object);
 	void update_database(cppcms::json::value object);
+	void update_domain_alias(cppcms::json::value object);
 
 	void delete_user(std::string username);
 	void delete_domain(std::string domain_name);

@@ -79,8 +79,17 @@ bool model::update(std::map<std::string, any> update_list)
 	return false;
 }
 
+
+/* Debug for fields */
+void dump_map(const std::map<std::string,bool>& map) {
+	for (std::map<std::string, bool>::const_iterator it = map.begin(); it != map.end(); it++) {
+		std::cout << "Key: " << it->first << std::endl;
+	}
+}
+
 bool model::compare_field(std::string field)
 {
+	// dump_map(this->field_list);
 	std::cout << "Size " << this->field_list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
 		for(auto it = this->field_list.begin(); it != this->field_list.end(); ++it) {
@@ -149,4 +158,5 @@ bool model::is_empty(std::string var)
 		return true;
 	}
 }
+
 
