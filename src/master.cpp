@@ -61,6 +61,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
 	bind("get_queue", cppcms::rpc::json_method(&master::get_queue, this), method_role);
+	bind("get_domain_alias", cppcms::rpc::json_method(&master::get_domain_alias, this), method_role);
 
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
@@ -1091,9 +1092,22 @@ void master::get_user()
 
 			user.load();
 
+			json["user"]["uid"] = user.get_uid();
 			json["user"]["username"] = user.get_username();
-			json["user"]["password"] = user.get_password();
-			json["user"]["email"] =  user.get_email();
+			json["user"]["email"] = user.get_email();
+			json["user"]["firstname"] = user._firstname;
+			json["user"]["lastname"] = user._lastname;
+			json["user"]["country"] = user._country;
+			json["user"]["city"] = user._city;
+			json["user"]["address"] = user._address;
+			json["user"]["address_number"] = user._address_number;
+			json["user"]["postal"] = user._postal;
+			json["user"]["note"] = user._note;
+			json["user"]["remote"] = user._remote;
+			json["user"]["user_type"] = user._user_type;
+			json["user"]["active"] = user._active;
+			json["user"]["created"] = user.get_created();
+			json["user"]["last_login"] = user.get_lastlogin();
 
 			return_result(json);
 		} else {
@@ -1433,7 +1447,7 @@ void master::get_queue(int qid)
 			queue queue(get_database(),qid);
 			queue.load();
 
-			json["queue"]["id"] = queue.qid;
+			json["queue"]["id"] = queue.qid; // TODO read only
 			json["queue"]["action"] = queue._action;
 			json["queue"]["params"] = queue._params;
 			json["queue"]["created"] = queue.get_created();
@@ -1442,6 +1456,34 @@ void master::get_queue(int qid)
 			json["queue"]["uid"] = queue.get_user().get_uid();
 			json["queue"]["status"] = queue._status;
 			json["queue"]["result"] = queue.get_result();
+
+			return_result(json);
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_domain_alias(int id)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value json;
+
+			domain_alias domain_alias(get_database(),id);
+			domain_alias.load();
+
+			json["domain_alias"]["id"] = domain_alias.get_id();
+			json["domain_alias"]["domain_name"] = domain_alias.get_domain().name;
+			json["domain_alias"]["source"] = domain_alias._source;
+			json["domain_alias"]["destination"] = domain_alias._destination;
+			json["domain_alias"]["created"] = domain_alias.get_created();
+			json["domain_alias"]["active"] = domain_alias._active;
 
 			return_result(json);
 		} else {
