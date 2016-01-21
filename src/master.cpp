@@ -69,6 +69,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_domains", cppcms::rpc::json_method(&master::get_domains, this), method_role);
 	bind("get_dns_records", cppcms::rpc::json_method(&master::get_dns_records, this), method_role);
 	bind("get_ftp_accounts", cppcms::rpc::json_method(&master::get_ftp_accounts, this), method_role);
+	bind("get_vhosts", cppcms::rpc::json_method(&master::get_vhosts, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1807,6 +1808,84 @@ void master::get_ftp_accounts(cppcms::json::value object)
 				json["ftp_accounts"][count]["created"] = ftp_account_obj->get_created();
 				json["ftp_accounts"][count]["accessed"] = ftp_account_obj->get_accessed();
 				json["ftp_accounts"][count]["modified"] = ftp_account_obj->get_modified();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_vhosts(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT id FROM vhost WHERE name = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			try {
+				options = object["options"];
+				domain_name = options.get<std::string>("domain_name");
+			}	catch(std::exception &e) {
+				throw missing_params_ex();
+			}
+
+			stat << domain_name;
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				int id;
+				r >> id;
+	  			std::map<std::string,any> primary_list;
+				primary_list["id"] = id;
+
+				std::cout << "the test 1 " << std::endl;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list);
+	  			std::cout << "the test 2 " << std::endl;
+	  			vhost* tmp = dynamic_cast<vhost*>(model_obj.get());
+				std::unique_ptr<vhost> vhost_obj;
+
+				std::cout << "the test 3 " << std::endl;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    vhost_obj.reset(tmp);
+				}
+
+				vhost_obj->load(); //sigsev
+
+				std::cout << "the test" << std::endl;
+
+				json["vhosts"][count]["id"] = vhost_obj->get_id();
+				json["vhosts"][count]["name"] = vhost_obj->_name;
+				json["vhosts"][count]["custom_config"] = vhost_obj->_custom_config;
+				json["vhosts"][count]["created"] = vhost_obj->get_created();
+				json["vhosts"][count]["active"] = vhost_obj->get_active();
 
 				count++;
 			}
