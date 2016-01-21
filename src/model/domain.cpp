@@ -136,3 +136,8 @@ vhost domain::get_vhost()
 	return *this->_vhost;
 }
 
+std::shared_ptr<vhost> domain::get_vhost_ptr()
+{
+	return this->_vhost;
+}
+

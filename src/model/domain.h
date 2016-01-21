@@ -50,6 +50,7 @@ public:
 	std::string get_created();
 	user get_user();
 	vhost get_vhost();
+	std::shared_ptr<vhost> get_vhost_ptr();
 
 	std::string name;
 	std::string _status;

@@ -66,6 +66,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_ip", cppcms::rpc::json_method(&master::get_ip, this), method_role);
 
 	bind("get_users", cppcms::rpc::json_method(&master::get_users, this), method_role);
+	bind("get_domains", cppcms::rpc::json_method(&master::get_domains, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1516,13 +1517,12 @@ cppdb::result master::get_result(std::ostringstream& query)
 	return stat.query();
 }
 
-void master::create_get_all_query(cppcms::json::value& object, std::ostringstream& query)
+void master::create_get_all_query(cppcms::json::value object, std::ostringstream& query)
 {
 	cppcms::json::value options;
-	cppcms::json::value json;
 
 	try {
-		options = object.get<cppcms::json::object>("options");
+		options = object["options"];
 	}	catch(std::exception &e) {
 		throw missing_params_ex();
 	}
@@ -1538,7 +1538,7 @@ void master::create_get_all_query(cppcms::json::value& object, std::ostringstrea
 
 	cppcms::json::value size = options.find("size");
 	if( !size.is_undefined() ) {
-		query << options.number();
+		query << size.number();
 	} else {
 		query << DEFAULT_LIMIT;
 	}
@@ -1549,6 +1549,7 @@ void master::get_users(cppcms::json::value object)
 	try{
 		std::vector<std::string> role_types;
 		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
 		if ( this->check_authenticated(role_types) ) {
 			cppcms::json::value json;
 			std::ostringstream query;
@@ -1595,7 +1596,12 @@ void master::get_users(cppcms::json::value object)
 
 				count++;
 			}
-			return_result(json);
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
 		} else {
 			throw not_auth_ex();
 		}
@@ -1604,6 +1610,71 @@ void master::get_users(cppcms::json::value object)
 	}
 }
 
+void master::get_domains(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppdb::statement stat;
+			cppcms::json::value json;
+			std::ostringstream query;
+			int count = 0;
+
+			query << "SELECT name FROM domain WHERE uid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+			stat << this->get_uid_from_token();
+
+			std::cout << query.str() << std::endl;
+
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				std::string domain_name;
+				r >> domain_name;
+	  			std::map<std::string,any> primary_list;
+				primary_list["name"] = domain_name;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Domain, get_database(), primary_list);		
+	  			domain* tmp = dynamic_cast<domain*>(model_obj.get());
+				std::unique_ptr<domain> domain_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    domain_obj.reset(tmp);
+				}
+
+				json["domains"][count]["domain_name"] = domain_obj->name;
+				json["domains"][count]["status"] = domain_obj->_status;
+				json["domains"][count]["registrar"] = domain_obj->_registrar;
+				json["domains"][count]["created"] = domain_obj->get_created();
+				json["domains"][count]["uid"] = domain_obj->get_user().get_uid();
+				if( domain_obj->get_vhost_ptr() )
+				{
+					json["domains"][count]["vhost_id"] = domain_obj->get_vhost().get_id();
+				}
+				json["domains"][count]["active"] = domain_obj->_active;
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
 
 /* Update */
 

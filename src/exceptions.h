@@ -35,6 +35,14 @@ class entity_save_ex: public std::exception
   }
 };
 
+class empty_result_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Result was empty";
+  }
+};
+
 class primary_key_ex: public std::exception
 {
   virtual const char* what() const throw()

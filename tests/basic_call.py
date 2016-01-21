@@ -223,10 +223,16 @@ def test_rpc_get_domain_alias():
 	data = '{"id":0,"method":"get_domain_alias","params":[1]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+
 ## get multiple
 def test_rpc_get_users():
 	print bcolors.OKBLUE + "Testcase: Get users" + bcolors.ENDC
-	data = '{"id":0,"method":"get_users","params":[{"options":{"start_point":10,"size":50}}]}'
+	data = '{"id":0,"method":"get_users","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
+def test_rpc_get_domains():
+	print bcolors.OKBLUE + "Testcase: Get domains" + bcolors.ENDC
+	data = '{"id":0,"method":"get_domains","params":[{"options":{}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
 
@@ -408,30 +414,31 @@ test_rpc_get_queue()
 test_rpc_get_domain_alias()
 
 test_rpc_get_users()
+test_rpc_get_domains()
 
-test_rpc_update_user()
-test_rpc_update_domain()
-test_rpc_update_dns()
-test_rpc_update_ftp_account()
-test_rpc_update_vhost()
-test_rpc_update_mailbox()
-test_rpc_update_subdomain()
-test_rpc_update_setting()
-test_rpc_update_database_user()
-test_rpc_update_database()
-test_rpc_update_domain_alias()
+# test_rpc_update_user()
+# test_rpc_update_domain()
+# test_rpc_update_dns()
+# test_rpc_update_ftp_account()
+# test_rpc_update_vhost()
+# test_rpc_update_mailbox()
+# test_rpc_update_subdomain()
+# test_rpc_update_setting()
+# test_rpc_update_database_user()
+# test_rpc_update_database()
+# test_rpc_update_domain_alias()
 
-test_rpc_delete_dns()
-test_rpc_delete_ftp_account()
-test_rpc_delete_vhost()
-test_rpc_delete_mailbox()
-test_rpc_delete_shell()
-test_rpc_delete_subdomain()
-test_rpc_delete_domain_alias()
-test_rpc_delete_setting()
-test_rpc_delete_database()
-test_rpc_delete_database_user() ## DELETE LAST (foreign key)
-test_rpc_delete_database_type() ## DELETE LAST (foreign key)
-test_rpc_delete_domain() ## DELETE LAST (foreign key)
-test_rpc_delete_user() ## DELETE LAST (foreign key)
+# test_rpc_delete_dns()
+# test_rpc_delete_ftp_account()
+# test_rpc_delete_vhost()
+# test_rpc_delete_mailbox()
+# test_rpc_delete_shell()
+# test_rpc_delete_subdomain()
+# test_rpc_delete_domain_alias()
+# test_rpc_delete_setting()
+# test_rpc_delete_database()
+# test_rpc_delete_database_user() ## DELETE LAST (foreign key)
+# test_rpc_delete_database_type() ## DELETE LAST (foreign key)
+# test_rpc_delete_domain() ## DELETE LAST (foreign key)
+# test_rpc_delete_user() ## DELETE LAST (foreign key)
 ## all 'perfect' scenarios ##

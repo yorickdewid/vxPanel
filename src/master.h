@@ -57,7 +57,7 @@ public:
 
 	/* LISTS */
 	void get_users(cppcms::json::value object); // admin only for now
-	void get_domains(); // get domains for 1 user
+	void get_domains(cppcms::json::value object); // get domains for 1 user
 	void get_dns_records(std::string domain_name); // get all dns records for 1 domain
 	void get_ftp_accounts(std::string ftp_account); // get all ftp accounts for 1 user
 	void get_vhosts(std::string domain_name); // get all vhosts for 1 domain
@@ -98,7 +98,7 @@ public:
 
 	/* used for get_all functions */
 	cppdb::result get_result(std::ostringstream& query);
-	void create_get_all_query(cppcms::json::value& object, std::ostringstream& query);
+	void create_get_all_query(cppcms::json::value object, std::ostringstream& query);
 
 	/* used mainly in update (create) functions */
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
