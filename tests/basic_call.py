@@ -351,6 +351,11 @@ def test_rpc_delete_database():
 	data = '{"id":0,"method":"delete_database","params":["kaas","arie"]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_delete_domain_alias():
+	print bcolors.OKBLUE + "Testcase: Delete domain alias" + bcolors.ENDC
+	data = '{"id":0,"method":"delete_domain_alias","params":[1]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 
 config = open_config_file(sys.argv[1])
 os.system('mysql -u' + config['user'] +' -p' + config['password'] +' -e "DROP DATABASE IF EXISTS ' + config['database'] +'"')
@@ -416,16 +421,17 @@ test_rpc_update_database_user()
 test_rpc_update_database()
 test_rpc_update_domain_alias()
 
-# test_rpc_delete_dns()
-# test_rpc_delete_ftp_account()
-# test_rpc_delete_vhost()
-# test_rpc_delete_mailbox()
-# test_rpc_delete_shell()
-# test_rpc_delete_subdomain()
-# test_rpc_delete_setting()
-# test_rpc_delete_database()
-# test_rpc_delete_database_user() ## DELETE LAST (foreign key)
-# test_rpc_delete_database_type() ## DELETE LAST (foreign key)
-# test_rpc_delete_domain() ## DELETE LAST (foreign key)
-# test_rpc_delete_user() ## DELETE LAST (foreign key)
+test_rpc_delete_dns()
+test_rpc_delete_ftp_account()
+test_rpc_delete_vhost()
+test_rpc_delete_mailbox()
+test_rpc_delete_shell()
+test_rpc_delete_subdomain()
+test_rpc_delete_domain_alias()
+test_rpc_delete_setting()
+test_rpc_delete_database()
+test_rpc_delete_database_user() ## DELETE LAST (foreign key)
+test_rpc_delete_database_type() ## DELETE LAST (foreign key)
+test_rpc_delete_domain() ## DELETE LAST (foreign key)
+test_rpc_delete_user() ## DELETE LAST (foreign key)
 ## all 'perfect' scenarios ##

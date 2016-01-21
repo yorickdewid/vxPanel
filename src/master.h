@@ -94,6 +94,7 @@ public:
 	void delete_database_type(std::string name);
 	void delete_database_user(std::string username);
 	void delete_database(std::string db_name, std::string username);
+	void delete_domain_alias(int id);
 
 	/* used for get_all functions */
 	cppdb::result get_result(std::ostringstream& query);

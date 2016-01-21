@@ -93,6 +93,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("delete_database_type", cppcms::rpc::json_method(&master::delete_database_type, this), method_role);
 	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
 	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
+	bind("delete_domain_alias", cppcms::rpc::json_method(&master::delete_domain_alias, this), method_role);
 }
 
 master::~master()
@@ -1425,8 +1426,7 @@ void master::get_database(std::string db_name)
 				json["db"]["db_type"] = database.get_database_type().get_name();
 
 				return_result(json);
-			}
-			else {
+			} else {
 				throw auth_ex();
 			}
 		} else {
@@ -2112,6 +2112,33 @@ void master::delete_database(std::string db_name, std::string db_username)
 				}
 			} else {
 				return_error("Delete failed");
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::delete_domain_alias(int id)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			domain_alias domain_alias(get_database(), id);
+
+			domain_alias.load();
+			if ( domain_alias.get_domain().get_user().get_uid() == this->get_uid_from_token() ){
+				if ( domain_alias.m_delete() ) {
+					return_result("OK");
+				} else {
+					return_error("Delete failed");
+				}
+			} else {
+				throw auth_ex();
 			}
 		} else {
 			throw not_auth_ex();
