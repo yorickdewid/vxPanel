@@ -67,6 +67,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 
 	bind("get_users", cppcms::rpc::json_method(&master::get_users, this), method_role);
 	bind("get_domains", cppcms::rpc::json_method(&master::get_domains, this), method_role);
+	bind("get_dns_records", cppcms::rpc::json_method(&master::get_dns_records, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1659,6 +1660,77 @@ void master::get_domains(cppcms::json::value object)
 					json["domains"][count]["vhost_id"] = domain_obj->get_vhost().get_id();
 				}
 				json["domains"][count]["active"] = domain_obj->_active;
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_dns_records(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppdb::statement stat;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			int count = 0;
+
+			query << "SELECT id FROM dns WHERE domain_name = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			cppcms::json::value options;
+			try {
+				options = object["options"];
+				domain_name = options.get<std::string>("domain_name");
+			}	catch(std::exception &e) {
+				throw missing_params_ex();
+			}
+
+			stat << domain_name;
+			std::cout << query.str() << std::endl;
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				int dns_id;
+				r >> dns_id;
+	  			std::map<std::string,any> primary_list;
+				primary_list["id"] = dns_id;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Dns, get_database(), primary_list);		
+	  			dns* tmp = dynamic_cast<dns*>(model_obj.get());
+				std::unique_ptr<dns> dns_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    dns_obj.reset(tmp);
+				}
+
+				dns_obj->load(); //sigsev
+
+				json["dns_records"][count]["id"] = dns_obj->get_id();
+				json["dns_records"][count]["name"] = dns_obj->_name;
+				json["dns_records"][count]["created"] = dns_obj->get_created();
+				json["dns_records"][count]["domain_name"] = dns_obj->get_domain().name;
+				json["dns_records"][count]["active"] = dns_obj->_active;
 
 				count++;
 			}
