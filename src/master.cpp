@@ -57,7 +57,6 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_shell", cppcms::rpc::json_method(&master::get_shell, this), method_role);
 	bind("get_subdomain", cppcms::rpc::json_method(&master::get_subdomain, this), method_role);
 	bind("get_setting", cppcms::rpc::json_method(&master::get_setting, this), method_role);
-	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_user", cppcms::rpc::json_method(&master::get_database_user, this), method_role);
 	bind("get_database", cppcms::rpc::json_method(&master::get_database, this), method_role);
 	bind("get_queue", cppcms::rpc::json_method(&master::get_queue, this), method_role);
@@ -72,6 +71,11 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_vhosts", cppcms::rpc::json_method(&master::get_vhosts, this), method_role);
 	bind("get_mailboxes", cppcms::rpc::json_method(&master::get_mailboxes, this), method_role);
 	bind("get_shells", cppcms::rpc::json_method(&master::get_shells, this), method_role);
+	bind("get_subdomains", cppcms::rpc::json_method(&master::get_subdomains, this), method_role);
+	bind("get_settings", cppcms::rpc::json_method(&master::get_settings, this), method_role);
+	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
+	bind("get_database_users", cppcms::rpc::json_method(&master::get_database_users, this), method_role);
+
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -2095,6 +2099,131 @@ void master::get_subdomains(cppcms::json::value object)
 				}
 				json["subdomains"][count]["created"] = subdomain_obj->get_created();
 				json["subdomains"][count]["active"] = subdomain_obj->_active;
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_settings(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT `key` FROM settings LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				std::string key;
+				r >> key;
+	  			std::map<std::string,any> primary_list;
+				primary_list["key"] = key;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::AppSettings, get_database(), primary_list);
+	  			app_settings* tmp = dynamic_cast<app_settings*>(model_obj.get());
+				std::unique_ptr<app_settings> app_settings_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    app_settings_obj.reset(tmp);
+				}
+
+				app_settings_obj->load(); //sigsev
+
+				json["app_setting"][count]["key"] = app_settings_obj->get_key();
+				json["app_setting"][count]["value"] = app_settings_obj->get_value();
+				json["app_setting"][count]["description"] = app_settings_obj->get_description();
+				json["app_setting"][count]["updated"] = app_settings_obj->get_updated();
+				json["app_setting"][count]["created"] = app_settings_obj->get_created();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_database_users(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT name FROM user_db_user WHERE uid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+			stat = get_database().session() << query.str();
+			stat << this->get_uid_from_token();
+
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				std::string name;
+				r >> name;
+	  			std::map<std::string,any> primary_list;
+				primary_list["name"] = name;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::DatabaseUser, get_database(), primary_list);
+	  			database_user* tmp = dynamic_cast<database_user*>(model_obj.get());
+				std::unique_ptr<database_user> database_user_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    database_user_obj.reset(tmp);
+				}
+
+				database_user_obj->load(); //sigsev
+
+				json["database_user"][count]["name"] = database_user_obj->get_name();
+				json["database_user"][count]["permissions"] = database_user_obj->get_permissions();
+				json["database_user"][count]["created"] = database_user_obj->get_created();
+				json["database_user"][count]["uid"] = database_user_obj->get_user().get_uid();
+
 
 				count++;
 			}

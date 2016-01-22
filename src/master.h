@@ -65,7 +65,7 @@ public:
 	void get_shells(cppcms::json::value object); // get all shells for 1 domain 
 	void get_subdomains(cppcms::json::value object); // get all subdomains for 1 user
 	void get_settings(cppcms::json::value object); // get all settings (admin only)
-	void get_database_types(); // get all subdomains for 1 user
+	void get_database_types(); 
 	void get_database_users(cppcms::json::value object); // get all database users for 1 user
 	void get_databases(cppcms::json::value object); // get all databases for 1 user
 	void get_queues(cppcms::json::value object); // get all queues for 1 user

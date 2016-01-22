@@ -265,6 +265,16 @@ def test_rpc_get_subdomains():
 	data = '{"id":0,"method":"get_subdomains","params":[{"options":{"domain_name":"trol.com"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_settings():
+	print bcolors.OKBLUE + "Testcase: Get settings" + bcolors.ENDC
+	data = '{"id":0,"method":"get_settings","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
+def test_rpc_get_database_users():
+	print bcolors.OKBLUE + "Testcase: Get database users" + bcolors.ENDC
+	data = '{"id":0,"method":"get_database_users","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 ### update ###
 
 def test_rpc_update_user():
@@ -436,7 +446,6 @@ test_rpc_get_mailbox()
 test_rpc_get_shell()
 test_rpc_get_subdomain()
 test_rpc_get_setting()
-test_rpc_get_database_types()
 test_rpc_get_database_user()
 test_rpc_get_database()
 test_rpc_get_queue()
@@ -449,7 +458,10 @@ test_rpc_get_ftp_accounts()
 test_rpc_get_vhosts()
 test_rpc_get_mailboxes()
 test_rpc_get_shells()
-test_rpc_get_subdomain()
+test_rpc_get_subdomains()
+test_rpc_get_settings()
+test_rpc_get_database_types()
+test_rpc_get_database_users()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()
