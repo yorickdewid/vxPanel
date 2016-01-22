@@ -1780,14 +1780,10 @@ void master::get_ftp_accounts(cppcms::json::value object)
 	  			std::map<std::string,any> primary_list;
 				primary_list["id"] = id;
 
-				std::cout << "the test 1 " << std::endl;
-
 	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::FtpAccount, get_database(), primary_list);
-	  			std::cout << "the test 2 " << std::endl;
 	  			ftp_account* tmp = dynamic_cast<ftp_account*>(model_obj.get());
 				std::unique_ptr<ftp_account> ftp_account_obj;
 
-				std::cout << "the test 3 " << std::endl;
 
 				if(tmp != nullptr)
 				{
@@ -1797,7 +1793,6 @@ void master::get_ftp_accounts(cppcms::json::value object)
 
 				ftp_account_obj->load_id(); //sigsev
 
-				std::cout << "the test" << std::endl;
 
 				json["ftp_accounts"][count]["id"] = ftp_account_obj->get_id();
 				json["ftp_accounts"][count]["name"] = ftp_account_obj->_name;
@@ -1875,8 +1870,6 @@ void master::get_vhosts(cppcms::json::value object)
 				}
 
 				vhost_obj->load(); //sigsev
-
-				std::cout << "the test" << std::endl;
 
 				json["vhosts"][count]["id"] = vhost_obj->get_id();
 				json["vhosts"][count]["name"] = vhost_obj->_name;
@@ -2023,12 +2016,85 @@ void master::get_shells(cppcms::json::value object)
 
 				shell_obj->load(); //sigsev
 
-				std::cout << "the test" << std::endl;
-
 				json["shells"][count]["id"] = shell_obj->get_id();
 				json["shells"][count]["uid"] = shell_obj->get_user().get_uid();
 				json["shells"][count]["created"] = shell_obj->get_created();
 				json["shells"][count]["active"] = shell_obj->get_active();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_subdomains(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT name FROM subdomain WHERE domain_name = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			try {
+				options = object["options"];
+				domain_name = options.get<std::string>("domain_name");
+			}	catch(std::exception &e) {
+				throw missing_params_ex();
+			}
+
+			stat << domain_name;
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				std::string name;
+				r >> name;
+	  			std::map<std::string,any> primary_list;
+				primary_list["name"] = name;
+				primary_list["domain_name"] = domain_name;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Subdomain, get_database(), primary_list);
+	  			subdomain* tmp = dynamic_cast<subdomain*>(model_obj.get());
+				std::unique_ptr<subdomain> subdomain_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    subdomain_obj.reset(tmp);
+				}
+
+				subdomain_obj->load(); //sigsev
+
+				json["subdomains"][count]["name"] = subdomain_obj->get_name();
+				json["subdomains"][count]["domain_name"] = subdomain_obj->get_domain().name;
+				if( subdomain_obj->get_vhost_ptr() )
+				{
+					json["subdomains"][count]["vhost_id"] = subdomain_obj->get_vhost().get_id();
+				}
+				json["subdomains"][count]["created"] = subdomain_obj->get_created();
+				json["subdomains"][count]["active"] = subdomain_obj->_active;
 
 				count++;
 			}

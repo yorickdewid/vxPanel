@@ -260,6 +260,11 @@ def test_rpc_get_shells():
 	data = '{"id":0,"method":"get_shells","params":[{"options":{}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_subdomains():
+	print bcolors.OKBLUE + "Testcase: Get subdomains" + bcolors.ENDC
+	data = '{"id":0,"method":"get_subdomains","params":[{"options":{"domain_name":"trol.com"}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 ### update ###
 
 def test_rpc_update_user():
@@ -444,6 +449,7 @@ test_rpc_get_ftp_accounts()
 test_rpc_get_vhosts()
 test_rpc_get_mailboxes()
 test_rpc_get_shells()
+test_rpc_get_subdomain()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()

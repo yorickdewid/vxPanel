@@ -47,6 +47,7 @@ public:
 	domain get_domain();
 	std::shared_ptr<domain> get_domain_ptr();
 	vhost get_vhost();
+	std::shared_ptr<vhost> get_vhost_ptr();
 
 	bool _active;
 
