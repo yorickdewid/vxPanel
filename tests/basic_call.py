@@ -250,6 +250,11 @@ def test_rpc_get_vhosts():
 	data = '{"id":0,"method":"get_vhosts","params":[{"options":{"domain_name":"trol.com"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_vhosts():
+	print bcolors.OKBLUE + "Testcase: Get mailboxes" + bcolors.ENDC
+	data = '{"id":0,"method":"get_mailboxes","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 
 ### update ###
 

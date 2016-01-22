@@ -70,6 +70,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_dns_records", cppcms::rpc::json_method(&master::get_dns_records, this), method_role);
 	bind("get_ftp_accounts", cppcms::rpc::json_method(&master::get_ftp_accounts, this), method_role);
 	bind("get_vhosts", cppcms::rpc::json_method(&master::get_vhosts, this), method_role);
+	bind("get_mailboxes", cppcms::rpc::json_method(&master::get_mailboxes, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1862,14 +1863,9 @@ void master::get_vhosts(cppcms::json::value object)
 	  			std::map<std::string,any> primary_list;
 				primary_list["id"] = id;
 
-				std::cout << "the test 1 " << std::endl;
-
 	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Vhost, get_database(), primary_list);
-	  			std::cout << "the test 2 " << std::endl;
 	  			vhost* tmp = dynamic_cast<vhost*>(model_obj.get());
 				std::unique_ptr<vhost> vhost_obj;
-
-				std::cout << "the test 3 " << std::endl;
 
 				if(tmp != nullptr)
 				{
@@ -1888,6 +1884,84 @@ void master::get_vhosts(cppcms::json::value object)
 				json["vhosts"][count]["active"] = vhost_obj->get_active();
 
 				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+void master::get_mailboxes(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+
+			query << "SELECT name FROM domain WHERE uid = ?";
+
+			stat = get_database().session() << query.str();
+			stat << this->get_uid_from_token();
+
+			cppdb::result result_domain = stat.query(); // its a reference to stat->result so if stat.reset() is called result points to empty memory
+
+			while ( result_domain.next() ) {
+				std::string domain_name;
+				int count_mailboxes = 0;
+				result_domain >> domain_name;
+
+				query.str("");
+				query << "SELECT id FROM mailbox WHERE domain_name = ? LIMIT ";
+				this->create_get_all_query(object,query);
+				stat = get_database().session() << query.str();
+				stat << domain_name;
+
+				cppdb::result result_mailbox = stat.query();
+				
+				while ( result_mailbox.next() ) {
+					int id;
+					result_mailbox >> id;
+		  			std::map<std::string,any> primary_list;
+					primary_list["id"] = id;
+
+		  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Mailbox, get_database(), primary_list);
+		  			mailbox* tmp = dynamic_cast<mailbox*>(model_obj.get());
+					std::unique_ptr<mailbox> mailbox_obj;
+
+					if(tmp != nullptr)
+					{
+						model_obj.release();
+					    mailbox_obj.reset(tmp);
+					}
+
+					mailbox_obj->load(); //sigsev
+
+					json["mailboxes"][count_mailboxes]["id"] = mailbox_obj->get_id();
+					json["mailboxes"][count_mailboxes]["email"] = mailbox_obj->_email;
+					json["mailboxes"][count_mailboxes]["maildir"] = mailbox_obj->_maildir;
+					json["mailboxes"][count_mailboxes]["quota"] = mailbox_obj->_quota;
+					json["mailboxes"][count_mailboxes]["created"] = mailbox_obj->get_created();
+					json["mailboxes"][count_mailboxes]["domain_name"] = mailbox_obj->get_domain().name;
+					json["mailboxes"][count_mailboxes]["bytes"] = mailbox_obj->_bytes;
+					json["mailboxes"][count_mailboxes]["messages"] = mailbox_obj->_messages;
+					json["mailboxes"][count_mailboxes]["active"] = mailbox_obj->_active;
+
+					count_mailboxes++;
+				}
 			}
 			if(!json.is_undefined())
 			{
