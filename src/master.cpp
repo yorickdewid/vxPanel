@@ -71,6 +71,7 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_ftp_accounts", cppcms::rpc::json_method(&master::get_ftp_accounts, this), method_role);
 	bind("get_vhosts", cppcms::rpc::json_method(&master::get_vhosts, this), method_role);
 	bind("get_mailboxes", cppcms::rpc::json_method(&master::get_mailboxes, this), method_role);
+	bind("get_shells", cppcms::rpc::json_method(&master::get_shells, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -1899,7 +1900,10 @@ void master::get_vhosts(cppcms::json::value object)
 	}
 }
 
-void master::get_mailboxes(cppcms::json::value object)
+/* NOTE this method could be more efficient:
+	If the mailbox table includes an uid.
+*/
+void master::get_mailboxes(cppcms::json::value object) 
 {
 	try{
 		std::vector<std::string> role_types;
@@ -1912,12 +1916,12 @@ void master::get_mailboxes(cppcms::json::value object)
 			std::string domain_name;
 			cppdb::statement stat;
 
-			query << "SELECT name FROM domain WHERE uid = ?";
+			query << "SELECT name FROM domain WHERE uid = ?"; /* first get the domains from the logged in user */
 
 			stat = get_database().session() << query.str();
 			stat << this->get_uid_from_token();
 
-			cppdb::result result_domain = stat.query(); // its a reference to stat->result so if stat.reset() is called result points to empty memory
+			cppdb::result result_domain = stat.query(); /* its a reference to stat->result so if stat.reset() is called result points to empty memory */
 
 			while ( result_domain.next() ) {
 				std::string domain_name;
@@ -1925,7 +1929,7 @@ void master::get_mailboxes(cppcms::json::value object)
 				result_domain >> domain_name;
 
 				query.str("");
-				query << "SELECT id FROM mailbox WHERE domain_name = ? LIMIT ";
+				query << "SELECT id FROM mailbox WHERE domain_name = ? LIMIT "; /* now get the mailboxes from the domains */
 				this->create_get_all_query(object,query);
 				stat = get_database().session() << query.str();
 				stat << domain_name;
@@ -1976,6 +1980,72 @@ void master::get_mailboxes(cppcms::json::value object)
 		return_error(e.what());
 	}
 }
+
+void master::get_shells(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT id FROM shell WHERE uid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+
+			stat = get_database().session() << query.str();
+
+			stat << this->get_uid_from_token();
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				int id;
+				r >> id;
+	  			std::map<std::string,any> primary_list;
+				primary_list["id"] = id;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Shell, get_database(), primary_list);
+	  			shell* tmp = dynamic_cast<shell*>(model_obj.get());
+				std::unique_ptr<shell> shell_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    shell_obj.reset(tmp);
+				}
+
+				shell_obj->load(); //sigsev
+
+				std::cout << "the test" << std::endl;
+
+				json["shells"][count]["id"] = shell_obj->get_id();
+				json["shells"][count]["uid"] = shell_obj->get_user().get_uid();
+				json["shells"][count]["created"] = shell_obj->get_created();
+				json["shells"][count]["active"] = shell_obj->get_active();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
 
 /* Update */
 

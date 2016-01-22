@@ -250,11 +250,15 @@ def test_rpc_get_vhosts():
 	data = '{"id":0,"method":"get_vhosts","params":[{"options":{"domain_name":"trol.com"}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
-def test_rpc_get_vhosts():
+def test_rpc_get_mailboxes():
 	print bcolors.OKBLUE + "Testcase: Get mailboxes" + bcolors.ENDC
 	data = '{"id":0,"method":"get_mailboxes","params":[{"options":{}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_shells():
+	print bcolors.OKBLUE + "Testcase: Get shells" + bcolors.ENDC
+	data = '{"id":0,"method":"get_shells","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
 
 ### update ###
 
@@ -438,6 +442,8 @@ test_rpc_get_domains()
 test_rpc_get_dns_records()
 test_rpc_get_ftp_accounts()
 test_rpc_get_vhosts()
+test_rpc_get_mailboxes()
+test_rpc_get_shells()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()
