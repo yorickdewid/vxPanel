@@ -275,6 +275,16 @@ def test_rpc_get_database_users():
 	data = '{"id":0,"method":"get_database_users","params":[{"options":{}}]}'
 	result_test(rpc_call(data,{auth_header : token}), None)
 
+def test_rpc_get_databases():
+	print bcolors.OKBLUE + "Testcase: Get databases" + bcolors.ENDC
+	data = '{"id":0,"method":"get_databases","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
+def test_rpc_get_queues():
+	print bcolors.OKBLUE + "Testcase: Get queues" + bcolors.ENDC
+	data = '{"id":0,"method":"get_queues","params":[{"options":{}}]}'
+	result_test(rpc_call(data,{auth_header : token}), None)
+
 ### update ###
 
 def test_rpc_update_user():
@@ -462,6 +472,8 @@ test_rpc_get_subdomains()
 test_rpc_get_settings()
 test_rpc_get_database_types()
 test_rpc_get_database_users()
+test_rpc_get_databases()
+test_rpc_get_queues()
 
 # test_rpc_update_user()
 # test_rpc_update_domain()

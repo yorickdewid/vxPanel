@@ -75,7 +75,8 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("get_settings", cppcms::rpc::json_method(&master::get_settings, this), method_role);
 	bind("get_database_types", cppcms::rpc::json_method(&master::get_database_types, this), method_role);
 	bind("get_database_users", cppcms::rpc::json_method(&master::get_database_users, this), method_role);
-
+	bind("get_databases", cppcms::rpc::json_method(&master::get_databases, this), method_role);
+	bind("get_queues", cppcms::rpc::json_method(&master::get_queues, this), method_role);
 
 	bind("update_user", cppcms::rpc::json_method(&master::update_user, this), method_role);
 	bind("update_domain", cppcms::rpc::json_method(&master::update_domain, this), method_role);
@@ -2156,11 +2157,11 @@ void master::get_settings(cppcms::json::value object)
 
 				app_settings_obj->load(); //sigsev
 
-				json["app_setting"][count]["key"] = app_settings_obj->get_key();
-				json["app_setting"][count]["value"] = app_settings_obj->get_value();
-				json["app_setting"][count]["description"] = app_settings_obj->get_description();
-				json["app_setting"][count]["updated"] = app_settings_obj->get_updated();
-				json["app_setting"][count]["created"] = app_settings_obj->get_created();
+				json["app_settings"][count]["key"] = app_settings_obj->get_key();
+				json["app_settings"][count]["value"] = app_settings_obj->get_value();
+				json["app_settings"][count]["description"] = app_settings_obj->get_description();
+				json["app_settings"][count]["updated"] = app_settings_obj->get_updated();
+				json["app_settings"][count]["created"] = app_settings_obj->get_created();
 
 				count++;
 			}
@@ -2219,11 +2220,10 @@ void master::get_database_users(cppcms::json::value object)
 
 				database_user_obj->load(); //sigsev
 
-				json["database_user"][count]["name"] = database_user_obj->get_name();
-				json["database_user"][count]["permissions"] = database_user_obj->get_permissions();
-				json["database_user"][count]["created"] = database_user_obj->get_created();
-				json["database_user"][count]["uid"] = database_user_obj->get_user().get_uid();
-
+				json["database_users"][count]["name"] = database_user_obj->get_name();
+				json["database_users"][count]["permissions"] = database_user_obj->get_permissions();
+				json["database_users"][count]["created"] = database_user_obj->get_created();
+				json["database_users"][count]["uid"] = database_user_obj->get_user().get_uid();
 
 				count++;
 			}
@@ -2241,6 +2241,137 @@ void master::get_database_users(cppcms::json::value object)
 	}
 }
 
+void master::get_databases(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT name FROM user_db WHERE uid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+			stat = get_database().session() << query.str();
+			stat << this->get_uid_from_token();
+
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				std::string name;
+				r >> name;
+	  			std::map<std::string,any> primary_list;
+				primary_list["name"] = name;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Database, get_database(), primary_list);
+	  			database* tmp = dynamic_cast<database*>(model_obj.get());
+				std::unique_ptr<database> database_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    database_obj.reset(tmp);
+				}
+
+				database_obj->load(); //sigsev
+
+				json["databases"][count]["name"] = database_obj->get_name();
+				json["databases"][count]["created"] = database_obj->get_created();
+				json["databases"][count]["type"] = database_obj->get_database_type().get_name();
+				json["databases"][count]["uid"] = database_obj->get_user().get_uid();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
+
+/*
+ base on uid?
+ */
+void master::get_queues(cppcms::json::value object)
+{
+	try{
+		std::vector<std::string> role_types;
+		role_types.push_back(USER_TYPE_ADMINISTRATOR);
+		role_types.push_back(USER_TYPE_USER);
+		if ( this->check_authenticated(role_types) ) {
+			cppcms::json::value options;
+			cppcms::json::value json;
+			std::ostringstream query;
+			std::string domain_name;
+			cppdb::statement stat;
+			
+			int count = 0;
+
+			query << "SELECT qid FROM queue WHERE uid = ? LIMIT ";
+
+			this->create_get_all_query(object,query);
+			stat = get_database().session() << query.str();
+			stat << this->get_uid_from_token();
+
+			cppdb::result r = stat.query();
+
+			while ( r.next() ) {
+				int qid;
+				r >> qid;
+	  			std::map<std::string,any> primary_list;
+				primary_list["qid"] = qid;
+
+	  			std::unique_ptr<model> model_obj = ModelFactory::createModel(ModelFactory::ModelType::Queue, get_database(), primary_list);
+	  			queue* tmp = dynamic_cast<queue*>(model_obj.get());
+				std::unique_ptr<queue> queue_obj;
+
+				if(tmp != nullptr)
+				{
+					model_obj.release();
+				    queue_obj.reset(tmp);
+				}
+
+				queue_obj->load(); //sigsev
+
+				json["queues"][count]["qid"] = queue_obj->qid;
+				json["queues"][count]["action"] = queue_obj->_action;
+				json["queues"][count]["params"] = queue_obj->_params;
+				json["queues"][count]["created"] = queue_obj->get_created();
+				json["queues"][count]["started"] = queue_obj->_started;
+				json["queues"][count]["finished"] = queue_obj->_finished;
+				json["queues"][count]["uid"] = queue_obj->get_user().get_uid();
+				json["queues"][count]["status"] = queue_obj->_status;
+				json["queues"][count]["result"] = queue_obj->get_result();
+
+				count++;
+			}
+			if(!json.is_undefined())
+			{
+				return_result(json);
+			} else {
+				throw empty_result_ex();
+			}
+		} else {
+			throw not_auth_ex();
+		}
+    } catch(std::exception &e) {
+		return_error(e.what());
+	}
+}
 
 /* Update */
 
