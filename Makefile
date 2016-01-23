@@ -3,7 +3,8 @@ NAME = vxd
 SRCDIR = src
 BINDIR = bin
 MODDIR = $(SRCDIR)/model
-CXX_OBJS = $(wildcard $(MODDIR)/*.o) $(wildcard $(SRCDIR)/*.o)
+VALDIR = $(SRCDIR)/validation
+CXX_OBJS = $(wildcard $(VALDIR)/*.o) $(wildcard $(MODDIR)/*.o) $(wildcard $(SRCDIR)/*.o) 
 GRINDFLAGS = --leak-check=full --track-origins=yes
 GRIND = valgrind
 CPPCHECKFLAGS = --quiet --std=c++11

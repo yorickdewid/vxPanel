@@ -99,6 +99,23 @@ class token_not_valid_ex: public std::exception
   }
 };
 
+/* Domain exceptions */
+
+class invalid_domain_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Domain is invalid";
+  }
+};
+
+class domain_length_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Domain length exceeds 253";
+  }
+};
 
 #endif /* EXCEPTIONS_H */
 

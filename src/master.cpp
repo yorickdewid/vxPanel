@@ -13,6 +13,7 @@
 #include "any.h"
 #include "model/models.h"
 #include "constants.h"
+#include "validation/domain_validator.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -476,6 +477,8 @@ void master::create_domain(cppcms::json::value object)
 				throw missing_required_field_ex();
 			}
 			
+			domain_validator::validate_domain(list["name"].string);
+
 			domain_obj->name = list["name"].string;
 			domain_obj->_status = list["status"].string;
 			domain_obj->_registrar = list["registrar"].string;
