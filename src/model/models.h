@@ -18,4 +18,4 @@
 #include "domain_alias.h"
 #include "auth_token.h"
 
-#endif /* MODEL_H */
+#endif /* MODELS_H */

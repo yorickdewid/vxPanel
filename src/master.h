@@ -9,6 +9,7 @@
 #include "model.h"
 #include "ModelFactory.h"
 
+class create;
 class master: public cppcms::rpc::json_rpc_server {
 
 public:
@@ -25,20 +26,6 @@ public:
 	void db_version();
 
 	void authenticate(std::string username, std::string password);
-
-	void create_user(cppcms::json::value object);
-	void create_domain(cppcms::json::value object);
-	void create_dns(cppcms::json::value object);
-	void create_ftp_account(cppcms::json::value object);
-	void create_vhost(cppcms::json::value object);
-	void create_mailbox(cppcms::json::value object);
-	void create_shell(cppcms::json::value object);
-	void create_subdomain(cppcms::json::value object);
-	void create_setting(cppcms::json::value object);
-	void create_database_user(cppcms::json::value object);
-	void create_database(cppcms::json::value object);
-	void create_queue(cppcms::json::value object);
-	void create_domain_alias(cppcms::json::value object);
 
 	void get_user();
 	void get_domain(std::string domain_name);
@@ -109,17 +96,19 @@ public:
 	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 
+	bool check_authenticated(std::vector<std::string> role_types); // usage in functions
+
 protected:
 	std::string format_uptime(std::string sec);
 
 private:
 	std::string create_auth_token(int uid);
-	bool check_authenticated(std::vector<std::string> role_types);
 	bool is_role_allowed(std::vector<std::string> role_types, int uid);
 	int get_uid_from_token();
 	void init_backend();
 
 	backend *db = NULL;
+	create* create_obj = NULL;
 
 };
 
