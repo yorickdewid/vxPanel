@@ -33,11 +33,7 @@ public:
 
 	void get_ip();
 
-	/* used mainly in update (create) functions */
-	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 	bool check_primary_field(std::vector<any> primary_list, std::string field);
-	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
-
 	bool check_authenticated(std::vector<std::string> role_types); // usage in functions
 	int get_uid_from_token();
 

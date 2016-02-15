@@ -28,7 +28,6 @@ public:
 	/*helper*/
 
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
-	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list); // TODO MOVE TO OWN CLASS
 
 };
 

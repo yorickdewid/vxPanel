@@ -1,6 +1,7 @@
 #include "create.h"
 #include "../model/models.h"
 #include "../validation/domain_validator.h"
+#include "helper.h"
 
 /*
 	Create
@@ -17,14 +18,12 @@ void create::create_user(cppcms::json::value object)
 		std::unique_ptr<model> model_obj = ModelFactory::createModel(type, this->functions::get_database(), primary_list);		
 		user* tmp = dynamic_cast<user*>(model_obj.get());
 		std::unique_ptr<user> user_obj;
-		if(tmp != nullptr)
-		{
+		if ( tmp != nullptr ) {
 		    model_obj.release();
 		    user_obj.reset(tmp);
 		}
 
-		if(!user_obj->model::check_required_fields(list))
-		{
+		if ( !user_obj->model::check_required_fields(list) ) {
 			throw missing_required_field_ex();
 		}
 		
@@ -718,46 +717,12 @@ std::map<std::string, any> create::create_generic(cppcms::json::value object, Mo
 	std::map<std::string, any> primary_list_empty;
 
 	for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+		helper::convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
 	}
 
 	for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
+		helper::convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
 	}
 	return list;
-}
-
-
-/* PLEASE MOVE TO SEPERATE CLASS TO PREVENT OUT OF SYNC (MULTIPLE DEFINITIONS ATM) */
-bool create::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
-{
-	// std::cout << "convert" << std::endl;
-	// std::cout << "Field " << first.str() << std::endl;
-	if ( tmp->model::compare_field(first.str()) ) {
-		switch(second.type()) {
-			case cppcms::json::json_type::is_number: 
-			{
-				update_list[first.str()] = any((int)second.number());
-				break;
-			}
-			case cppcms::json::json_type::is_string: 
-			{
-				std::string val = (std::string)second.str();
-				update_list[first.str()] = any(val);
-				break;
-			}
-			case cppcms::json::json_type::is_boolean:
-			{
-				update_list[first.str()] = any((bool)second.boolean());
-				break;
-			}
-			default:
-				break;
-		}
-		// dump_map(update_list);
-		return true;
-	}
-	std::cout << "field " << first.str() << std::endl;
-	throw unrecognized_field_ex();
 }
 

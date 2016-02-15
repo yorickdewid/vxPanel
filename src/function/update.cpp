@@ -1,6 +1,7 @@
 #include "update.h"
 #include "../model/models.h"
 #include "../validation/domain_validator.h"
+#include "helper.h"
 
 /* password,email,fname,lname,country,city,address,postal,note,user_type,active */
 void update::update_user(cppcms::json::value object)
@@ -266,7 +267,7 @@ void update::update_generic(cppcms::json::value object, std::unique_ptr<model> t
 			if ( primary ) {
 				continue; // skip primary value
 			}
-			this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, update_list);
+			helper::convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, update_list);
 		}
 		if ( !this->check_default(primary_list) ) {
 			std::unique_ptr<model> model_obj = ModelFactory::createModel(type, get_database(), primary_list);
@@ -329,14 +330,12 @@ bool update::check_default(std::map<std::string,any> primary_list)
 	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
 		switch ((*it).second.tag) {
 			case any::CHAR:
-				if( ((std::string)(*it).second.string).empty() )
-				{
+				if( ( (std::string)(*it).second.string).empty() ) {
 					count_defaults++;
 				}
 				break;
 			case any::INT:
-				if( (*it).second.integer == -1 )
-				{
+				if( (*it).second.integer == -1 ){
 					count_defaults++;
 				}
 				break;
@@ -345,45 +344,11 @@ bool update::check_default(std::map<std::string,any> primary_list)
 				break;
 		}
 	}
-	if(count_defaults == 0 )
-	{
+	if ( count_defaults == 0 ) {
 		return false;
 	} else {
 		return true;
 	}
-}
-
-bool update::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
-{
-	// std::cout << "convert" << std::endl;
-	// std::cout << "Field " << first.str() << std::endl;
-	if ( tmp->model::compare_field(first.str()) ) {
-		switch(second.type()) {
-			case cppcms::json::json_type::is_number: 
-			{
-				update_list[first.str()] = any((int)second.number());
-				break;
-			}
-			case cppcms::json::json_type::is_string: 
-			{
-				std::string val = (std::string)second.str();
-				update_list[first.str()] = any(val);
-				break;
-			}
-			case cppcms::json::json_type::is_boolean:
-			{
-				update_list[first.str()] = any((bool)second.boolean());
-				break;
-			}
-			default:
-				break;
-		}
-		// dump_map(update_list);
-		return true;
-	}
-	std::cout << "field " << first.str() << std::endl;
-	throw unrecognized_field_ex();
-	return false;
 }
 
 bool update::check_default(any value)
@@ -391,16 +356,14 @@ bool update::check_default(any value)
 	switch (value.tag) {
 		case any::CHAR:
 			std::cout << " String " << std::endl;
-			if( ((std::string)value.string).empty() )
-			{
+			if ( ((std::string)value.string).empty() ) {
 				return true;
 			}
 			return false;
 			break;
 		case any::INT:
 			std::cout << " Integer " << std::endl;
-			if( value.integer == -1 )
-			{
+			if ( value.integer == -1 ) {
 				return true;
 			}
 			return false;

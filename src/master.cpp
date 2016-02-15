@@ -302,7 +302,7 @@ void master::authenticate(std::string username, std::string password)
 	}
 	catch (std::exception &e)
 	{
-
+		return_error(e.what());
 	}
 }
 
@@ -316,10 +316,8 @@ bool master::check_authenticated(std::vector<std::string> role_types)
 	std::cout << remote << std::endl;
 	std::cout << token << std::endl;
 
-	if( token.empty() )
-	{
+	if( token.empty() ) {
 		throw no_token_ex();
-		return false;
 	}
 
 	if(token.size() != 40) {
@@ -342,7 +340,6 @@ bool master::check_authenticated(std::vector<std::string> role_types)
 			return false;
 		} else {
 			throw token_not_valid_ex();
-			return false;
 		}
 	}
 	return false;
@@ -373,9 +370,9 @@ int master::get_uid_from_token()
 
 	stat = get_database().session() << 
 			"SELECT * FROM auth_token WHERE sessionid = ? and remote = inet6_aton(?) and valid > now()" << token << remote;
-		cppdb::result r = stat.query();
+	cppdb::result r = stat.query();
 
-	if(r.next()){
+	if ( r.next() ) {
 		int uid = -1;
 		r.fetch(2, uid);
 		return uid;
@@ -439,44 +436,10 @@ void dump_map(const std::map<std::string,any>& map) {
 	}
 }
 
-bool master::convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list)
-{
-	// std::cout << "convert" << std::endl;
-	// std::cout << "Field " << first.str() << std::endl;
-	if ( tmp->model::compare_field(first.str()) ) {
-		switch(second.type()) {
-			case cppcms::json::json_type::is_number: 
-			{
-				update_list[first.str()] = any((int)second.number());
-				break;
-			}
-			case cppcms::json::json_type::is_string: 
-			{
-				std::string val = (std::string)second.str();
-				update_list[first.str()] = any(val);
-				break;
-			}
-			case cppcms::json::json_type::is_boolean:
-			{
-				update_list[first.str()] = any((bool)second.boolean());
-				break;
-			}
-			default:
-				break;
-		}
-		// dump_map(update_list);
-		return true;
-	}
-	std::cout << "field " << first.str() << std::endl;
-	throw unrecognized_field_ex();
-	return false;
-}
-
 bool master::check_primary_field(std::vector<any> primary_list, std::string field)
 {
 	for ( auto it = primary_list.begin(); it != primary_list.end(); ++it ) {
-		if(field.compare((*it).string) == 0)
-		{
+		if ( field.compare((*it).string) == 0 ) {
 			return true;
 		}
 	}
