@@ -18,6 +18,7 @@
 #include "function/get.h"
 #include "function/get_multiple.h"
 #include "function/update.h"
+#include "function/delete_m.h"
 
 /*
  * Bind JSON RPC calls to class methods
@@ -98,21 +99,20 @@ master::master(cppcms::service &srv) : cppcms::rpc::json_rpc_server(srv)
 	bind("update_database", cppcms::rpc::json_method(&update::update_database, update_obj), method_role);
 	bind("update_domain_alias", cppcms::rpc::json_method(&update::update_domain_alias, update_obj), method_role);
 
-	/* TODO update */
-
-	bind("delete_user", cppcms::rpc::json_method(&master::delete_user, this), method_role);
-	bind("delete_domain", cppcms::rpc::json_method(&master::delete_domain, this), method_role);
-	bind("delete_dns", cppcms::rpc::json_method(&master::delete_dns, this), method_role);
-	bind("delete_ftp_account", cppcms::rpc::json_method(&master::delete_ftp_account, this), method_role);
-	bind("delete_vhost", cppcms::rpc::json_method(&master::delete_vhost, this), method_role);
-	bind("delete_mailbox", cppcms::rpc::json_method(&master::delete_mailbox, this), method_role);
-	bind("delete_shell", cppcms::rpc::json_method(&master::delete_shell, this), method_role);
-	bind("delete_subdomain", cppcms::rpc::json_method(&master::delete_subdomain, this), method_role);
-	bind("delete_setting", cppcms::rpc::json_method(&master::delete_setting, this), method_role);
-	bind("delete_database_type", cppcms::rpc::json_method(&master::delete_database_type, this), method_role);
-	bind("delete_database_user", cppcms::rpc::json_method(&master::delete_database_user, this), method_role);
-	bind("delete_database", cppcms::rpc::json_method(&master::delete_database, this), method_role);
-	bind("delete_domain_alias", cppcms::rpc::json_method(&master::delete_domain_alias, this), method_role);
+	delete_m_obj = new delete_m( get_database(), this);
+	bind("delete_user", cppcms::rpc::json_method(&delete_m::delete_user, delete_m_obj), method_role);
+	bind("delete_domain", cppcms::rpc::json_method(&delete_m::delete_domain, delete_m_obj), method_role);
+	bind("delete_dns", cppcms::rpc::json_method(&delete_m::delete_dns, delete_m_obj), method_role);
+	bind("delete_ftp_account", cppcms::rpc::json_method(&delete_m::delete_ftp_account, delete_m_obj), method_role);
+	bind("delete_vhost", cppcms::rpc::json_method(&delete_m::delete_vhost, delete_m_obj), method_role);
+	bind("delete_mailbox", cppcms::rpc::json_method(&delete_m::delete_mailbox, delete_m_obj), method_role);
+	bind("delete_shell", cppcms::rpc::json_method(&delete_m::delete_shell, delete_m_obj), method_role);
+	bind("delete_subdomain", cppcms::rpc::json_method(&delete_m::delete_subdomain, delete_m_obj), method_role);
+	bind("delete_setting", cppcms::rpc::json_method(&delete_m::delete_setting, delete_m_obj), method_role);
+	bind("delete_database_type", cppcms::rpc::json_method(&delete_m::delete_database_type, delete_m_obj), method_role);
+	bind("delete_database_user", cppcms::rpc::json_method(&delete_m::delete_database_user, delete_m_obj), method_role);
+	bind("delete_database", cppcms::rpc::json_method(&delete_m::delete_database, delete_m_obj), method_role);
+	bind("delete_domain_alias", cppcms::rpc::json_method(&delete_m::delete_domain_alias, delete_m_obj), method_role);
 }
 
 master::~master()
@@ -122,6 +122,7 @@ master::~master()
 	delete get_obj;
 	delete get_multiple_obj;
 	delete update_obj;
+	delete delete_m_obj;
 }
 
 void master::init_backend()
@@ -411,329 +412,7 @@ void master::get_ip()
 	return_result(remote_address);
 }
 
-/* delete */
-
-void master::delete_user(std::string username)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			user user(get_database(), this->get_uid_from_token());
-
-			user.load();
-
-			if ( user.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_domain(std::string domain_name)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			domain domain(get_database(),domain_name);
-
-			domain.load();
-
-			if ( domain.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_dns(int dns_id)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			dns dns(get_database(),dns_id);
-
-			dns.load();
-
-			if ( dns.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_ftp_account(std::string ftp_username)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			ftp_account ftp_account(get_database(),ftp_username);
-
-			ftp_account.load();
-
-			if ( ftp_account.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_vhost(int vhost_id)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			vhost vhost(get_database(),vhost_id);
-
-			vhost.load();
-
-			if ( vhost.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_mailbox(int mailbox_id)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			mailbox mailbox(get_database(),mailbox_id);
-
-			mailbox.load();
-
-			if ( mailbox.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_shell(int id)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			shell shell(get_database(),id);
-
-			shell.load();
-
-			if ( shell.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_subdomain(std::string subdomain_name, std::string domain_name)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			subdomain subdomain(get_database(),subdomain_name,domain_name);
-
-			subdomain.load();
-
-			if ( subdomain.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_setting(std::string key)
-{
-	app_settings app_settings(get_database(),key);
-
-	app_settings.load();
-	if ( app_settings.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
-	}
-}
-
-void master::delete_database_type(std::string name)
-{
-	database_type database_type(get_database(),name);
-
-	database_type.load();
-
-	if ( database_type.m_delete() ) {
-		return_result("OK");
-	} else {
-		return_error("Delete failed");
-	}
-}
-
-void master::delete_database_user(std::string username)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			database_user database_user(get_database(),username);
-
-			database_user.load();
-			if ( database_user.m_delete() ) {
-				return_result("OK");
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_database(std::string db_name, std::string db_username)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			database database(get_database(),db_name);
-
-			database.load();
-			user_dbuser_db connect(get_database(),db_username,db_name);
-			if ( connect.m_delete() ) {
-				if ( database.m_delete() ) {
-					return_result("OK");
-				}
-				else {
-					return_error("Failed to delete database, and remove connection with username");
-				}
-			} else {
-				return_error("Delete failed");
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-void master::delete_domain_alias(int id)
-{
-	try{
-		std::vector<std::string> role_types;
-		role_types.push_back(USER_TYPE_ADMINISTRATOR);
-		role_types.push_back(USER_TYPE_USER);
-		if ( this->check_authenticated(role_types) ) {
-			domain_alias domain_alias(get_database(), id);
-
-			domain_alias.load();
-			if ( domain_alias.get_domain().get_user().get_uid() == this->get_uid_from_token() ){
-				if ( domain_alias.m_delete() ) {
-					return_result("OK");
-				} else {
-					return_error("Delete failed");
-				}
-			} else {
-				throw auth_ex();
-			}
-		} else {
-			throw not_auth_ex();
-		}
-    } catch(std::exception &e) {
-		return_error(e.what());
-	}
-}
-
-
 /* Helper methods */
-
-std::map<std::string, any> master::create_generic(cppcms::json::value object, ModelFactory::ModelType type)
-{
-	cppcms::json::object ob_req;
-	cppcms::json::object ob_opt;
-	try {
-		ob_req = object.get<cppcms::json::object>("required_list");
-		ob_opt = object.get<cppcms::json::object>("optional_list");
-	}	catch(std::exception &e) {
-		throw missing_params_ex();
-	}
-	std::map<std::string, any> list;
-	std::map<std::string, any> primary_list_empty;
-
-	for (cppcms::json::object::const_iterator p=ob_req.begin(); p!=ob_req.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-	}
-
-	for (cppcms::json::object::const_iterator p=ob_opt.begin(); p!=ob_opt.end(); ++p) {
-		this->convert(ModelFactory::createModel(type, get_database(), primary_list_empty), p->first, p->second, list);
-	}
-	return list;
-}
 
 /* Dump map contents */
 void dump_map(const std::map<std::string,any>& map) {

@@ -28,8 +28,8 @@ public:
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 	bool check_default(std::map<std::string,any> primary_list);
 	bool check_default(any value);
-	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list);
-
+	bool convert(std::unique_ptr<model> tmp, cppcms::string_key first, cppcms::json::value second, std::map<std::string,any> &update_list); // TODO MOVE TO OWN CLASS
+ 
 };
 
 #endif /* UPDATE_H */

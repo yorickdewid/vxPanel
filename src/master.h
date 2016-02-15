@@ -13,6 +13,7 @@ class create;
 class get;
 class get_multiple;
 class update;
+class delete_m;
 class master: public cppcms::rpc::json_rpc_server {
 
 public:
@@ -31,20 +32,6 @@ public:
 	void authenticate(std::string username, std::string password);
 
 	void get_ip();
-
-	void delete_user(std::string username);
-	void delete_domain(std::string domain_name);
-	void delete_dns(int dns_id);
-	void delete_ftp_account(std::string ftp_username);
-	void delete_vhost(int vhost_id);
-	void delete_mailbox(int mailbox_id);
-	void delete_shell(int id);
-	void delete_subdomain(std::string subdomain_name, std::string domain_name);
-	void delete_setting(std::string key);
-	void delete_database_type(std::string name);
-	void delete_database_user(std::string username);
-	void delete_database(std::string db_name, std::string username);
-	void delete_domain_alias(int id);
 
 	/* used mainly in update (create) functions */
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
@@ -67,6 +54,7 @@ private:
 	get* get_obj = NULL;
 	get_multiple* get_multiple_obj = NULL;
 	update* update_obj = NULL;
+	delete_m* delete_m_obj = NULL;
 
 };
 
