@@ -11,6 +11,7 @@
 
 class create;
 class get;
+class get_multiple;
 class master: public cppcms::rpc::json_rpc_server {
 
 public:
@@ -29,21 +30,6 @@ public:
 	void authenticate(std::string username, std::string password);
 
 	void get_ip();
-
-	/* LISTS */
-	void get_users(cppcms::json::value object); // admin only for now
-	void get_domains(cppcms::json::value object); // get domains for 1 user
-	void get_dns_records(cppcms::json::value object); // get all dns records for 1 domain
-	void get_ftp_accounts(cppcms::json::value object); // get all ftp accounts for 1 user
-	void get_vhosts(cppcms::json::value object); // get all vhosts for 1 domain
-	void get_mailboxes(cppcms::json::value object); // get all mailboxes for 1 domain
-	void get_shells(cppcms::json::value object); // get all shells for 1 domain 
-	void get_subdomains(cppcms::json::value object); // get all subdomains for 1 user
-	void get_settings(cppcms::json::value object); // get all settings (admin only)
-	void get_database_types(); 
-	void get_database_users(cppcms::json::value object); // get all database users for 1 user
-	void get_databases(cppcms::json::value object); // get all databases for 1 user
-	void get_queues(cppcms::json::value object); // get all queues for 1 user
 
 	void update_user(cppcms::json::value object);
 	void update_domain(cppcms::json::value object);
@@ -71,10 +57,6 @@ public:
 	void delete_database(std::string db_name, std::string username);
 	void delete_domain_alias(int id);
 
-	/* used for get_all functions */
-	cppdb::result get_result(std::ostringstream& query);
-	void create_get_all_query(cppcms::json::value object, std::ostringstream& query);
-
 	/* used mainly in update (create) functions */
 	std::map<std::string, any> create_generic(cppcms::json::value object, ModelFactory::ModelType type);
 	bool check_default(any value);
@@ -98,6 +80,7 @@ private:
 	backend *db = NULL;
 	create* create_obj = NULL;
 	get* get_obj = NULL;
+	get_multiple* get_multiple_obj = NULL;
 
 };
 
