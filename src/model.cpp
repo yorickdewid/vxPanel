@@ -1,4 +1,5 @@
 #include "model.h"
+#include <booster/log.h>
 
 void model::add_to_statement(cppdb::statement& stat, any value)
 {
@@ -31,8 +32,8 @@ bool model::update(std::map<std::string, any> update_list)
 		query << "UPDATE "<< this->table_name;
 
 		std::cout << "Table name " << this->table_name << std::endl;
-
-		std::cout << "update_list.size() is " << update_list.size() << '\n';
+      
+    	BOOSTER_DEBUG("application_name") << "update_list.size() is " << update_list.size() << '\n';
 
 		int count = 0;
 		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {

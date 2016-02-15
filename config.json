@@ -19,6 +19,14 @@
 	},
 	"file_server" : {
 		"enable" : true
-	}
+	},
+	"logging" : {
+       "level" : "debug",
+        "file":{
+	       	"name":"CHANGME",
+	        "append":false,
+	        "max_files":1
+	    }
+    }  
 }
 

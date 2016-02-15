@@ -12,7 +12,7 @@ CPPCHECKFLAGS = --quiet --std=c++11
 CPPCHECK = cppcheck
 INCLUDE_DIRS = .
 LIBRARY_DIRS = /usr/local/lib /usr/lib64 /usr/lib
-LIBRARIES = cppcms cppdb
+LIBRARIES = cppcms cppdb booster
 CPPFLAGS += -O0 -Wall -Werror -g -DSAMPLE -std=c++11
 CPPFLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir))
