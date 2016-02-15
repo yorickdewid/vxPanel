@@ -10,6 +10,7 @@
 #include "ModelFactory.h"
 
 class create;
+class get;
 class master: public cppcms::rpc::json_rpc_server {
 
 public:
@@ -27,19 +28,6 @@ public:
 
 	void authenticate(std::string username, std::string password);
 
-	void get_user();
-	void get_domain(std::string domain_name);
-	void get_dns(std::string domain_name);
-	void get_ftp_account(std::string ftp_account);
-	void get_vhost(std::string domain_name, int vhost_id);
-	void get_mailbox(std::string domain_name);
-	void get_shell(int id);
-	void get_subdomain(std::string subdomain_name, std::string domain_name);
-	void get_setting(std::string key);
-	void get_database_user(std::string username);
-	void get_database(std::string db_name);
-	void get_queue(int qid);
-	void get_domain_alias(int id);
 	void get_ip();
 
 	/* LISTS */
@@ -97,6 +85,7 @@ public:
 	any get_identifier(std::string primary_field, cppcms::string_key first, cppcms::json::value second);
 
 	bool check_authenticated(std::vector<std::string> role_types); // usage in functions
+	int get_uid_from_token();
 
 protected:
 	std::string format_uptime(std::string sec);
@@ -104,11 +93,11 @@ protected:
 private:
 	std::string create_auth_token(int uid);
 	bool is_role_allowed(std::vector<std::string> role_types, int uid);
-	int get_uid_from_token();
 	void init_backend();
 
 	backend *db = NULL;
 	create* create_obj = NULL;
+	get* get_obj = NULL;
 
 };
 
