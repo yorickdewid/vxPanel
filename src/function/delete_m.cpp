@@ -39,6 +39,10 @@ void delete_m::delete_domain(std::string domain_name)
 
 			domain.load();
 
+			if ( domain.get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( domain.m_delete() ) {
 				get_main()->return_result("OK");
 			} else {
@@ -62,6 +66,10 @@ void delete_m::delete_dns(int dns_id)
 			dns dns(get_database(),dns_id);
 
 			dns.load();
+
+			if ( dns.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
 
 			if ( dns.m_delete() ) {
 				get_main()->return_result("OK");
@@ -87,6 +95,10 @@ void delete_m::delete_ftp_account(std::string ftp_username)
 
 			ftp_account.load();
 
+			if ( ftp_account.get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( ftp_account.m_delete() ) {
 				get_main()->return_result("OK");
 			} else {
@@ -100,6 +112,7 @@ void delete_m::delete_ftp_account(std::string ftp_username)
 	}
 }
 
+/* possible problem with authorization */
 void delete_m::delete_vhost(int vhost_id)
 {
 	try{
@@ -135,6 +148,10 @@ void delete_m::delete_mailbox(int mailbox_id)
 
 			mailbox.load();
 
+			if ( mailbox.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( mailbox.m_delete() ) {
 				get_main()->return_result("OK");
 			} else {
@@ -159,6 +176,10 @@ void delete_m::delete_shell(int id)
 
 			shell.load();
 
+			if ( shell.get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( shell.m_delete() ) {
 				get_main()->return_result("OK");
 			} else {
@@ -182,6 +203,10 @@ void delete_m::delete_subdomain(std::string subdomain_name, std::string domain_n
 			subdomain subdomain(get_database(),subdomain_name,domain_name);
 
 			subdomain.load();
+
+			if ( subdomain.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
 
 			if ( subdomain.m_delete() ) {
 				get_main()->return_result("OK");
@@ -231,6 +256,10 @@ void delete_m::delete_database_user(std::string username)
 			database_user database_user(get_database(),username);
 
 			database_user.load();
+			if ( database_user.get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( database_user.m_delete() ) {
 				get_main()->return_result("OK");
 			} else {
@@ -255,11 +284,15 @@ void delete_m::delete_database(std::string db_name, std::string db_username)
 
 			database.load();
 			user_dbuser_db connect(get_database(),db_username,db_name);
+
+			if ( database.get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			if ( connect.m_delete() ) {
 				if ( database.m_delete() ) {
 					get_main()->return_result("OK");
-				}
-				else {
+				} else {
 					get_main()->return_error("Failed to delete database, and remove connection with username");
 				}
 			} else {
@@ -283,14 +316,13 @@ void delete_m::delete_domain_alias(int id)
 			domain_alias domain_alias(get_database(), id);
 
 			domain_alias.load();
-			if ( domain_alias.get_domain().get_user().get_uid() == get_main()->get_uid_from_token() ){
-				if ( domain_alias.m_delete() ) {
-					get_main()->return_result("OK");
-				} else {
-					get_main()->return_error("Delete failed");
-				}
-			} else {
+			if ( domain_alias.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
 				throw auth_ex();
+			}
+			if ( domain_alias.m_delete() ) {
+				get_main()->return_result("OK");
+			} else {
+				get_main()->return_error("Delete failed");
 			}
 		} else {
 			throw not_auth_ex();
