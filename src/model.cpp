@@ -31,9 +31,8 @@ bool model::update(std::map<std::string, any> update_list)
 		std::ostringstream query;
 		query << "UPDATE "<< this->table_name;
 
-		std::cout << "Table name " << this->table_name << std::endl;
-      
-    	BOOSTER_DEBUG("application_name") << "update_list.size() is " << update_list.size() << '\n';
+		BOOSTER_DEBUG("model") << "Table name " << this->table_name << std::endl;
+    	BOOSTER_DEBUG("model") << "update_list.size() is " << update_list.size() << '\n';
 
 		int count = 0;
 		for ( auto it = update_list.begin(); it != update_list.end(); ++it ) {
@@ -54,7 +53,7 @@ bool model::update(std::map<std::string, any> update_list)
 				query << "`" << (*it).first << "` = ? ";
 			}
 		}
-		std::cout << query.str() << std::endl;
+		BOOSTER_DEBUG("model") << "Query is " << query.str() << std::endl;
 
 		stat = db.session() << query.str();
 
@@ -70,11 +69,11 @@ bool model::update(std::map<std::string, any> update_list)
 
 		stat.exec();
 
-		std::cout << "Affected "<< stat.affected() << std::endl;
+		BOOSTER_DEBUG("model") << "Affected "<< stat.affected() << std::endl;
 
 		return true;
 	} catch (std::exception &e) {
-		std::cout << "Exception occured in update (vector) " << e.what() << std::endl;
+		BOOSTER_DEBUG("model") << "Exception occured in update (vector) " << e.what() << std::endl;
 		return false;
 	}
 	return false;
@@ -84,14 +83,14 @@ bool model::update(std::map<std::string, any> update_list)
 /* Debug for fields */
 void dump_map(const std::map<std::string,bool>& map) {
 	for (std::map<std::string, bool>::const_iterator it = map.begin(); it != map.end(); it++) {
-		std::cout << "Key: " << it->first << std::endl;
+		BOOSTER_DEBUG("model") << "Key: " << it->first << std::endl;
 	}
 }
 
 bool model::compare_field(std::string field)
 {
 	// dump_map(this->field_list);
-	std::cout << "Size " << this->field_list.size() << std::endl;
+	BOOSTER_DEBUG("model") << "Size " << this->field_list.size() << std::endl;
 	if ( this->field_list.size() > 1 ) {
 		for(auto it = this->field_list.begin(); it != this->field_list.end(); ++it) {
 	    	if( it->first.compare(field) == 0)
@@ -106,19 +105,18 @@ bool model::compare_field(std::string field)
 
 bool model::compare_primary_field(std::string field)
 {
-	std::cout << " Primary Size " << this->primary_info.size() << std::endl;
+	BOOSTER_DEBUG("model") << " Primary Size " << this->primary_info.size() << std::endl;
 	if ( this->primary_info.size() > 0 ) {
 		for(auto it = this->primary_info.begin(); it != this->primary_info.end(); ++it) {
 	    	if(it->first.compare(field) == 0)
 	    	{
-	    		std::cout << "Primary field matches" << std::endl;
+	    		BOOSTER_DEBUG("model") << "Primary field matches" << std::endl;
 	    		return true;
 	    	}
 		}
-		std::cout << "Primary field matches" << std::endl;
 		return false;
 	}
-	std::cout << "Primary fields == 0" << std::endl;
+	BOOSTER_DEBUG("model") << "Primary fields == 0" << std::endl;
 	return false;
 }
 
@@ -130,12 +128,12 @@ bool model::check_required_fields(std::map<std::string,any> list)
 		for(auto fields = this->field_list.begin(); fields != this->field_list.end(); ++fields) {
 			if(fields->second) 
 	    	{
-	    		std::cout << "Found a required field" << std::endl;
+	    		BOOSTER_DEBUG("model") <<  "Found a required field" << std::endl;
  		    	countRequired++;
  		    	for(auto values = list.begin(); values != list.end(); ++values) {
 			    	if( fields->first.compare(values->first) == 0)
 			    	{
-			    		std::cout << "Matched required field" << std::endl;
+			    		BOOSTER_DEBUG("model") <<  "Matched required field" << std::endl;
 			    		countValuesOfRequired++;
 			    		break;
 			    	}
@@ -145,7 +143,7 @@ bool model::check_required_fields(std::map<std::string,any> list)
 	}
 	if(countValuesOfRequired == countRequired)
 	{
-		std::cout << "all required fields are there" << std::endl;
+		BOOSTER_DEBUG("model") << "all required fields are there" << std::endl;
 		return true;
 	}
 	return false;
@@ -159,5 +157,4 @@ bool model::is_empty(std::string var)
 		return true;
 	}
 }
-
 
