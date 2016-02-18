@@ -1,3 +1,4 @@
+#include <booster/log.h>
 #include <cppcms/application.h>
 #include <cppcms/service.h>
 #include <cppcms/applications_pool.h>
@@ -22,16 +23,16 @@ bool check_secret(cppcms::service &srv )
 int main(int argc, char *argv[])
 {
 	try {
-		std::cout << "Starting vxPanel " << VERSION << std::endl;
+		BOOSTER_INFO("main") << "Starting vxPanel " << VERSION << std::endl;
 		cppcms::service srv(argc,argv);
 
 		srv.applications_pool().mount(cppcms::applications_factory<master>());
 		if( !check_secret(srv) ) {
-			std::cout << "Secret key badly formed, exiting..." << std::endl;
+			BOOSTER_ERROR("main") << "Secret key badly formed, exiting..." << std::endl;
 			exit (EXIT_FAILURE);
 		}
 		srv.run();
-		std::cout << "Stopping vxPanel " << std::endl;
+		BOOSTER_INFO("main")<< "Stopping vxPanel " << std::endl;
 	}
 	catch(std::exception const &e) {
 		std::cerr << e.what() << std::endl;
