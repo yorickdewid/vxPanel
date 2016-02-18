@@ -56,16 +56,16 @@ void get::get_domain(std::string domain_name)
 
 			domain.load();
 
-			if (domain.get_user().get_uid() == get_main()->get_uid_from_token() ) {
-
-				json["domain"]["domainname"] = domain.name;
-				json["domain"]["status"] = domain._status;
-				json["domain"]["registrar"] =  domain._registrar;
-
-				get_main()->return_result(json);
-			} else {
+			if ( domain.get_user().get_uid() != get_main()->get_uid_from_token() ) {
 				throw auth_ex();
 			}
+
+			json["domain"]["domainname"] = domain.name;
+			json["domain"]["status"] = domain._status;
+			json["domain"]["registrar"] =  domain._registrar;
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -87,16 +87,16 @@ void get::get_dns(std::string domain_name)
 			dns dns(this->functions::get_database(), 0);
 			dns.load(domain_name);
 
-			if (dns.get_domain().get_user().get_uid() == get_main()->get_uid_from_token() ) {
-
-				json["dns"]["address"] = dns.get_name();
-				json["dns"]["created"] = dns.get_created();
-				json["dns"]["domain_name"] = domain_name;
-
-				get_main()->return_result(json);
-			} else {
+			if (dns.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ) {
 				throw auth_ex();
 			}
+
+			json["dns"]["address"] = dns.get_name();
+			json["dns"]["created"] = dns.get_created();
+			json["dns"]["domain_name"] = domain_name;
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -118,17 +118,16 @@ void get::get_ftp_account(std::string ftp_username)
 			ftp_account ftp_account(this->functions::get_database(), ftp_username);
 			ftp_account.load();
 
-			if (ftp_account.get_user().get_uid() == get_main()->get_uid_from_token() ){
-
-				json["ftp_account"]["username"] = ftp_account.get_username();
-				json["ftp_account"]["password"] = ftp_account.get_password();
-				json["ftp_account"]["created"] = ftp_account.get_created();
-
-				get_main()->return_result(json);
-			}
-			else{
+			if (ftp_account.get_user().get_uid() != get_main()->get_uid_from_token() ){
 				throw auth_ex();
 			}
+
+			json["ftp_account"]["username"] = ftp_account.get_username();
+			json["ftp_account"]["password"] = ftp_account.get_password();
+			json["ftp_account"]["created"] = ftp_account.get_created();
+
+			get_main()->return_result(json);
+			
 		} else {
 			throw not_auth_ex();
 		}
@@ -176,21 +175,22 @@ void get::get_mailbox(std::string domain_name)
 			mailbox mailbox(this->functions::get_database(),0);
 			mailbox.load(domain_name);
 
-			if ( mailbox.get_domain().name.compare(domain_name) == 0) {
-				json["mailbox"]["id"] = mailbox.get_id();
-				json["mailbox"]["email"] = mailbox.get_email();
-				json["mailbox"]["password"] = mailbox.get_password();
-				json["mailbox"]["maildir"] = mailbox.get_maildir();
-				json["mailbox"]["quota"] = mailbox.get_quota();
-				json["mailbox"]["created"] = mailbox.get_created();
-				if ( !mailbox.get_domain().name.compare("") ) { /* good enough? */
-					json["mailbox"]["domain"] = mailbox.get_domain().name;
-				}
-
-				get_main()->return_result(json);
-			} else{
+			if (mailbox.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
 				throw auth_ex();
 			}
+
+			json["mailbox"]["id"] = mailbox.get_id();
+			json["mailbox"]["email"] = mailbox.get_email();
+			json["mailbox"]["password"] = mailbox.get_password();
+			json["mailbox"]["maildir"] = mailbox.get_maildir();
+			json["mailbox"]["quota"] = mailbox.get_quota();
+			json["mailbox"]["created"] = mailbox.get_created();
+			if ( !mailbox.get_domain().name.compare("") ) { /* good enough? */
+				json["mailbox"]["domain"] = mailbox.get_domain().name;
+			}
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -211,14 +211,14 @@ void get::get_shell(int id)
 			shell shell(this->functions::get_database(),id);
 			shell.load();
 
-			if ( shell.get_user().get_uid() == get_main()->get_uid_from_token() ) {
-				json["shell"]["created"] = shell.get_created();
-
-				get_main()->return_result(json);
-			}
-			else{
+			if ( shell.get_user().get_uid() != get_main()->get_uid_from_token() ) {
 				throw auth_ex();
 			}
+
+			json["shell"]["created"] = shell.get_created();
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -239,6 +239,10 @@ void get::get_subdomain(std::string subdomain_name, std::string domain_name)
 
 			subdomain subdomain(this->functions::get_database(),subdomain_name, domain_name);
 			subdomain.load();
+
+			if ( subdomain.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ) {
+				throw auth_ex();
+			}
 
 			json["subdomain"]["name"] = subdomain.get_name();	
 			json["subdomain"]["created"] = subdomain.get_created();
@@ -294,17 +298,17 @@ void get::get_database_user(std::string username)
 			database_user database_user(this->functions::get_database(),username);
 			database_user.load();
 
-			if ( database_user.get_user().get_uid() == get_main()->get_uid_from_token() ) {
-				json["db_user"]["username"] = database_user.get_name();
-				json["db_user"]["password"] = database_user.get_password();
-				json["db_user"]["permissions"] = database_user.get_permissions();
-				json["db_user"]["created"] = database_user.get_created();
-
-				get_main()->return_result(json);
-			}
-			else {
+			if ( database_user.get_user().get_uid() != get_main()->get_uid_from_token() ) {
 				throw auth_ex();
 			}
+
+			json["db_user"]["username"] = database_user.get_name();
+			json["db_user"]["password"] = database_user.get_password();
+			json["db_user"]["permissions"] = database_user.get_permissions();
+			json["db_user"]["created"] = database_user.get_created();
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -325,15 +329,16 @@ void get::get_database(std::string db_name)
 			database database(this->functions::get_database(),db_name);
 			database.load();
 
-			if ( database.get_user().get_uid() == get_main()->get_uid_from_token()) {
-				json["db"]["name"] = database.get_name();
-				json["db"]["created"] = database.get_created();
-				json["db"]["db_type"] = database.get_database_type().get_name();
-
-				get_main()->return_result(json);
-			} else {
+			if ( database.get_user().get_uid() != get_main()->get_uid_from_token()) {
 				throw auth_ex();
 			}
+
+			json["db"]["name"] = database.get_name();
+			json["db"]["created"] = database.get_created();
+			json["db"]["db_type"] = database.get_database_type().get_name();
+
+			get_main()->return_result(json);
+
 		} else {
 			throw not_auth_ex();
 		}
@@ -352,6 +357,10 @@ void get::get_queue(int qid)
 
 			queue queue(this->functions::get_database(),qid);
 			queue.load();
+
+			if ( queue.get_user().get_uid() != get_main()->get_uid_from_token()) {
+				throw auth_ex();
+			}
 
 			json["queue"]["id"] = queue.qid; // TODO read only
 			json["queue"]["action"] = queue._action;
@@ -383,6 +392,10 @@ void get::get_domain_alias(int id)
 
 			domain_alias domain_alias(this->functions::get_database(),id);
 			domain_alias.load();
+
+			if ( domain_alias.get_domain().get_user().get_uid() != get_main()->get_uid_from_token()) {
+				throw auth_ex();
+			}
 
 			json["domain_alias"]["id"] = domain_alias.get_id();
 			json["domain_alias"]["domain_name"] = domain_alias.get_domain().name;
