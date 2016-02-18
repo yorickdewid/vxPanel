@@ -22,7 +22,7 @@ void ftp_account::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("ftp_account") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -51,7 +51,7 @@ void ftp_account::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -70,9 +70,9 @@ void ftp_account::load_id()
 		cppdb::result r = stat.query();
 
 		while(r.next()) {
-			std::cout << "before " << std::endl;
+			BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
 			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
-	  		std::cout << "before " << std::endl;
+	  		BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
 	  		set_user(std::shared_ptr<user>(new user(db,userid)));
 	    }
 
@@ -80,7 +80,7 @@ void ftp_account::load_id()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -111,8 +111,6 @@ bool ftp_account::m_delete()
 	}
 	return false;
 }
-
-
 
 void ftp_account::set_username(std::string username)
 {

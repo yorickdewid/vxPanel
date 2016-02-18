@@ -29,6 +29,8 @@ void user::save()
 		stat.reset();
 
 		this->saved = true;
+
+		BOOSTER_INFO("user") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -61,7 +63,7 @@ void user::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("user") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{

@@ -18,7 +18,7 @@ void dns::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("dns") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -54,7 +54,7 @@ void dns::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded dns " << std::endl;
+		BOOSTER_INFO("dns") << "Entity loaded dns " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -89,7 +89,7 @@ void dns::load(std::string domain_name)
 
     	this->saved = true;
 
-		std::cout << "Entity loaded dns (domain_name) " << std::endl;
+		BOOSTER_INFO("dns") << "Entity loaded dns (domain_name) " << std::endl;
 	}
 	catch(std::exception &e)
 	{

@@ -17,7 +17,7 @@ void mailbox::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("mailbox") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -52,7 +52,7 @@ void mailbox::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -86,7 +86,7 @@ void mailbox::load(std::string domain_name)
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{

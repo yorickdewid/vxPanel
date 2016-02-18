@@ -18,7 +18,7 @@ void shell::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("shell") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -51,7 +51,7 @@ void shell::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("shell") <<  "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{

@@ -25,7 +25,7 @@ void domain::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("domain") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -62,7 +62,7 @@ void domain::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded domain " << std::endl;
+		BOOSTER_INFO("domain") << "Entity loaded domain " << std::endl;
 	}
 	catch(std::exception &e)
 	{

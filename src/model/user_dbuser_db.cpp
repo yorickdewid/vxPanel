@@ -17,7 +17,7 @@ void user_dbuser_db::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("user_db_user") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -27,7 +27,7 @@ void user_dbuser_db::save()
 
 void user_dbuser_db::load()
 {
-	std::cout << "trick" << std::endl;
+	BOOSTER_DEBUG("user_db_user") << "trick" << std::endl;
 }
 
 void user_dbuser_db::load(std::string db_username, std::string db_name = "false")
@@ -52,7 +52,7 @@ void user_dbuser_db::load(std::string db_username, std::string db_name = "false"
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("user_db_user") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
