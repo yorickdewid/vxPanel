@@ -18,7 +18,7 @@ void database_type::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("database_type") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -43,7 +43,7 @@ void database_type::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("database_type") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -96,8 +96,8 @@ std::vector<database_type> database_type::load_all()
 
 	    stat.reset();
 
+		BOOSTER_INFO("database_type") << "All data loaded" << std::endl;
 
-		std::cout << "All data loaded" << std::endl;
 		return database_types;
 	}
 	catch(std::exception &e)

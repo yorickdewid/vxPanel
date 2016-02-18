@@ -19,7 +19,7 @@ void database::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("database") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
