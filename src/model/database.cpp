@@ -48,7 +48,7 @@ void database::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("database") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{

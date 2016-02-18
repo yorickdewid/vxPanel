@@ -63,7 +63,7 @@ void queue::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("queue") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -92,7 +92,7 @@ void queue::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("queue") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
