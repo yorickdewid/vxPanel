@@ -1,3 +1,4 @@
+#include <booster/log.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>

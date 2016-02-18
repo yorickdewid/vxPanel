@@ -68,7 +68,7 @@ void auth_token::load()
 
     	this->saved = true;
 
-		BOOSTER_INFO("auth_token") << "Entity loaded domain " << std::endl;
+		BOOSTER_INFO("auth_token") << "Entity loaded auth_token " << std::endl;
 	}
 	catch(std::exception &e)
 	{

@@ -1,5 +1,4 @@
 #include "model.h"
-#include <booster/log.h>
 
 void model::add_to_statement(cppdb::statement& stat, any value)
 {

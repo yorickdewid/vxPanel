@@ -1,15 +1,16 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "exceptions.h"
-#include "backend.h"
-#include "any.h"
-#include "config.h"
-
+#include <booster/log.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <map>
+
+#include "exceptions.h"
+#include "backend.h"
+#include "any.h"
+#include "config.h"
 
 class model {
 

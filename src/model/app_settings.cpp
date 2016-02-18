@@ -5,78 +5,60 @@
 
 void app_settings::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO settings (`key`,value,`default`,description) "
-			"VALUES (?, ?, ?, ?)" << key << _value << _default << _description;
-			
-		stat.exec();
-		stat.reset();
+	stat = db.session() << 
+		"INSERT INTO settings (`key`,value,`default`,description) "
+		"VALUES (?, ?, ?, ?)" << key << _value << _default << _description;
+		
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("app_settings") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("app_settings") << "Saved" << std::endl;
 }
 
 void app_settings::load()
 {
-	try{
-		cppdb::statement stat;
-		int tmp_default;
+	cppdb::statement stat;
+	int tmp_default;
 
-		stat = db.session() << 
-				"SELECT * FROM settings WHERE `key` = ?" << key;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM settings WHERE `key` = ?" << key;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-	  		r >> this->key >> this->_value >> tmp_default >> this->_description >> this->_updated >> this->_created;
-	  		if ( tmp_default == 0 ){
-  				this->_default = false;
-  			}
-  			else if ( tmp_default == 1 ){
-  				this->_default = true;
-  			}
-	    }
+	while(r.next()) {
+  		r >> this->key >> this->_value >> tmp_default >> this->_description >> this->_updated >> this->_created;
+  		if ( tmp_default == 0 ){
+				this->_default = false;
+			}
+			else if ( tmp_default == 1 ){
+				this->_default = true;
+			}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("app_settings") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("app_settings") << "Entity loaded " << std::endl;
 }
 
 bool app_settings::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM settings WHERE `key` = ?" << key;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM settings WHERE `key` = ?" << key;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
 	return false;
 }
