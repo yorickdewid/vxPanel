@@ -65,7 +65,7 @@ bool backend::is_active()
 		}
 	}
 	catch(std::exception const &e) {
-		std::cerr << "ERROR: " << e.what() << std::endl;
+		BOOSTER_ERROR("master") << "ERROR: " << e.what() << std::endl;
 		return false;
 	}
 	return true;
@@ -82,7 +82,7 @@ std::string backend::version()
 		res >> version;
 	}
 	catch(std::exception const &e) {
-		std::cerr << "ERROR: " << e.what() << std::endl;
+		BOOSTER_ERROR("master") << "ERROR: " << e.what() << std::endl;
 	}
 	return version;
 }
