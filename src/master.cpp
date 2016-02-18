@@ -1,3 +1,4 @@
+#include <booster/log.h>
 #include <cppcms/json.h>
 #include <cppcms/session_interface.h>
 #include <cppcms/url_mapper.h>
@@ -141,14 +142,14 @@ backend& master::get_database()
 #ifdef SAMPLE
 void master::sum(int x, int y)
 {
-	std::cout << "Sum Called" << std::endl;
+	BOOSTER_DEBUG("master") << "Sum Called" << std::endl;
 	return_result(x + y);
 }
 #endif
 
 void master::div(int x, int y)
 {
-	std::cout << "Div Called" << std::endl;
+	BOOSTER_DEBUG("master") << "Div Called" << std::endl;
 	if (y == 0) {
 		return_error("Division by zero");
 	} else {
@@ -158,13 +159,13 @@ void master::div(int x, int y)
 
 void master::notify(std::string msg)
 {
-	std::cout << "We got notification " << msg << std::endl;
+	BOOSTER_DEBUG("master") << "We got notification " << msg << std::endl;
 }
 
 void master::both(std::string msg)
 {
 	if (notification()) {
-		std::cout << "We got notification " << msg << std::endl;
+		BOOSTER_DEBUG("master") << "We got notification " << msg << std::endl;
 	} else {
 		return_result("call:" + msg);
 	}
@@ -174,10 +175,10 @@ void master::header()
 {
 	std::map<std::string,std::string> env = cppcms::application::request().getenv();
 	std::string env2 = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN");
-	std::cout << env2 << std::endl;
+	BOOSTER_INFO("master") << env2 << std::endl;
 
 	for (auto p=env.begin(); p!=env.end(); ++p) {
-		std::cout << "Key " << p->first << " Value " << p->second << std::endl;
+		BOOSTER_INFO("master") << "Key " << p->first << " Value " << p->second << std::endl;
 	}
 	return_result("OK");
 }
@@ -251,7 +252,7 @@ void master::authenticate(std::string username, std::string password)
 		{
 			int uid = -1;
 			r.fetch(0, uid);
-			std::cout << "UID == " << uid << std::endl;
+			BOOSTER_INFO("master") << "UID == " << uid << std::endl;
 			if( uid != -1 ) {
 				std::string remote_address = cppcms::application::request().remote_addr();
 				/*  check if already authenticated */
@@ -313,8 +314,8 @@ bool master::check_authenticated(std::vector<std::string> role_types)
 	std::string remote = cppcms::application::request().remote_addr();
 	std::string token = cppcms::application::request().getenv("HTTP_X_AUTH_TOKEN"); // dont supply the http part in js or python
 
-	std::cout << remote << std::endl;
-	std::cout << token << std::endl;
+	BOOSTER_INFO("master") << remote << std::endl;
+	BOOSTER_INFO("master") << token << std::endl;
 
 	if( token.empty() ) {
 		throw no_token_ex();
@@ -414,8 +415,8 @@ void master::get_ip()
 /* Dump map contents */
 void dump_map(const std::map<std::string,any>& map) {
 	for (std::map<std::string, any>::const_iterator it = map.begin(); it != map.end(); it++) {
-		std::cout << "Key: " << it->first << std::endl;
-		std::cout << "Value: " << std::endl;
+		BOOSTER_DEBUG("master") << "Key: " << it->first << std::endl;
+		BOOSTER_DEBUG("master") << "Value: " << std::endl;
 		switch (it->second.tag) {
 			case any::CHAR:
 				puts(it->second.string);
