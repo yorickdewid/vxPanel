@@ -17,7 +17,7 @@ void app_settings::save()
 
 		this->saved = true;
 
-		std::cout << "Saved" << std::endl;
+		BOOSTER_INFO("app_settings") << "Saved" << std::endl;
 	}
 	catch(std::exception &e)
 	{
@@ -49,7 +49,7 @@ void app_settings::load()
 
     	this->saved = true;
 
-		std::cout << "Entity loaded " << std::endl;
+		BOOSTER_INFO("app_settings") << "Entity loaded " << std::endl;
 	}
 	catch(std::exception &e)
 	{
