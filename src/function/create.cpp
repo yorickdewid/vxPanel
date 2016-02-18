@@ -166,6 +166,11 @@ void create::create_dns(cppcms::json::value object)
 			dns_obj->_name = list["name"].string;
 			dns_obj->set_domain(std::shared_ptr<domain>(new domain(this->functions::get_database(),list["domain_name"].string)));
 
+			/* check if domain is actually of user */
+			if ( dns_obj->get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			// optional
 	    	if ( list.count("active") == 1 ) {
 	    		dns_obj->_active = list.at("active").boolean;
@@ -216,7 +221,7 @@ void create::create_ftp_account(cppcms::json::value object)
 			ftp_account_obj->_name = list["name"].string;
 			ftp_account_obj->_password = list["password"].string;
 			ftp_account_obj->_homedir= list["homedir"].string;
-			ftp_account_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),list["userid"].integer)));
+			ftp_account_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
 
 			// optional
 	    	if ( list.count("shell") == 1 ) {
@@ -326,6 +331,10 @@ void create::create_mailbox(cppcms::json::value object)
 			mailbox_obj->_maildir = list["maildir"].string;
 			mailbox_obj->set_domain(std::shared_ptr<domain>(new domain(this->functions::get_database(),list["domain_name"].string)));
 
+			if ( mailbox_obj->get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
+
 			// optional
 	    	if ( list.count("quota") == 1 ) {
 	    		mailbox_obj->_quota = list["quota"].ll_integer;
@@ -382,7 +391,7 @@ void create::create_shell(cppcms::json::value object)
 				throw missing_required_field_ex();
 			}
 
-			shell_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),list["uid"].integer)));
+			shell_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
 
 			if ( list.count("active") == 1 ) {
 	    		shell_obj->_active = list["active"].boolean;
@@ -432,6 +441,10 @@ void create::create_subdomain(cppcms::json::value object)
 
 			subdomain_obj->set_name(list["name"].string);
 			subdomain_obj->set_domain(std::shared_ptr<domain>(new domain(this->functions::get_database(),list["domain_name"].string)));
+
+			if ( subdomain_obj->get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
 
 			if ( list.count("active") == 1 ) {
 	    		subdomain_obj->_active = list["active"].boolean;
@@ -533,7 +546,7 @@ void create::create_database_user(cppcms::json::value object)
 			database_user_obj->set_name(list["name"].string); // validate?
 			database_user_obj->set_password(list["password"].string);
 			database_user_obj->set_permissions(list["permissions"].string);
-			database_user_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),list["uid"].integer)));
+			database_user_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
 
 			database_user_obj->save();
 
@@ -579,7 +592,7 @@ void create::create_database(cppcms::json::value object)
 
 			database_obj->set_name(list["name"].string); // validate?
 			database_obj->set_database_type(std::shared_ptr<database_type>(new database_type(this->functions::get_database(),list["db_type"].string)));
-			database_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),list["uid"].integer)));
+			database_obj->set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
 
 			database_obj->save();
 
@@ -602,6 +615,7 @@ void create::create_database(cppcms::json::value object)
 	}
 }
 
+/* todo rewrite to pointer */
 void create::create_queue(cppcms::json::value object)
 {
 	try{
@@ -615,7 +629,7 @@ void create::create_queue(cppcms::json::value object)
 			queue queue(this->functions::get_database());
 
 			queue._action = list["action"].string;
-			queue.set_user(std::shared_ptr<user>(new user(this->functions::get_database(),list["uid"].integer)));
+			queue.set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
 
 			// optional
 			if ( list.count("params") == 1 ) {
@@ -648,6 +662,7 @@ void create::create_queue(cppcms::json::value object)
 	}
 }
 
+/* todo rewrite to pointer */
 void create::create_domain_alias(cppcms::json::value object)
 {
 	try{
@@ -679,6 +694,10 @@ void create::create_domain_alias(cppcms::json::value object)
 			domain_alias.set_domain(std::shared_ptr<domain>(new domain(this->functions::get_database(),list["domain_name"].string)));
 			domain_alias._source = list["source"].string;
 			domain_alias._destination = list["destination"].string;
+
+			if ( domain_alias.get_domain().get_user().get_uid() != get_main()->get_uid_from_token() ){
+				throw auth_ex();
+			}
 
 			// optional
 			if ( list.count("active") == 1 ) {
