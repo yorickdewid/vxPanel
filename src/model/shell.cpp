@@ -6,81 +6,62 @@
 
 void shell::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO shell (uid,active) "
-			"VALUES (?,?)" << _user->get_uid() << _active;
+	stat = db.session() << 
+		"INSERT INTO shell (uid,active) "
+		"VALUES (?,?)" << _user->get_uid() << _active;
 
-		stat.exec();
-		stat.reset();
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("shell") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("shell") << "Saved" << std::endl;
 }
 
 void shell::load()
 {
-	try{
-		cppdb::statement stat;
-		int uid;
+	cppdb::statement stat;
+	int uid;
 
-		stat = db.session() << 
-				"SELECT * FROM shell WHERE id = ? " << id;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM shell WHERE id = ? " << id;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_active;
-			r >> this->id >> this->_created >> uid >> tmp_active;
-	  		set_user(std::shared_ptr<user>(new user(db,uid)));
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_active;
+		r >> this->id >> this->_created >> uid >> tmp_active;
+  		set_user(std::shared_ptr<user>(new user(db,uid)));
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("shell") <<  "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("shell") <<  "Entity loaded " << std::endl;
 }
 
 bool shell::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM shell WHERE id = ?" << id;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM shell WHERE id = ?" << id;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 void shell::set_user(std::shared_ptr<user> user)

@@ -8,108 +8,84 @@
 
 void ftp_account::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		std::ostringstream query;
-		
-		query << "INSERT INTO ftpuser (name, password, homedir, userid) ";
-		query << "VALUES (?, encrypt(?,'"<< FTP_SALT <<"'), ?, ?)";
+	std::ostringstream query;
+	
+	query << "INSERT INTO ftpuser (name, password, homedir, userid) ";
+	query << "VALUES (?, encrypt(?,'"<< FTP_SALT <<"'), ?, ?)";
 
-		stat = db.session() << query.str() << _name << _password << _homedir << _user->get_uid(); 
-		stat.exec();
-		stat.reset();
+	stat = db.session() << query.str() << _name << _password << _homedir << _user->get_uid(); 
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("ftp_account") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("ftp_account") << "Saved" << std::endl;
 }
 
 void ftp_account::load()
 {
-	try{
-		cppdb::statement stat;
-		int userid;
+	cppdb::statement stat;
+	int userid;
 
-		stat = db.session() << 
-				"SELECT * FROM ftpuser WHERE name = ?" << _name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM ftpuser WHERE name = ?" << _name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			std::cout << "before " << std::endl;
-			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
-	  		std::cout << "before " << std::endl;
-	  		set_user(std::shared_ptr<user>(new user(db,userid)));
-	    }
+	while(r.next()) {
+		BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
+		r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
+  		BOOSTER_DEBUG("ftp_account") << "after " << std::endl;
+  		set_user(std::shared_ptr<user>(new user(db,userid)));
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
 }
+
 
 void ftp_account::load_id()
 {
-	try{
-		cppdb::statement stat;
-		int userid;
+	cppdb::statement stat;
+	int userid;
 
-		stat = db.session() << 
-				"SELECT * FROM ftpuser WHERE id = ?" << id;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM ftpuser WHERE id = ?" << id;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
-			r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
-	  		BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
-	  		set_user(std::shared_ptr<user>(new user(db,userid)));
-	    }
+	while(r.next()) {
+		BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
+		r >> this->id >> this->_name >> this->_password >> this->_uid >> this->_gid >> this->_homedir >> this->_shell >> this->_count >> userid >> this->_created >> this->_accessed >> this ->_modified;
+  		BOOSTER_DEBUG("ftp_account") << "before " << std::endl;
+  		set_user(std::shared_ptr<user>(new user(db,userid)));
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("ftp_account") << "Entity loaded " << std::endl;
 }
 
 bool ftp_account::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM ftpuser WHERE name = ?" << _name;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM ftpuser WHERE name = ?" << _name;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 void ftp_account::set_username(std::string username)

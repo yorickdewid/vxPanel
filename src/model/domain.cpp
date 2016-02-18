@@ -7,92 +7,73 @@
 
 void domain::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		if ( _vhost ) {
-			stat = db.session() << 
-				"INSERT INTO domain (name, status, registrar, uid, vhost_id) "
-				"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost->get_id();
-		}else	{
-			stat = db.session() << 
-				"INSERT INTO domain (name, status, registrar, uid) "
-				"VALUES (?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid();
-		}
-
-		stat.exec();
-		stat.reset();
-
-		this->saved = true;
-
-		BOOSTER_INFO("domain") << "Saved" << std::endl;
+	if ( _vhost ) {
+		stat = db.session() << 
+			"INSERT INTO domain (name, status, registrar, uid, vhost_id) "
+			"VALUES (?, ?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid() << _vhost->get_id();
+	}else	{
+		stat = db.session() << 
+			"INSERT INTO domain (name, status, registrar, uid) "
+			"VALUES (?, ?, ?, ?)" << name << _status << _registrar << get_user().get_uid();
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+
+	stat.exec();
+	stat.reset();
+
+	this->saved = true;
+
+	BOOSTER_INFO("domain") << "Saved" << std::endl;
 }
 
 void domain::load()
 {
-	try{
-		cppdb::statement stat;
-		int uid;
+	cppdb::statement stat;
+	int uid;
 
-		stat = db.session() << 
-				"SELECT * FROM domain WHERE name = ?" << name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM domain WHERE name = ?" << name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_vhost_id = -1;
-			int tmp_active;
-			r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> tmp_active;
-	  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
-	  		if ( tmp_vhost_id != -1 ) { /* TODO replace with vhost object) */
-	  			set_vhost(std::shared_ptr<vhost>(new vhost(db,tmp_vhost_id)));
-	  		}
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_vhost_id = -1;
+		int tmp_active;
+		r >> this->name >> this->_status >> this->_registrar >> this->_created >> uid >> tmp_vhost_id >> tmp_active;
+  		this->set_user(std::shared_ptr<user>(new user(db,uid)));
+  		if ( tmp_vhost_id != -1 ) { /* TODO replace with vhost object) */
+  			set_vhost(std::shared_ptr<vhost>(new vhost(db,tmp_vhost_id)));
+  		}
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("domain") << "Entity loaded domain " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured domain load " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("domain") << "Entity loaded domain " << std::endl;
 }
 
 /* TODO Handle foreign key block correctly */
 bool domain::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM domain WHERE name = ?" << name;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM domain WHERE name = ?" << name;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 bool domain::compare_owner(int uid)

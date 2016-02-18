@@ -5,86 +5,68 @@
 
 void vhost::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO vhost (name, custom_config) "
-			"VALUES (?, ?)" << _name << _custom_config;
+	stat = db.session() << 
+		"INSERT INTO vhost (name, custom_config) "
+		"VALUES (?, ?)" << _name << _custom_config;
 
-		stat.exec();
-		stat.reset();
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("vhost") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("vhost") << "Saved" << std::endl;
 }
 
 void vhost::load()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"SELECT * FROM vhost WHERE id = ?" << id;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM vhost WHERE id = ?" << id;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_active;
-	  		r >> this->id >> this->_name >> this->_custom_config >> this->_created >> tmp_active;
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_active;
+  		r >> this->id >> this->_name >> this->_custom_config >> this->_created >> tmp_active;
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("vhost") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured vhost load " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("vhost") << "Entity loaded " << std::endl;
 }
 
 void vhost::load(std::string domain_name)
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"SELECT * FROM vhost WHERE name = ?" << domain_name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM vhost WHERE name = ?" << domain_name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_active;
-	  		r >> this->id >> this->_name >> this->_custom_config >> this->_created >> tmp_active;
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_active;
+  		r >> this->id >> this->_name >> this->_custom_config >> this->_created >> tmp_active;
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("vhost") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured vhost load (domain_name) " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("vhost") << "Entity loaded " << std::endl;
 }
 
 bool vhost::m_delete()

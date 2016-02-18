@@ -6,84 +6,65 @@
 
 void domain_alias::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO domain_alias (domain_name, source, destination) "
-			"VALUES (?, ?, ?)" << _domain->name <<  _source << _destination;
+	stat = db.session() << 
+		"INSERT INTO domain_alias (domain_name, source, destination) "
+		"VALUES (?, ?, ?)" << _domain->name <<  _source << _destination;
 
-		stat.exec();
-		stat.reset();
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("domain_alias") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("domain_alias") << "Saved" << std::endl;
 }
 
 void domain_alias::load()
 {
-	try{
-		cppdb::statement stat;
-		std::string domain_name;
-		int tmp_active;
+	cppdb::statement stat;
+	std::string domain_name;
+	int tmp_active;
 
-		stat = db.session() << 
-				"SELECT * FROM domain_alias WHERE id = ?" << id;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM domain_alias WHERE id = ?" << id;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			r >> this->id >> domain_name >> this->_source >> this->_destination >> this->_created >> tmp_active;
-	  		if ( !domain_name.empty() ) {
-	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
-	  		}
-	  		if ( tmp_active == 0 ){
-  				this->_active = false;
-  			}
-  			else if ( tmp_active == 1 ){
-  				this->_active = true;
-  			}
-	    }
+	while(r.next()) {
+		r >> this->id >> domain_name >> this->_source >> this->_destination >> this->_created >> tmp_active;
+  		if ( !domain_name.empty() ) {
+  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
+  		}
+  		if ( tmp_active == 0 ){
+				this->_active = false;
+			}
+			else if ( tmp_active == 1 ){
+				this->_active = true;
+			}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("domain_alias") << "Entity loaded domain_alias " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("domain_alias") << "Entity loaded domain_alias " << std::endl;
 }
 
 bool domain_alias::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM domain_alias WHERE id = ?" << this->id;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM domain_alias WHERE id = ?" << this->id;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 void domain_alias::set_domain(std::shared_ptr<domain> domain)

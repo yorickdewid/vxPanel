@@ -6,118 +6,92 @@
 
 void mailbox::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO mailbox (email, password, maildir, quota, domain_name) "
-			"VALUES (?, ?, ?, ?, ?)" << _email << this->_password << this->_maildir << this->_quota << _domain->name;
-		stat.exec();
-		stat.reset();
+	stat = db.session() << 
+		"INSERT INTO mailbox (email, password, maildir, quota, domain_name) "
+		"VALUES (?, ?, ?, ?, ?)" << _email << this->_password << this->_maildir << this->_quota << _domain->name;
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("mailbox") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("mailbox") << "Saved" << std::endl;
 }
 
 void mailbox::load()
 {
-	try{
-		cppdb::statement stat;
-		std::string domain_name;
+	cppdb::statement stat;
+	std::string domain_name;
 
-		stat = db.session() << 
-				"SELECT * FROM mailbox WHERE id = ?" << id;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM mailbox WHERE id = ?" << id;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_active;
-			r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
-			if ( !domain_name.empty() ) {
-	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
-	  		}
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_active;
+		r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
+		if ( !domain_name.empty() ) {
+  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
+  		}
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
 }
 
 void mailbox::load(std::string domain_name)
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"SELECT * FROM mailbox WHERE domain_name = ?" << domain_name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM mailbox WHERE domain_name = ?" << domain_name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			int tmp_active;
-			r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
-			if ( !domain_name.empty() ) {
-	  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
-	  		}
-	  		if ( tmp_active == 1 ) {
-	  			this->_active = true;
-	  		} else {
-	  			this->_active = false;
-	  		}
-	    }
+	while(r.next()) {
+		int tmp_active;
+		r >> this->id >> this->_email >> this->_password >> this->_maildir >> this->_quota >> this->_created >> domain_name >> tmp_active;
+		if ( !domain_name.empty() ) {
+  			set_domain(std::shared_ptr<domain>(new domain(db,domain_name)));
+  		}
+  		if ( tmp_active == 1 ) {
+  			this->_active = true;
+  		} else {
+  			this->_active = false;
+  		}
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("mailbox") << "Entity loaded " << std::endl;
 }
 
 bool mailbox::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM mailbox WHERE id = ?" << id;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM mailbox WHERE id = ?" << id;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
-
 
 void mailbox::set_email(std::string email)
 {

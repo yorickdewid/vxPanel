@@ -6,106 +6,79 @@
 
 void database_type::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO user_db_type (name) "
-			"VALUES (?)" << name;
+	stat = db.session() << 
+		"INSERT INTO user_db_type (name) "
+		"VALUES (?)" << name;
 
-		stat.exec();
-		stat.reset();
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("database_type") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("database_type") << "Saved" << std::endl;
 }
 
 void database_type::load()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"SELECT * FROM user_db_type WHERE name = ?" << name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM user_db_type WHERE name = ?" << name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-	  		r >> this->name;
-	    }
+	while(r.next()) {
+  		r >> this->name;
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("database_type") << "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("database_type") << "Entity loaded " << std::endl;
 }
 
 /* TODO Handle foreign key block correctly */
 bool database_type::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM user_db_type WHERE name = ?" << name;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM user_db_type WHERE name = ?" << name;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 
 std::vector<database_type> database_type::load_all()
 {
-	try{
-		cppdb::statement stat;
-		std::vector<database_type> database_types; 
+	cppdb::statement stat;
+	std::vector<database_type> database_types; 
 
-		stat = db.session() << 
-				"SELECT * FROM user_db_type";
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM user_db_type";
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			std::string tmp_name;
-	  		r >> tmp_name;
-	  		database_type obj = database_type(db,tmp_name);
-	  		database_types.push_back(obj);
-	    }
+	while(r.next()) {
+		std::string tmp_name;
+  		r >> tmp_name;
+  		database_type obj = database_type(db,tmp_name);
+  		database_types.push_back(obj);
+    }
 
-	    stat.reset();
+    stat.reset();
 
-		BOOSTER_INFO("database_type") << "All data loaded" << std::endl;
+	BOOSTER_INFO("database_type") << "All data loaded" << std::endl;
 
-		return database_types;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-		std::vector<database_type> k;
-		return k;
-	}
+	return database_types;
 }
 
 std::string database_type::get_name()

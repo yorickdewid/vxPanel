@@ -6,76 +6,57 @@
 
 void database_user::save()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-			"INSERT INTO user_db_user (name, password, permissions, uid) "
-			"VALUES (?, ?, ?, ?)" << name << _password << _permissions << _user->get_uid();
+	stat = db.session() << 
+		"INSERT INTO user_db_user (name, password, permissions, uid) "
+		"VALUES (?, ?, ?, ?)" << name << _password << _permissions << _user->get_uid();
 
-		stat.exec();
-		stat.reset();
+	stat.exec();
+	stat.reset();
 
-		this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("database_user") << "Saved" << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("database_user") << "Saved" << std::endl;
 }
 
 void database_user::load()
 {
-	try{
-		cppdb::statement stat;
-		int uid;
+	cppdb::statement stat;
+	int uid;
 
-		stat = db.session() << 
-				"SELECT * FROM user_db_user WHERE name = ?" << name;
-		cppdb::result r = stat.query();
+	stat = db.session() << 
+			"SELECT * FROM user_db_user WHERE name = ?" << name;
+	cppdb::result r = stat.query();
 
-		while(r.next()) {
-			r >> this->name >> this->_password >> this->_permissions >> this->_created >> uid;
-	  		set_user(std::shared_ptr<user>(new user(db,uid)));
-	    }
+	while(r.next()) {
+		r >> this->name >> this->_password >> this->_permissions >> this->_created >> uid;
+  		set_user(std::shared_ptr<user>(new user(db,uid)));
+    }
 
-	    stat.reset();
+    stat.reset();
 
-    	this->saved = true;
+	this->saved = true;
 
-		BOOSTER_INFO("database_user") <<  "Entity loaded " << std::endl;
-	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
+	BOOSTER_INFO("database_user") <<  "Entity loaded " << std::endl;
 }
 
 /* TODO Handle foreign key block correctly */
 bool database_user::m_delete()
 {
-	try{
-		cppdb::statement stat;
+	cppdb::statement stat;
 
-		stat = db.session() << 
-				"DELETE FROM user_db_user WHERE name = ?" << name;
-		stat.exec();
+	stat = db.session() << 
+			"DELETE FROM user_db_user WHERE name = ?" << name;
+	stat.exec();
 
-		if ( stat.affected() == 1 ) {
-			stat.reset();
-			return true;
-		} else {
-			stat.reset();
-			return false;
-		}
+	if ( stat.affected() == 1 ) {
+		stat.reset();
+		return true;
+	} else {
+		stat.reset();
+		return false;
 	}
-	catch(std::exception &e)
-	{
-		std::cout << "Exception occured " << e.what() << std::endl;
-	}
-	return false;
 }
 
 
