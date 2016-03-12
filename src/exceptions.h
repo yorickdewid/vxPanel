@@ -117,5 +117,13 @@ class domain_length_ex: public std::exception
   }
 };
 
+class invalid_queue_action_ex: public std::exception
+{
+  virtual const char* what() const throw()
+  {
+    return "Queue action invalid";
+  }
+};
+
 #endif /* EXCEPTIONS_H */
 

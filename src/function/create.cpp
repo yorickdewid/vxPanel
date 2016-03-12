@@ -1,6 +1,7 @@
 #include "create.h"
 #include "../model/models.h"
 #include "../validation/domain_validator.h"
+#include "../validation/queue_validator.h"
 #include "helper.h"
 
 /*
@@ -627,6 +628,10 @@ void create::create_queue(cppcms::json::value object)
 			std::map<std::string, any> list = this->create_generic(object, type);
 
 			queue queue(this->functions::get_database());
+
+			queue_validator valid;
+
+			valid.valid_action(list["action"].string); // throws exception if invalid
 
 			queue._action = list["action"].string;
 			queue.set_user(std::shared_ptr<user>(new user(this->functions::get_database(),get_main()->get_uid_from_token())));
